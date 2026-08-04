@@ -7,7 +7,7 @@ Provide complete handover documentation for installation, configuration, daily a
 Complete tasks 02, 03, 06, 09, 10, and 11.
 
 ## Owner
-Documentation agent. Reviewers: System operator and system administrator.
+Documentation agent.
 
 ## Files and artifacts
 - Installation and native deployment guide.
@@ -16,7 +16,7 @@ Documentation agent. Reviewers: System operator and system administrator.
 - Troubleshooting guide for startup, auth, permissions, missing commands, invalid output, timeouts, and CrowdSec failures.
 - Update/start/stop/restart procedures.
 
-## Work
+## Implementation steps
 1. Explain the single-host source-of-truth model and supported command limitations.
 2. Document package layout, config fields, permissions, service account, bind defaults, and HTTPS boundary.
 3. Document secure initial administrator setup, login/logout, sessions, and mutation confirmation.
@@ -24,6 +24,12 @@ Documentation agent. Reviewers: System operator and system administrator.
 5. Provide safe troubleshooting steps using logs and `cscli` diagnostics without requesting secrets.
 6. Document direct execution and systemd procedures, including update and rollback-safe operator steps without destructive shortcuts.
 7. List explicit non-goals: database backup, monitoring platforms, notifications, containers, and multi-user identity.
+
+## Contracts
+- Documentation must distinguish supported, capability-gated, and explicitly unsupported operations and must match the command matrix, API contracts, implementation, and package layout.
+- Troubleshooting uses only safe error classes: `unsupported`, `malformed_output`, `permission_denied`, `timeout`, `unavailable`, and `crowdsec_failure`.
+- Examples and procedures must not recommend `--force`, `--all`, `--bypass-allowlist`, arbitrary flags, direct database access, or secret disclosure.
+- `source.command` is documented as a fixed operation label, not a raw executed command line.
 
 ## Acceptance criteria
 - An administrator can install, configure, log in, operate every supported page, diagnose failures, and update the service without undocumented assumptions.
@@ -34,6 +40,9 @@ Documentation agent. Reviewers: System operator and system administrator.
 - Perform a documentation-only walkthrough using a clean-host checklist.
 - Cross-reference every command and config key against tasks 02, 03, and 11.
 - Confirm troubleshooting advice distinguishes operator fixes from unsupported operations.
+
+## Reviewer
+System operator and system administrator.
 
 ## Out of scope
 New features, unsupported commands, security-policy expansion, CI/CD, backups, monitoring, and notification workflows.

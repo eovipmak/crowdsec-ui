@@ -7,14 +7,14 @@ Create the authoritative command matrix that all backend and frontend work must 
 Complete task 01. The deployment environment or official CrowdSec documentation must be available for command verification.
 
 ## Owner
-CrowdSec command-mapper agent. Reviewers: CrowdSec domain reviewer and Backend Developer.
+CrowdSec command-mapper agent.
 
 ## Files and artifacts
 - Create a command-matrix document under `docs/`.
 - Define typed operation names and request/response shapes for backend consumers.
 - Do not implement handlers or UI controls in this task.
 
-## Work
+## Implementation steps
 For alerts, decisions, machines/status, scenarios, profiles, collections, allowlists, bouncers, and optional metrics, document:
 - operation identifier and exact `cscli` argument vector;
 - supported structured output format and parsing rules;
@@ -25,6 +25,13 @@ For alerts, decisions, machines/status, scenarios, profiles, collections, allowl
 - required permissions and whether support is environment-dependent.
 
 Explicitly decide whether decision add/delete and component enable/disable belong to the MVP. Mark unsupported operations instead of inventing fallback commands. State that browser input can select typed operation parameters only and can never supply shell fragments, executable paths, or arbitrary flags.
+
+## Contracts
+- `docs/command-matrix.md` is the sole operation allowlist and must define one typed row per supported, capability-gated, or explicitly unsupported operation.
+- Each row must specify the fixed argument vector, typed parameters, output/parser contract, exact page mode (`limit`, `offset`, `cursor`, or `none`), permission, failure classes, mutation confirmation, and source-of-truth refresh.
+- Browser input may select typed operation parameters only; it may never provide command text, executable paths, raw flags, shell fragments, filesystem paths, or arbitrary filters.
+- The matrix must distinguish MVP-supported/capability-gated operations from documented-but-unsupported rows. The profiles exception, if retained, is a separate read-only server-side profiles-file boundary and not a `cscli` command.
+- Target-environment verification and CrowdSec-domain sign-off are completion gates for version-dependent rows.
 
 ## Acceptance criteria
 - Every API operation maps to one matrix row and every matrix row has a named consumer.
@@ -37,6 +44,9 @@ Explicitly decide whether decision add/delete and component enable/disable belon
 - Compare each command against the target environment or official command behavior.
 - Review all parameters for shell injection and unintended destructive combinations.
 - Confirm output schemas cover empty, malformed, unsupported, and command-failure cases.
+
+## Reviewer
+CrowdSec domain reviewer and Backend Developer. CrowdSec-domain sign-off is required for completion.
 
 ## Out of scope
 HTTP routes, UI design, authentication, direct database queries, Prometheus/Grafana integration, and arbitrary command passthrough.

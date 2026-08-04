@@ -7,7 +7,7 @@ Expose the approved adapter operations through the contract from task 03 and ser
 Complete tasks 03 and 04.
 
 ## Owner
-Go backend agent. Reviewer: Go backend developer.
+Go backend agent.
 
 ## Files and artifacts
 - Implement `net/http` server, routing, middleware hooks, handlers, JSON encoding, validation, and health endpoint.
@@ -15,7 +15,7 @@ Go backend agent. Reviewer: Go backend developer.
 - Implement the defined frontend asset serving boundary.
 - Add secret-safe structured logging.
 
-## Work
+## Implementation steps
 1. Implement all matrix-approved read and mutation routes.
 2. Validate path/query/body parameters and reject unknown or unsupported fields.
 3. Return the exact success/error envelopes and status codes from task 03.
@@ -23,6 +23,13 @@ Go backend agent. Reviewer: Go backend developer.
 5. Provide startup, config-error, command-failure, and communication-error logs without secrets.
 6. Serve the production frontend assets according to the packaging contract while preserving API routing.
 7. Leave authentication middleware attachable before protected routes are considered complete.
+
+## Contracts
+- Routes exist only for supported or capability-gated matrix operations plus explicitly defined health and session routes; unsupported matrix rows never become functional endpoints.
+- Handlers use the exact task-03 status codes and envelopes, reject unknown fields and unsupported query parameters, and pass only typed validated requests to the adapter.
+- Health and session routes are fixed application routes and must not become generic command endpoints.
+- Static asset delivery cannot expose configuration files, profiles, executable paths, raw command lines, or raw command output, and cannot shadow API routes.
+- Authentication remains attachable before protected routes are complete; secret-safe logging is mandatory at this boundary.
 
 ## Acceptance criteria
 - Routes and payloads match task 03 exactly.
@@ -35,6 +42,9 @@ Go backend agent. Reviewer: Go backend developer.
 - Run the repository’s Go formatting, build, and available checks.
 - Exercise health, read, mutation, malformed-request, and adapter-failure paths.
 - Verify static asset requests and unknown-route behavior.
+
+## Reviewer
+Go backend developer and Security reviewer.
 
 ## Out of scope
 Authentication implementation, UI pages, systemd, arbitrary command endpoints, and application persistence.
