@@ -10,3 +10,7 @@
 - Prefers a reusable four-stage workflow: create a feature plan, edit/research an existing plan, break plans into executable kanban tasks, and coordinate agents to execute those tasks. Confidence: 0.95
 - Requires delegated kanban execution agents to use the exact model `deepseek/deepseek-v4-flash`. Confidence: 0.95
 - Prefers project-scoped skills under `.commandcode/skills/` with matching lowercase-hyphenated names and self-contained `SKILL.md` instructions. Confidence: 0.9
+- Prefers delegated-task completion to be verified from the agent's returned result/state and repository artifacts (including filesystem and git checks), rather than trusting a feed label such as “Done” alone. Confidence: 0.9
+- Prefers agent-orchestration problems to be diagnosed against authoritative Command Code documentation as well as local coordination skills and task artifacts, distinguishing runtime failures from workflow defects. Confidence: 0.9
+- Prefers delegated research agents to remain read-only and return their findings, with the coordinator responsible for validating the response, creating durable artifacts, and updating task status only after acceptance-criteria verification. Confidence: 0.95
+- Prefers coordination skills to explicitly distinguish the coordinator, reusable agent definitions, sub-agent worker runs, and the separate task ledger, including clear ownership boundaries for delegation, artifact creation, result collection, and status updates. Confidence: 0.95
