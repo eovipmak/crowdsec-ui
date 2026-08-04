@@ -1,0 +1,36 @@
+# Task 08 — Implement overview, machines, status, and statistics views
+
+## Objective
+Provide the administrator with a source-of-truth overview of CrowdSec health and current counts.
+
+## Prerequisites
+Complete tasks 05 and 07.
+
+## Owner
+Next.js dashboard agent. Reviewer: Next.js dashboard developer and CrowdSec domain reviewer.
+
+## Files and artifacts
+- Implement overview page and its data-fetching components.
+- Implement machines/status sections.
+- Add optional alert/decision history charts only when supported by the matrix/API.
+
+## Work
+1. Fetch status, machines, alert counts, decision counts, and approved metrics independently so one failure does not hide all data.
+2. Display timestamps/source labels and clear loading, empty, unsupported, and command-failure states.
+3. Add explicit refresh and bounded polling behavior consistent with task 03.
+4. Render small internal charts only from approved `cscli` data and label unavailable history honestly.
+5. Provide links from summary cards to detailed pages.
+
+## Acceptance criteria
+- Overview never claims real-time or monitoring-platform behavior.
+- Data shown comes from current API responses, not a duplicated local store.
+- Each failed operation identifies its affected section and offers refresh.
+- Machine/status views reflect the command matrix and handle empty results.
+
+## Verification
+- Test success, empty, unsupported, timeout, and permission-error responses.
+- Verify refresh/polling does not create unbounded requests.
+- Confirm charts are absent or clearly unavailable when matrix data is insufficient.
+
+## Out of scope
+Prometheus/Grafana, notifications, streaming, historical storage, and backend command changes.
