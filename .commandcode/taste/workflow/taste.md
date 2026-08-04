@@ -7,3 +7,6 @@
 - Prefers repository-specific, focused Command Code agents mapped to concrete plan workstreams rather than broad or generic agents. Confidence: 0.85
 - Wants implementation tasks to be self-contained and specific enough for agents to execute without clarification or uncertainty about scope. Confidence: 0.95
 - Organizes task artifacts under `docs/kanban/[$date]_[$plan-name]/task-[$number].md`. Confidence: 0.9
+- Prefers a reusable four-stage workflow: create a feature plan, edit/research an existing plan, break plans into executable kanban tasks, and coordinate agents to execute those tasks. Confidence: 0.95
+- Requires delegated kanban execution agents to use the exact model `deepseek/deepseek-v4-flash`. Confidence: 0.95
+- Prefers project-scoped skills under `.commandcode/skills/` with matching lowercase-hyphenated names and self-contained `SKILL.md` instructions. Confidence: 0.9
