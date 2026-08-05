@@ -15,3 +15,4 @@
 - Prefers delegated research agents to remain read-only and return their findings, with the coordinator responsible for validating the response, creating durable artifacts, and updating task status only after acceptance-criteria verification. Confidence: 0.95
 - Prefers coordination skills to explicitly distinguish the coordinator, reusable agent definitions, sub-agent worker runs, and the separate task ledger, including clear ownership boundaries for delegation, artifact creation, result collection, and status updates. Confidence: 0.95
 - Expects kanban task sets to be schema-complete before coordination: required headings such as `Implementation steps`, `Contracts`, and `Reviewer` should be explicit and validated literally, not inferred from equivalent content. Confidence: 0.9
+- Prefers kanban coordination to persist verified task-completion markers in task artifacts so later runs can skip already completed work instead of repeating full checks. Confidence: 0.95

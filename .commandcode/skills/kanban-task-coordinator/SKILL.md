@@ -17,14 +17,32 @@ Require a path to one kanban directory, for example:
 
 If no directory is provided, ask for it. Do not guess a plan.
 
+## Completion markers
+
+Persist completion in the kanban plan by adding this exact block to the task file only after implementation and verification pass:
+
+```markdown
+## Coordinator status
+- Status: completed
+- Completed by: <agent role or coordinator>
+- Completed at: <ISO-8601 timestamp>
+- Verification: <commands/checks and concise results>
+- Commit or artifact reference: <reference, or `working tree`>
+```
+
+Treat `Status: completed` as authoritative only when the block is complete and the referenced artifacts still exist. Never mark a task completed merely from an agent’s claim. If later changes invalidate the evidence, remove or change the marker and re-open the task. Preserve all existing task content when updating the marker.
+
 ## Phase 1 — Inspect and validate
 
 1. Read `AGENTS.md` and the complete target directory.
 2. List all `task-*.md` files and sort by numeric task number.
-3. Validate that every task contains objective, prerequisites, owner, files/artifacts, implementation steps, contracts, acceptance criteria, verification, reviewer, and out-of-scope sections.
-4. Build a dependency graph from each task’s prerequisites. Treat missing, cyclic, or ambiguous dependencies as blockers and report them before delegation.
-5. Inspect repository status and relevant files before assigning work. Preserve existing uncommitted changes.
-6. Group tasks into dependency waves. Only tasks with completed prerequisites may be delegated.
+3. Read each task’s coordinator status block first. Exclude tasks marked `completed` with valid evidence from delegation, implementation review, and verification; include them in the dependency graph as satisfied prerequisites and report them as skipped/already completed.
+4. Validate every task without a valid completion marker contains objective, prerequisites, owner, files/artifacts, implementation steps, contracts, acceptance criteria, verification, reviewer, and out-of-scope sections.
+5. Build a dependency graph from each task’s prerequisites. Treat missing, cyclic, or ambiguous dependencies as blockers and report them before delegation.
+6. Inspect repository status and relevant files before assigning work. Preserve existing uncommitted changes.
+7. Group remaining tasks into dependency waves. Only tasks with completed prerequisites may be delegated.
+
+When a task passes review and verification, immediately append or update its completion marker before moving to the next task. On subsequent runs, recheck only the marker’s referenced artifacts and any tasks that depend on changed or invalidated work; do not repeat the full task review for valid completed markers.
 
 ## Phase 2 — Assign work
 
