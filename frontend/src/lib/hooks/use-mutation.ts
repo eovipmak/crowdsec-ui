@@ -11,11 +11,11 @@
  *     server re-verifies the binding before running the cscli command.
  *
  * The token is opaque to the frontend — there is no client-computable
- * confirmation, and no command text ever leaves the typed request.
+ * confirmation, and no command text ever leaves the typed request. The token
+ * is kept in a ref so execute() never reads a stale closure value.
  */
-import { useCallback, useState } from "react";
-import type { ApiError } from "@/lib/api/errors";
-import { isApiError } from "@/lib/api/errors";
+import { useCallback, useRef, useState } from "react";
+import { ApiError, API_ERROR_CODES, isApiError } from "@/lib/api/errors";
 import type {
   ConfirmationIssuanceRequest,
   ConfirmationIssuanceResponse,
@@ -46,19 +46,25 @@ export function useMutation() {
     outcome: null,
     result: null,
   });
+  const tokenRef = useRef<string | null>(null);
 
   const reset = useCallback(() => {
+    tokenRef.current = null;
     setState({ isPending: false, confirmation: null, outcome: null, result: null });
   }, []);
 
   const issueConfirmation = useCallback(
-    async (issue: () => Promise<ConfirmationIssuanceResponse>): Promise<ConfirmationIssuanceResponse["confirmation"] | null> => {
+    async (
+      issue: () => Promise<ConfirmationIssuanceResponse>,
+    ): Promise<ConfirmationIssuanceResponse["confirmation"] | null> => {
       setState((prev) => ({ ...prev, isPending: true, outcome: null, confirmation: null }));
       try {
         const response = await issue();
+        tokenRef.current = response.confirmation.token;
         setState((prev) => ({ ...prev, isPending: false, confirmation: response.confirmation }));
         return response.confirmation;
       } catch (err) {
+        tokenRef.current = null;
         setState((prev) => ({
           ...prev,
           isPending: false,
@@ -73,21 +79,29 @@ export function useMutation() {
 
   const execute = useCallback(
     async (run: (token: string) => Promise<MutationEnvelope<MutationOperationId>>): Promise<boolean> => {
-      setState((prev) => ({ ...prev, isPending: true, outcome: null }));
-      const token = state.confirmation?.token;
+      const token = tokenRef.current;
       if (!token) {
         setState((prev) => ({
           ...prev,
           isPending: false,
-          outcome: { ok: false, error: new ApiError("confirmation_required", "This action requires confirmation.") },
+          outcome: {
+            ok: false,
+            error: new ApiError(
+              API_ERROR_CODES.CONFIRMATION_REQUIRED,
+              "This action requires confirmation.",
+            ),
+          },
         }));
         return false;
       }
+      setState((prev) => ({ ...prev, isPending: true, outcome: null }));
       try {
         const result = await run(token);
+        tokenRef.current = null;
         setState((prev) => ({ ...prev, isPending: false, confirmation: null, outcome: { ok: true }, result }));
         return true;
       } catch (err) {
+        tokenRef.current = null;
         setState((prev) => ({
           ...prev,
           isPending: false,
@@ -97,7 +111,7 @@ export function useMutation() {
         return false;
       }
     },
-    [state.confirmation],
+    [],
   );
 
   return { ...state, issueConfirmation, execute, reset };
@@ -107,7 +121,7 @@ function toApiError(err: unknown): ApiError {
   if (isApiError(err)) {
     return err;
   }
-  return new ApiError("internal", "An unexpected error occurred.");
+  return new ApiError(API_ERROR_CODES.INTERNAL, "An unexpected error occurred.");
 }
 
 export type { ConfirmationIssuanceRequest };

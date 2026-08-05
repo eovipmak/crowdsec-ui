@@ -3,7 +3,7 @@
 import type { SessionStatus } from "@/lib/api/types";
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { getSessionStatus, logout } from "@/lib/api/client";
+import { apiClient } from "@/lib/api/client";
 import { API_ERROR_CODES, type ApiError } from "@/lib/api/errors";
 
 export type SessionState =
@@ -29,8 +29,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const refreshSession = useCallback(async () => {
     try {
-      const session = await getSessionStatus();
-      setState({ status: "authenticated", session });
+      const response = await apiClient.getSessionStatus();
+      setState({ status: "authenticated", session: response.session });
     } catch (err) {
       const apiError = err as ApiError;
       if (apiError && apiError.code === API_ERROR_CODES.UNAUTHENTICATED) {
@@ -63,8 +63,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [refreshSession]);
 
   const signOut = useCallback(async () => {
+    // DELETE /session is CSRF-protected; use the CSRF token from the last
+    // session status when available.
+    const csrfToken = state.status === "authenticated" ? state.session.csrf_token : undefined;
     try {
-      await logout();
+      await apiClient.logout(csrfToken);
     } catch (err) {
       const apiError = err as ApiError;
       // 401 unauthenticated means the session already expired server-side;
@@ -75,7 +78,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     } finally {
       setState({ status: "unauthenticated" });
     }
-  }, []);
+  }, [state]);
 
   const value = useMemo(
     () => ({ state, refreshSession, signOut, isChecking }),

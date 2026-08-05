@@ -7,6 +7,7 @@
  * produces from `cscli -o json` are rendered as known fields and unknown
  * fields are ignored (architecture §7: "renders only known fields").
  */
+import type { OperationErrorCode } from "@/lib/api/errors";
 
 // ---------------------------------------------------------------------------
 // Envelope (architecture §4.3)
@@ -418,14 +419,6 @@ export type MetricsComponent = "acquisition" | "appsec" | "lapi";
 // ---------------------------------------------------------------------------
 // Query parameter builders (architecture §6.1)
 // ---------------------------------------------------------------------------
-
-export type FilterField =
-  | "filter.scenario"
-  | "filter.ip"
-  | "filter.scope"
-  | "filter.kind"
-  | "filter.type"
-  | "filter.origin";
 
 export interface AlertFilterValues {
   scenario?: string;

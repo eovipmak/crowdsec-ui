@@ -5,7 +5,26 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useSession } from "@/components/auth/session-provider";
 import { onSessionExpired } from "@/lib/api/client";
-import Icon from "@/app/icon";
+
+/** Inline shield mark for the sidebar brand (placeholder). */
+function ShieldMark() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.75}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3l7 3v5c0 4.56-2.9 8.36-7 10-4.1-1.64-7-5.44-7-10V6l7-3z"
+      />
+    </svg>
+  );
+}
 
 interface NavItem {
   href: string;
@@ -60,7 +79,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-slate-200 bg-white lg:flex">
         <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-4">
           <span className="text-slate-900">
-            <Icon />
+            <ShieldMark />
           </span>
           <div>
             <p className="text-sm font-semibold text-slate-900">CrowdSec Dashboard</p>

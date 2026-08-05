@@ -7,11 +7,11 @@
  * contract surface only:
  *  - POST /api/v1/session with a single typed field {"password": "..."};
  *  - on success the server sets the session cookie and returns the session
- *    status + CSRF token (stored in memory for this page session);
+ *    status + CSRF token (kept in memory for this page session);
  *  - 401 invalid_credentials renders an identical, non-enumerating message;
  *  - when already authenticated, redirects to /overview.
  */
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { SessionProvider, useSession } from "@/components/auth/session-provider";
 import { apiClient } from "@/lib/api/client";
@@ -19,7 +19,25 @@ import { isApiError } from "@/lib/api/errors";
 import { API_ERROR_CODES } from "@/lib/api/errors";
 import { Field, TextInput } from "@/components/ui/forms";
 import { Button } from "@/components/ui/button";
-import Icon from "@/app/icon";
+
+function ShieldMark() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-8 w-8"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.75}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3l7 3v5c0 4.56-2.9 8.36-7 10-4.1-1.64-7-5.44-7-10V6l7-3z"
+      />
+    </svg>
+  );
+}
 
 export function LoginForm() {
   const router = useRouter();
@@ -28,10 +46,11 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (state.status === "authenticated") {
-    router.replace("/overview");
-    return null;
-  }
+  useEffect(() => {
+    if (state.status === "authenticated") {
+      router.replace("/overview");
+    }
+  }, [state.status, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,9 +71,7 @@ export function LoginForm() {
       if (isApiError(err) && err.code === API_ERROR_CODES.INVALID_CREDENTIALS) {
         setError("Invalid username or password.");
       } else {
-        setError(
-          "The dashboard could not be reached. Make sure the backend is running, then try again.",
-        );
+        setError("The dashboard could not be reached. Make sure the backend is running, then try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -66,7 +83,7 @@ export function LoginForm() {
       <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <span className="text-slate-900">
-            <Icon />
+            <ShieldMark />
           </span>
           <h1 className="text-xl font-semibold text-slate-900">CrowdSec Dashboard</h1>
           <p className="text-sm text-slate-500">Sign in to administer CrowdSec</p>

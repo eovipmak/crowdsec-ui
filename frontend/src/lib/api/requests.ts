@@ -27,6 +27,7 @@ import type {
   ScenariosInspectRequest,
   SessionStatus,
 } from "@/lib/api/types";
+import { alertsListParams, decisionsListParams } from "@/lib/api/types";
 
 export interface HttpOptions {
   /** CSRF token for state-changing requests (POST/DELETE). */
@@ -53,11 +54,11 @@ export const apiRequests = {
     post("/confirmations", req, { csrfToken: opts.csrfToken }),
 
   // --- alerts ---
-  alertsList: (req: AlertsListRequest) => get("/alerts", { limit: req.limit, ...req.filter }),
+  alertsList: (req: AlertsListRequest) => getWithParams("/alerts", alertsListParams(req)),
   alertsInspect: (req: AlertsInspectRequest) => get(`/alerts/${req.id}`),
 
   // --- decisions ---
-  decisionsList: (req: DecisionsListRequest) => get("/decisions", { limit: req.limit, ...req.filter }),
+  decisionsList: (req: DecisionsListRequest) => getWithParams("/decisions", decisionsListParams(req)),
   decisionsAdd: (req: DecisionsAddRequest, opts: HttpOptions = {}): [string, RequestInit] =>
     post("/decisions", { operation: "decisions.add", request: req }, { csrfToken: opts.csrfToken }),
   decisionsDelete: (req: DecisionsDeleteRequest, opts: HttpOptions = {}): [string, RequestInit] =>
@@ -77,7 +78,13 @@ export const apiRequests = {
     del("/bouncers", { body: { operation: "bouncers.delete", request: req }, csrfToken: opts.csrfToken }),
 
   // --- hub / scenarios / collections / profiles ---
-  hubList: (req: HubListRequest) => get("/hub", { type: req.type }),
+  hubList: (req: HubListRequest) => {
+    const params = new URLSearchParams();
+    if (req.type) {
+      params.append("type", req.type);
+    }
+    return getWithParams("/hub", params);
+  },
   scenariosList: () => get("/scenarios"),
   scenariosInspect: (req: ScenariosInspectRequest) => get(`/scenarios/${req.scenario}`),
   collectionsList: () => get("/collections"),
@@ -90,7 +97,10 @@ export const apiRequests = {
 
   // --- allowlists ---
   allowlistsList: () => get("/allowlists"),
-  allowlistsCheck: (req: AllowlistsCheckRequest) => get("/allowlists/check", { ip_or_range: req.ip_or_range }),
+  allowlistsCheck: (req: AllowlistsCheckRequest) => {
+    const params = new URLSearchParams({ ip_or_range: req.ip_or_range });
+    return getWithParams("/allowlists/check", params);
+  },
   allowlistsCreate: (req: AllowlistsCreateRequest, opts: HttpOptions = {}): [string, RequestInit] =>
     post("/allowlists", { operation: "allowlists.create", request: req }, { csrfToken: opts.csrfToken }),
   allowlistsAdd: (req: AllowlistsAddRequest, opts: HttpOptions = {}): [string, RequestInit] =>
@@ -111,20 +121,14 @@ export const apiRequests = {
 // Low-level helpers (internal)
 // ---------------------------------------------------------------------------
 
-interface QueryValue {
-  [key: string]: string | number | undefined;
+/** GET with an already-built parameter set (see alertsListParams/decisionsListParams). */
+function getWithParams(path: string, params: URLSearchParams): [string, RequestInit] {
+  const qs = params.toString();
+  return [qs ? `${path}?${qs}` : path, { method: "GET" }];
 }
 
-function get(path: string, query?: QueryValue): [string, RequestInit] {
-  const url = new URL(API_BASE + path, "http://localhost"); // relative base; see client
-  if (query) {
-    for (const [key, value] of Object.entries(query)) {
-      if (value !== undefined && value !== "") {
-        url.searchParams.append(key, String(value));
-      }
-    }
-  }
-  return [url.pathname + url.search, { method: "GET" }];
+function get(path: string): [string, RequestInit] {
+  return [path, { method: "GET" }];
 }
 
 function post(
@@ -149,15 +153,16 @@ function del(
   path: string,
   opts: { body?: unknown; csrfToken?: string } = {},
 ): [string, RequestInit] {
+  const hasBody = opts.body !== undefined;
   return [
     path,
     {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json",
+        ...(hasBody ? { "Content-Type": "application/json" } : {}),
         ...(opts.csrfToken ? { "X-CSRF-Token": opts.csrfToken } : {}),
       },
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      body: hasBody ? JSON.stringify(opts.body) : undefined,
     },
   ];
 }

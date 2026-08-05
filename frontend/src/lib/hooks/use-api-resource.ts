@@ -9,7 +9,7 @@
  * the bounded poll interval the caller chooses (architecture §2).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { isApiError, ApiError } from "@/lib/api/errors";
+import { isApiError, ApiError, API_ERROR_CODES } from "@/lib/api/errors";
 
 export type ApiResourceState<T> =
   | { status: "loading"; data: null; error: null }
@@ -45,7 +45,9 @@ export function useApiResource<T>(
       setState({
         status: "error",
         data: null,
-        error: isApiError(err) ? err : new ApiError("internal", "An unexpected error occurred."),
+        error: isApiError(err)
+          ? err
+          : new ApiError(API_ERROR_CODES.INTERNAL, "An unexpected error occurred."),
       });
     } finally {
       setIsRefreshing(false);
