@@ -3,8 +3,14 @@
 ## Objective
 Make the dashboard installable and operable as a native Linux binary with optional systemd supervision.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 05–07 and task 06.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 6. Can run in parallel with tasks 08–10; deployment paths must follow the backend/frontend contracts and must not modify page implementations.
 
 ## Owner
 Native deployment agent.

@@ -3,8 +3,14 @@
 ## Objective
 Create the authoritative command matrix that all backend and frontend work must implement.
 
-## Prerequisites
-Complete task 01. The deployment environment or official CrowdSec documentation must be available for command verification.
+## Prerequisites/dependencies
+Complete task 01.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it. The deployment environment or official CrowdSec documentation must be available for command verification.
+
+## Parallelization
+
+Wave 2. Starts after task 01; no file conflict with later implementation tasks.
 
 ## Owner
 CrowdSec command-mapper agent.

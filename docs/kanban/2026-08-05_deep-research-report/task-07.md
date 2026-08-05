@@ -3,8 +3,14 @@
 ## Objective
 Create the frontend foundation and shared interaction patterns required by all dashboard pages.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 01 and 03.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 4. Can run in parallel with task 04; later page tasks 08–10 depend on this frontend shell.
 
 ## Owner
 Next.js dashboard agent.

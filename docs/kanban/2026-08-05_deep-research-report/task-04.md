@@ -3,8 +3,14 @@
 ## Objective
 Implement the only integration boundary between the dashboard and CrowdSec.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 02 and 03.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 4. Can run in parallel with task 07 after tasks 02–03; do not modify frontend files.
 
 ## Owner
 Go backend agent.

@@ -3,8 +3,14 @@
 ## Objective
 Provide the administrator with a source-of-truth overview of CrowdSec health and current counts.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 05 and 07.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 6. Can run in parallel with tasks 09, 10, and 11; keep ownership limited to overview/machines/statistics files.
 
 ## Owner
 Next.js dashboard agent. Reviewer: Next.js dashboard developer and CrowdSec domain reviewer.

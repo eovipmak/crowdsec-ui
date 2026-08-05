@@ -3,8 +3,14 @@
 ## Objective
 Protect the dashboard with one local administrator account and secure expiring sessions.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 03 and 05.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 6. Can run in parallel with tasks 08, 09, 10, and 11 once their own prerequisites are met; owns authentication/security files.
 
 ## Owner
 Single-admin security agent.

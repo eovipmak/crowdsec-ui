@@ -3,8 +3,14 @@
 ## Objective
 Turn `docs/plans/deep-research-report.md` into an implementation-ready MVP baseline and establish the repository boundaries used by later agents.
 
-## Prerequisites
+## Prerequisites/dependencies
 None.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 1. This task is the prerequisite for all later tasks; no parallel dependency.
 
 ## Owner
 Product/architecture agent.

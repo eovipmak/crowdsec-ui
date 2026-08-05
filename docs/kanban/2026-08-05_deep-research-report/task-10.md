@@ -3,8 +3,14 @@
 ## Objective
 Display and manage scenarios, profiles, collections, allowlists, and bouncers according to the validated command matrix.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 05, 06, and 07.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 6. Can run in parallel with tasks 08, 09, and 11; keep ownership limited to component/allowlist/bouncer files.
 
 ## Owner
 Next.js dashboard agent.

@@ -3,8 +3,14 @@
 ## Objective
 Implement searchable, filterable, paginated alert and decision administration using only approved API operations.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 05, 06, and 07.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 6. Can run in parallel with tasks 08, 10, and 11; keep ownership limited to alerts/decisions files.
 
 ## Owner
 Next.js dashboard agent.

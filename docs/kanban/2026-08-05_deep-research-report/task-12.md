@@ -3,8 +3,14 @@
 ## Objective
 Provide complete handover documentation for installation, configuration, daily administration, and failed `cscli` operations.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 02, 03, 06, 09, 10, and 11.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 7. Starts after the command/API/security/UI/deployment artifacts it documents are available.
 
 ## Owner
 Documentation agent.

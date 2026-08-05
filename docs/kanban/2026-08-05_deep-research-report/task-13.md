@@ -3,8 +3,14 @@
 ## Objective
 Gate MVP completion by checking that code, contracts, UI, deployment, and documentation remain consistent and safe.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 02, 03, 04, 06, 09, 10, 11, and 12.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 8. Final gate; runs after all required artifacts are available and must route fixes to owning tasks.
 
 ## Owner
 Review agent.

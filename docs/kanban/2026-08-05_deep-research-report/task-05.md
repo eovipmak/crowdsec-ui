@@ -3,8 +3,14 @@
 ## Objective
 Expose the approved adapter operations through the contract from task 03 and serve the frontend in native deployment.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 03 and 04.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 5. Depends on the adapter and contracts; can run in parallel with task 07, but must not alter authentication implementation.
 
 ## Owner
 Go backend agent.

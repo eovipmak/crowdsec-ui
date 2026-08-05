@@ -3,8 +3,14 @@
 ## Objective
 Specify stable boundaries so backend, frontend, security, and deployment agents can work in parallel without inventing interfaces.
 
-## Prerequisites
+## Prerequisites/dependencies
 Complete tasks 01 and 02.
+
+If any prerequisite is missing or ambiguous, stop, report the blocker with the missing artifact/task, and do not guess or implement around it.
+
+## Parallelization
+
+Wave 3. Starts after tasks 01–02; its contracts unblock tasks 04, 05, 06, and 07.
 
 ## Owner
 Architecture agent.
