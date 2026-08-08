@@ -56,3 +56,12 @@ CrowdSec domain reviewer and Backend Developer. CrowdSec-domain sign-off is requ
 
 ## Out of scope
 HTTP routes, UI design, authentication, direct database queries, Prometheus/Grafana integration, and arbitrary command passthrough.
+
+## Coordinator status
+- Status: completed
+- Completed by: CrowdSec command-mapper agent
+- Completed at: 2026-08-08T04:00:00Z
+- Verification: Live CrowdSec v1.7.8 read-only probes passed for alerts, decisions, machines, bouncers, scenarios, collections, hub, metrics, LAPI, CAPI, and simulation; `git diff --check` passed. Mutation probes were intentionally not run to avoid changing CrowdSec state.
+- Commit or artifact reference: docs/command-matrix.md; working tree
+- Blocker: CrowdSec-domain reviewer sign-off is still required by the task acceptance criteria; mutation behavior and target-environment sign-off remain pending.
+
