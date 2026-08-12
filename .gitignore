@@ -142,3 +142,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 .commandcode/skills/crowdsec/scripts/__pycache__/
+
+# Go build output (backend/build.sh)
+backend/bin/
