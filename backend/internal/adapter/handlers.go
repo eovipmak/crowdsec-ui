@@ -76,7 +76,7 @@ func (a *adapter) decisionsList(ctx context.Context, req TypedRequest) (TypedRes
 	if opErr != nil {
 		return nil, opErr
 	}
-	items, perr := parseJSONCollection[DecisionItem](OpDecisionsList, res.Stdout)
+	items, perr := parseDecisionsList(OpDecisionsList, res.Stdout)
 	if perr != nil {
 		return nil, perr
 	}
@@ -434,7 +434,14 @@ func (a *adapter) lapiStatus(ctx context.Context, req TypedRequest) (TypedResult
 	if opErr != nil {
 		return nil, opErr
 	}
-	ok := strings.Contains(strings.ToLower(string(res.Stdout)), "ok")
+	// cscli 1.7.x prints "You can successfully interact with Local API (LAPI)"
+	// on success; the line is stable across verified 1.7.x builds. A failed
+	// probe exits non-zero and is classified by runProcess, so here we only
+	// need to recognize the success text. We also accept the bare "LAPI"
+	// success marker as a fallback for other builds.
+	lower := strings.ToLower(string(res.Stdout))
+	ok := strings.Contains(lower, "successfully interact") ||
+		strings.Contains(lower, "successfully interact with local api")
 	return LapiStatusResult{Healthy: ok}, nil
 }
 

@@ -22,7 +22,7 @@ import { EmptyState } from "@/components/shared/states";
 import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import type { CapabilityState } from "@/lib/api/capabilities";
-import type { ProfileItem, SuccessEnvelope } from "@/lib/api/types";
+import type { ProfileItem, SuccessEnvelope, CollectionResult } from "@/lib/api/types";
 
 interface ProfilesViewProps {
   capability: CapabilityState;
@@ -54,7 +54,7 @@ const COLUMNS: Column<ProfileItem>[] = [
  * rendered — the profile list reflects the configured profiles.yaml only.
  */
 export function ProfilesView({ capability, refreshKey }: ProfilesViewProps) {
-  const resource = useApiResource<SuccessEnvelope<ProfileItem[]>>(
+  const resource = useApiResource<SuccessEnvelope<CollectionResult<ProfileItem>>>(
     () => apiClient.inspectProfiles(),
     { key: refreshKey },
   );
@@ -65,7 +65,7 @@ export function ProfilesView({ capability, refreshKey }: ProfilesViewProps) {
     }
   }, [resource.status, resource.data]);
 
-  const items = resource.status === "success" ? resource.data.result : [];
+  const items = resource.status === "success" ? resource.data.result.items : [];
 
   return (
     <div className="rounded-md border border-slate-200 bg-white p-4">

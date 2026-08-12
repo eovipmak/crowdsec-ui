@@ -25,18 +25,19 @@ interface MachinesTableProps {
 }
 
 const COLUMNS: Column<MachineItem>[] = [
-  { key: "machine_id", header: "Machine ID" },
-  { key: "ip_address", header: "IP address", hiddenOnMobile: true },
+  { key: "machineId", header: "Machine ID" },
+  { key: "ipAddress", header: "IP address", hiddenOnMobile: true },
   {
-    key: "validated",
+    key: "isValidated",
     header: "Validation",
-    render: (row) => (row.validated ? "Validated" : "Not validated"),
+    render: (row) => (row.isValidated ? "Validated" : "Not validated"),
   },
   {
-    key: "last_seen",
-    header: "Last seen",
+    key: "last_heartbeat",
+    header: "Last heartbeat",
     hiddenOnMobile: true,
-    render: (row) => (row.last_seen ? new Date(row.last_seen).toLocaleString() : "—"),
+    render: (row) =>
+      row.last_heartbeat ? new Date(row.last_heartbeat).toLocaleString() : "—",
   },
 ];
 
@@ -89,7 +90,7 @@ export function MachinesTable({ capability, fetcher, refreshKey }: MachinesTable
             <DataTable
               columns={COLUMNS}
               rows={resource.data.result.items}
-              rowKey={(row) => row.machine_id ?? String(row.ip_address ?? "")}
+              rowKey={(row) => row.machineId ?? String(row.ipAddress ?? "")}
               caption="Registered CrowdSec machines"
             />
             {loadedAt ? (

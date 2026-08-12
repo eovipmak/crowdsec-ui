@@ -368,10 +368,14 @@ export interface CollectionItem {
 }
 
 export interface MachineItem {
-  machine_id?: string;
-  ip_address?: string;
-  last_seen?: string;
-  validated?: boolean;
+  machineId?: string;
+  ipAddress?: string;
+  version?: string;
+  last_heartbeat?: string;
+  updated_at?: string;
+  isValidated?: boolean;
+  auth_type?: string;
+  os?: string;
   [key: string]: unknown;
 }
 
@@ -414,12 +418,14 @@ export interface SimulationStatus {
 }
 
 export interface LapiStatus {
-  status?: string;
+  healthy?: boolean;
+  message?: string;
   [key: string]: unknown;
 }
 
 export interface CapiStatus {
-  connected?: boolean;
+  enabled?: boolean;
+  message?: string;
   [key: string]: unknown;
 }
 

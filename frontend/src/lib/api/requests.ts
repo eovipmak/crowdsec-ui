@@ -145,11 +145,26 @@ export const apiRequests = {
 /** GET with an already-built parameter set (see alertsListParams/decisionsListParams). */
 function getWithParams(path: string, params: URLSearchParams): [string, RequestInit] {
   const qs = params.toString();
-  return [qs ? `${path}?${qs}` : path, { method: "GET" }];
+  return [qs ? `${url(path)}?${qs}` : url(path), { method: "GET" }];
+}
+
+function url(path: string): string {
+  // Build the full API URL for a path fragment. Every request path below is
+  // expressed as a suffix under API_BASE ("/api/v1"), e.g. "/session".
+  // Without this prefix the request would fall through to the frontend
+  // asset handler, which only accepts GET/HEAD and returns 405 for POST/
+  // DELETE — so e.g. login would render a "dashboard could not be reached"
+  // error instead of reaching POST /api/v1/session. Keeping the prefix in
+  // one place also keeps the dev-server rewrite rule (next.config.ts) and
+  // the production Go routing (architecture §5.1) in sync.
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  return `${API_BASE}${path}`;
 }
 
 function get(path: string): [string, RequestInit] {
-  return [path, { method: "GET" }];
+  return [url(path), { method: "GET" }];
 }
 
 function post(
@@ -158,7 +173,7 @@ function post(
   opts: { csrfToken?: string } = {},
 ): [string, RequestInit] {
   return [
-    path,
+    url(path),
     {
       method: "POST",
       headers: {
@@ -176,7 +191,7 @@ function del(
 ): [string, RequestInit] {
   const hasBody = opts.body !== undefined;
   return [
-    path,
+    url(path),
     {
       method: "DELETE",
       headers: {

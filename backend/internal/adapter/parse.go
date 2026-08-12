@@ -110,6 +110,98 @@ func parseMetricsJSON(op OperationID, out []byte) (map[string]any, *OpError) {
 	return m, nil
 }
 
+// parseDecisionsList decodes `cscli decisions list -o json`. The cscli 1.7.x
+// decision list is NOT a flat array of decisions: it is an array of
+// alert-shaped blobs, each carrying an embedded `decisions` array (see
+// matrix §4 `decisions.list`). Each row in `decisions[]` carries the actual
+// decision fields (origin/type/scope/value/duration) but no alert-level id or
+// scenario, so each output DecisionItem is a synthesis: identity/time/scenario
+// from the alert blob, and origin/type/scope/value/duration from the embedded
+// decision. An alert with no decisions (e.g. a simulated/none scenario) is
+// skipped. Malformed JSON is malformed_output; an empty input is an empty list.
+func parseDecisionsList(op OperationID, out []byte) ([]DecisionItem, *OpError) {
+	trimmed := strings.TrimSpace(string(out))
+	if trimmed == "" {
+		return []DecisionItem{}, nil
+	}
+	// cscli emits decision records (not alert blobs) when there are no
+	// decisions in the last fetched window; the top-level shape is then a flat
+	// array of decision objects. Detect that and parse directly.
+	if flat, ok := tryParseFlatDecisions(trimmed); ok {
+		return flat, nil
+	}
+	var blobs []cscliDecisionsEntry
+	if err := json.Unmarshal([]byte(trimmed), &blobs); err != nil {
+		return nil, newOpError(ErrMalformedOutput, op)
+	}
+	items := make([]DecisionItem, 0, len(blobs))
+	for _, b := range blobs {
+		for _, d := range b.Decisions {
+			items = append(items, DecisionItem{
+				ID:        b.ID,
+				Origin:    d.Origin,
+				Type:      d.Type,
+				Scope:     d.Scope,
+				Value:     d.Value,
+				Scenario:  b.Scenario,
+				CreatedAt: b.CreatedAt,
+				Until:     d.Until,
+				Duration:  d.Duration,
+			})
+		}
+	}
+	if items == nil {
+		items = []DecisionItem{}
+	}
+	return items, nil
+}
+
+// tryParseFlatDecisions attempts to decode `out` as a flat array of
+// DecisionItem-shaped objects. This covers the cscli variant where rows are
+// already decision records. The boolean reports whether such a flat array
+// could be decoded.
+func tryParseFlatDecisions(out string) ([]DecisionItem, bool) {
+	var flat []DecisionItem
+	if err := json.Unmarshal([]byte(out), &flat); err != nil {
+		return nil, false
+	}
+	// Heuristic: a flat decision record carries a non-empty `type` and
+	// `scope` (or `value`) at the top level. cscli's alert-blob shape leaves
+	// those empty at the blob root, so a row with a non-empty type/scope means
+	// the flat decoder succeeded.
+	for _, d := range flat {
+		if d.Type != "" || d.Scope != "" || d.Value != "" {
+			if flat == nil {
+				flat = []DecisionItem{}
+			}
+			return flat, true
+		}
+	}
+	return nil, false
+}
+
+// cscliDecisionsEntry is the alert-blob shape emitted by `cscli decisions list
+// -o json`. Only the fields we synthesize DecisionItem from are decoded; the
+// remainder (events, meta, capacity) is ignored by the dashboard (matrix §4).
+type cscliDecisionsEntry struct {
+	ID        int64                  `json:"id"`
+	Scenario  string                 `json:"scenario"`
+	CreatedAt string                 `json:"created_at"`
+	Decisions []cscliEmbeddedDecision `json:"decisions"`
+}
+
+// cscliEmbeddedDecision is the per-decision record inside an alert blob. It
+// carries the decision-specific fields the dashboard surfaces to operators
+// (origin/type/scope/value/duration).
+type cscliEmbeddedDecision struct {
+	Origin   string `json:"origin"`
+	Type     string `json:"type"`
+	Scope    string `json:"scope"`
+	Value    string `json:"value"`
+	Duration string `json:"duration"`
+	Until    string `json:"until"`
+}
+
 // describeJSONError is a helper for tests/diagnostics only; it never leaks to
 // client-facing errors.
 func describeJSONError(err error) string { return fmt.Sprintf("%v", err) }

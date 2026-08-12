@@ -48,33 +48,50 @@ func (a *assetServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		clean = "index.html"
 	}
 
-	// Serve the file if it exists in the bundle.
-	if data, err := fs.ReadFile(a.bundle, clean); err == nil {
-		ct := mime.TypeByExtension(path.Ext(clean))
+	// serveFile attempts to serve a single candidate path from the bundle. It
+	// returns true on a hit so the caller can short-circuit. Index HTML is
+	// always served with no-store because it references content-hashed assets
+	// that change between builds; serving a stale index can pull old chunks.
+	serveFile := func(name string) bool {
+		data, err := fs.ReadFile(a.bundle, name)
+		if err != nil {
+			return false
+		}
+		ct := mime.TypeByExtension(path.Ext(name))
 		if ct == "" {
 			ct = "application/octet-stream"
 		}
 		w.Header().Set("Content-Type", ct)
-		// Content-hashed production assets may be cached; index.html must not.
-		if clean == "index.html" {
+		if name == "index.html" {
 			w.Header().Set("Cache-Control", "no-store")
 		} else {
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		}
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(data)
+		return true
+	}
+
+	// 1. Exact embedded file at the cleaned path (e.g. /_next/static/...
+	//    chunks, /icon.svg). This is the common case for hashed asset URLs.
+	if serveFile(clean) {
 		return
 	}
 
-	// SPA fallback to index.html for non-API GET paths (client routing).
-	if data, err := fs.ReadFile(a.bundle, "index.html"); err == nil {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Header().Set("Cache-Control", "no-store")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(data)
+	// 2. Prerendered route HTML produced by `next build` with
+	//    `output: "export"` (e.g. /login -> login.html, /overview ->
+	//    overview.html). Trailing slash variants map to the same file.
+	trimmed := strings.TrimSuffix(clean, "/")
+	if trimmed != "" && trimmed != "index" && serveFile(trimmed+".html") {
 		return
 	}
 
-	// No bundle (task 11 not wired yet).
+	// 3. SPA fallback to index.html for client-side routing of unknown
+	//    non-API GET paths (handled by Next.js Router on the client).
+	if serveFile("index.html") {
+		return
+	}
+
+	// No bundle wired (task 11 not yet complete).
 	http.Error(w, "frontend assets not bundled (task 11)", http.StatusNotFound)
 }

@@ -18,7 +18,19 @@ import (
 	"io/fs"
 )
 
-//go:embed bundle
+//go:embed all:bundle
+//
+// The "all:" prefix is required because Next.js emits its static export
+// under a "_next/" directory whose name begins with an underscore. Go's
+// `//go:embed` directive excludes files and directories whose names begin
+// with `.` or `_` by default (treating them as private), so without the
+// `all:` prefix the entire "_next" tree (JS chunks, CSS, build/SSG
+// manifests, hashed route bundles) would be silently dropped from the
+// embedded FS. Without those chunks the browser could not hydrate the
+// exported pages and any JS-driven form submission (login, mutations,
+// filters) fell back to native HTML form GET, leaking the password into
+// the URL bar. "all:" is safe here because the bundle is a controlled,
+// build-time produced static export containing only public assets.
 var bundleFS embed.FS
 
 // Forward is the embedded frontend bundle as an fs.FS, passed to

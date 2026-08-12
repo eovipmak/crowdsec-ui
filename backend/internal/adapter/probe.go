@@ -80,10 +80,12 @@ func runProbe(runner CommandRunner, opts Options) *probeResult {
 	// allowlists.check is a verified command.
 	pr.capabilities[OpAllowlistsCheck] = Supported
 
-	// Mutations. decisions.add/delete are MVP included but environment
-	// dependent (allowlist may reject). They are capability_gated unless
-	// confirmed.
-	pr.capabilities[OpDecisionsAdd] = CapabilityGated
+	// Mutations. decisions.add and decisions.delete are both MVP mutations.
+	// They are environment-dependent (an allowlist may reject the new
+	// decision) but the command shape itself is stable across verified
+	// cscli builds, so the probe reports them as supported; the handler
+	// surfaces crowdsec_failure when the underlying command rejects a row.
+	pr.capabilities[OpDecisionsAdd] = Supported
 	pr.capabilities[OpDecisionsDelete] = Supported
 
 	// machines.prune is only supported when the probe confirms it (it always

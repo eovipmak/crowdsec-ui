@@ -91,7 +91,11 @@ export default function MachinesPage() {
             pollIntervalMs={MACHINES_POLL_MS}
             render={(envelope) => (
               <p className="text-sm text-slate-700">
-                {String(envelope.result.status ?? "unknown")}
+                {envelope.result.healthy === true
+                  ? "Healthy"
+                  : envelope.result.healthy === false
+                    ? "Unhealthy"
+                    : "unknown"}
               </p>
             )}
           />
@@ -138,11 +142,11 @@ function CapiStatusCard({
       pollIntervalMs={pollIntervalMs}
       render={(envelope) => (
         <p className="text-sm text-slate-700">
-          {envelope.result.connected === true
+          {envelope.result.enabled === true
             ? "Connected"
-            : envelope.result.connected === false
+            : envelope.result.enabled === false
               ? "Disconnected"
-              : String(envelope.result.status ?? "unknown")}
+              : "unknown"}
         </p>
       )}
     />

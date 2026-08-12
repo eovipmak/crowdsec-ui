@@ -260,12 +260,19 @@ type DecisionsListResult struct {
 	Page  PageInfo       `json:"page"`
 }
 
-// MachineItem is a machine record from `cscli machines list -o json`.
+// MachineItem is a machine record from `cscli machines list -o json`. cscli
+// 1.7.x emits camelCase keys (machineId/ipAddress/isValidated) at the alert/
+// machine blob root; earlier releases used snake_case. We expose the camelCase
+// shape that the currently verified cscli 1.7.8 returns.
 type MachineItem struct {
-	MachineID string `json:"machine_id"`
-	IPAddress string `json:"ip_address,omitempty"`
-	LastSeen  string `json:"last_seen,omitempty"`
-	Validated bool   `json:"validated,omitempty"`
+	MachineID      string `json:"machineId"`
+	IPAddress      string `json:"ipAddress,omitempty"`
+	Version        string `json:"version,omitempty"`
+	LastHeartbeat  string `json:"last_heartbeat,omitempty"`
+	UpdatedAt      string `json:"updated_at,omitempty"`
+	IsValidated    bool   `json:"isValidated"`
+	AuthType        string `json:"auth_type,omitempty"`
+	OS              string `json:"os,omitempty"`
 }
 
 // BouncerItem is a bouncer record from `cscli bouncers list -o json`.

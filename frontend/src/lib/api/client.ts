@@ -238,7 +238,7 @@ export interface ApiClient {
   listScenarios(): Promise<SuccessEnvelope<CollectionResult<ScenarioItem>>>;
   inspectScenario(req: ScenariosInspectRequest): Promise<SuccessEnvelope<unknown>>;
   listCollections(): Promise<SuccessEnvelope<CollectionResult<CollectionItem>>>;
-  inspectProfiles(): Promise<SuccessEnvelope<ProfileItem[]>>;
+  inspectProfiles(): Promise<SuccessEnvelope<CollectionResult<ProfileItem>>>;
 
   // simulation / status
   getSimulationStatus(): Promise<SuccessEnvelope<SimulationStatus>>;
