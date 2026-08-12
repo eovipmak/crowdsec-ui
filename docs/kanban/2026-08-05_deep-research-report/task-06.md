@@ -53,3 +53,10 @@ Security reviewer.
 
 ## Out of scope
 External identity providers, role systems, DDoS-oriented rate limiting, HTTPS termination, and account recovery workflows beyond documented local administration.
+
+## Coordinator status
+- Status: completed
+- Completed by: Single-admin security agent (coordinator-reviewed)
+- Completed at: 2026-08-12T12:00:00Z
+- Verification: `gofmt -l backend/` empty (after coordinator `gofmt -w internal/auth/`); `go vet ./...` passed; `go build ./...` passed; `go test ./...` passed (auth unit tests for valid/invalid login, empty/malformed hash, argon2id+bcrypt, expiry, logout invalidation, replay resistance, no-sliding-renewal; api tests cover CSRF failure and mutation authorization). Static search confirms no `os/exec` or shell invocation in `backend/internal/auth/`; no plaintext password/hash/token logging — only doc-comment mentions. `backend/cmd/crowdsec-dashboard/main.go` now wires `auth.NewBcrypt(cfg.Auth.AdminPasswordHash, cfg.Session.TTL)` in place of the stub; `backend/internal/api` aliases the `auth` package types and keeps the `Authenticator` interface contract intact. Cookie attributes (`HttpOnly`, `SameSite=Strict`, `Path=/`, `Secure` on TLS) match §4.2; logout calls `auth.Invalidate` server-side (router.go:353); CSRF enforced on all `POST`/`DELETE` including `/api/v1/session` DELETE and `/api/v1/confirmations`.
+- Commit or artifact reference: backend/internal/auth/* (auth.go, authenticator.go, password.go, session.go, auth_test.go), backend/internal/api/auth.go, backend/internal/api/router.go, backend/cmd/crowdsec-dashboard/main.go, backend/go.mod, backend/go.sum; working tree

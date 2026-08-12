@@ -10,8 +10,16 @@ import (
 	"time"
 
 	"crowdsec-dashboard/backend/internal/adapter"
+	"crowdsec-dashboard/backend/internal/auth"
 	"crowdsec-dashboard/backend/internal/config"
 )
+
+// testPasswordHash is the bcrypt hash of "test-password" (cost 4, test-only).
+// It lets tests drive the real authenticator without a live CrowdSec.
+const testPasswordHash = "$2a$04$aTaoHi4WDabPBhQsGz1DUO7vxdLb2P.FK6FVEuwP99ZhbCQp1WYC6"
+
+// testPassword is the plaintext matching testPasswordHash (test-only).
+const testPassword = "test-password"
 
 // --- test helpers -----------------------------------------------------------
 
@@ -22,15 +30,16 @@ func testConfig() *config.Config {
 	}
 }
 
-// newTestServer builds a router with a fake adapter and the stub authenticator.
+// newTestServer builds a router with a fake adapter and the real
+// authenticator wired to the test password hash.
 func newTestServer(t *testing.T, fake *fakeAdapter) *httptest.Server {
 	t.Helper()
 	confirm := NewConfirmationService()
-	auth := NewStubAuthenticator(8 * time.Hour)
+	au := auth.NewBcrypt(testPasswordHash, 8*time.Hour)
 	router := NewRouterOpts(Options{
 		Config:   testConfig(),
 		Executor: fake,
-		Auth:     auth,
+		Auth:     au,
 		Confirm:  confirm,
 	})
 	ts := httptest.NewServer(router)
@@ -38,10 +47,10 @@ func newTestServer(t *testing.T, fake *fakeAdapter) *httptest.Server {
 	return ts
 }
 
-// login returns the session cookie and CSRF token for the stub authenticator.
+// login returns the session cookie and CSRF token for the real authenticator.
 func login(t *testing.T, ts *httptest.Server) (*http.Cookie, string) {
 	t.Helper()
-	body := `{"password":"anything"}`
+	body := `{"password":"` + testPassword + `"}`
 	resp, err := http.Post(ts.URL+"/api/v1/session", "application/json", strings.NewReader(body))
 	if err != nil {
 		t.Fatalf("login: %v", err)
@@ -381,7 +390,7 @@ func TestOffsetAlwaysRejected(t *testing.T) {
 func TestLoginSessionStatusLogoutFlow(t *testing.T) {
 	ts := newTestServer(t, newFakeAdapter())
 	// Login
-	resp, out := doJSON(t, ts, "POST", "/api/v1/session", `{"password":"x"}`, nil, "")
+	resp, out := doJSON(t, ts, "POST", "/api/v1/session", `{"password":"`+testPassword+`"}`, nil, "")
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("login: %d %s", resp.StatusCode, out)
 	}

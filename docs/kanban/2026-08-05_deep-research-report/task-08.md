@@ -49,3 +49,10 @@ Next.js dashboard developer and CrowdSec domain reviewer.
 
 ## Out of scope
 Prometheus/Grafana, notifications, streaming, historical storage, and backend command changes.
+
+## Coordinator status
+- Status: completed
+- Completed by: Next.js dashboard agent (coordinator-reviewed)
+- Completed at: 2026-08-12T12:00:00Z
+- Verification: `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm run build` all passed in `frontend/` (13 static routes; `/overview` 3.01 kB, `/machines` 3.42 kB). Overview fetches capabilities + five independent sections (alerts, decisions, machines, lapi.status, capi.status, metrics) so one failure cannot hide all data; explicit "Refresh all" plus a single bounded 30s poll with cleanup on unmount — no unbounded fetching. CAPI status and metrics render an "unsupported" notice (no control, no fetch) when `GET /api/v1/capabilities` reports `unsupported`; page modes honored (`limit` only for alerts/decisions; `none` elsewhere, no pagination invented). Summary cards link to `/alerts`, `/decisions`, `/machines`. API client uses typed requests only (`apiClient.listAlerts/listDecisions/listMachines/getLapiStatus/getCapiStatus/showMetrics`) — no command/flag strings. No backend, docs, or other-page files modified.
+- Commit or artifact reference: frontend/src/app/(dashboard)/overview/page.tsx, frontend/src/app/(dashboard)/overview/_components/ (status-item.tsx, summary-card.tsx, metric-panel.tsx), frontend/src/app/(dashboard)/machines/page.tsx, frontend/src/app/(dashboard)/machines/_components/machines-table.tsx; working tree

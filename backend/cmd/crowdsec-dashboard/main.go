@@ -24,6 +24,7 @@ import (
 
 	"crowdsec-dashboard/backend/internal/adapter"
 	"crowdsec-dashboard/backend/internal/api"
+	"crowdsec-dashboard/backend/internal/auth"
 	"crowdsec-dashboard/backend/internal/config"
 	"crowdsec-dashboard/backend/internal/logging"
 )
@@ -66,15 +67,17 @@ func run() error {
 		return fmt.Errorf("failed to initialize CrowdSec adapter: %w", err)
 	}
 
-	// Auth hook (task 06 replaces this stub with the real authenticator).
-	auth := api.NewStubAuthenticator(cfg.Session.TTL)
+	// Real single-admin authenticator. config.Load already refused to start
+	// when the admin_password_hash is unset/placeholder (architecture §8.3),
+	// so cfg.HashSet() is guaranteed true here.
+	authz := auth.NewBcrypt(cfg.Auth.AdminPasswordHash, cfg.Session.TTL)
 	// Mutation confirmation service (in-memory, no application database).
 	confirm := api.NewConfirmationService()
 
 	router := api.NewRouterOpts(api.Options{
 		Config:   cfg,
 		Executor: ex,
-		Auth:     auth,
+		Auth:     authz,
 		Confirm:  confirm,
 		Logger:   logger,
 		// Assets: task 11 wires the embedded frontend bundle here.

@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"crowdsec-dashboard/backend/internal/adapter"
+	"crowdsec-dashboard/backend/internal/auth"
 	"crowdsec-dashboard/backend/internal/config"
 	"crowdsec-dashboard/backend/internal/logging"
 )
@@ -63,7 +64,12 @@ func NewRouterOpts(opts Options) http.Handler {
 		opts.Config = &config.Config{}
 	}
 	if opts.Auth == nil {
-		opts.Auth = NewStubAuthenticator(opts.Config.Session.TTL)
+		// No authenticator supplied: fall back to a real authenticator with
+		// an unconfigured hash so every login fails as invalid credentials.
+		// This is deliberately NOT a test-only stub; there is no default
+		// discoverable password (architecture §8.3). The entry point always
+		// supplies a configured hash.
+		opts.Auth = auth.NewBcrypt("", opts.Config.Session.TTL)
 	}
 	if opts.Confirm == nil {
 		opts.Confirm = NewConfirmationService()
@@ -298,10 +304,14 @@ func (s *Server) setSessionCookie(w http.ResponseWriter, r *http.Request, sess S
 	})
 }
 
-// sesssToken returns the opaque session token to store in the cookie. Task 06
-// supplies the real token; the stub authenticator returns a placeholder.
+// sesssToken returns the opaque session token to store in the cookie. The
+// real authenticator generates an unguessable token per session; the cookie
+// never carries the session ID or CSRF value directly.
 func sesssToken(r *http.Request, sess Session) string {
-	return "stub-session-token"
+	if sess.Token == "" {
+		return ""
+	}
+	return sess.Token
 }
 
 // clearSessionCookie removes the session cookie (logout).
