@@ -24,6 +24,7 @@ import (
 
 	"crowdsec-dashboard/backend/internal/adapter"
 	"crowdsec-dashboard/backend/internal/api"
+	"crowdsec-dashboard/backend/internal/assets"
 	"crowdsec-dashboard/backend/internal/auth"
 	"crowdsec-dashboard/backend/internal/config"
 	"crowdsec-dashboard/backend/internal/logging"
@@ -80,7 +81,11 @@ func run() error {
 		Auth:     authz,
 		Confirm:  confirm,
 		Logger:   logger,
-		// Assets: task 11 wires the embedded frontend bundle here.
+		// Assets serves the embedded production frontend bundle
+		// (architecture §9). assets.Forward is the static export produced by
+		// `next build` and embedded into the binary by build.sh. When the
+		// bundle is absent, the api layer serves an explicit placeholder.
+		Assets: api.NewAssetHandler(assets.Forward),
 	})
 
 	addr := net.JoinHostPort(cfg.Server.Bind, fmt.Sprintf("%d", cfg.Server.Port))

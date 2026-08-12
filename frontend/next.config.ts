@@ -12,6 +12,13 @@ const DEV_API_TARGET = process.env.DASHBOARD_API_TARGET ?? "http://127.0.0.1:809
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Production (native packaging) embeds a static bundle served by the Go
+  // binary (architecture §9). `output: "export"` makes `next build` emit the
+  // bundle to frontend/out/, which backend/build.sh copies into the Go embed
+  // package. Static export is required because the binary is the only server
+  // in production; there is no Next.js runtime. Rewrites below are
+  // development-only (the dev server proxies /api/* to the Go backend).
+  output: "export",
   async rewrites() {
     return [
       {

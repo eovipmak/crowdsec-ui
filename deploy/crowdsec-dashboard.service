@@ -1,0 +1,54 @@
+# CrowdSec dashboard systemd unit (native deployment, task 11).
+#
+# Install to /etc/systemd/system/crowdsec-dashboard.service, then:
+#   systemctl daemon-reload
+#   systemctl enable --now crowdsec-dashboard
+#
+# Logging goes to journald (the binary writes to stderr via the config
+# logging.output: "stderr"). Read logs with:
+#   journalctl -u crowdsec-dashboard -f
+#
+# The dashboard runs as a dedicated least-privilege service account
+# (crowdsec-dashboard). It is NOT root. The service account needs only the
+# permissions required for the supported cscli operations and read access to
+# the CrowdSec config directory (profiles.inspect). See
+# deploy/install/README.md for the exact permission set and how to grant it.
+
+[Unit]
+Description=CrowdSec Dashboard (single-administrator web UI)
+# The dashboard drives CrowdSec exclusively through cscli, so it must start
+# after CrowdSec's LAPI is up. Wants= (not Requires=) keeps the dashboard
+# startable even if the CrowdSec unit is named differently; Restart=on-failure
+# below retries if cscli is not ready yet.
+After=crowdsec.service
+Wants=crowdsec.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Least-privilege service account. Do not run as root unless the CrowdSec
+# installation method requires it (see deploy/install/README.md).
+User=crowdsec-dashboard
+Group=crowdsec-dashboard
+
+# The binary path and configuration path must agree with the packaging layout
+# (deploy/install/README.md §Install layout).
+#
+# No ExecReload: the binary does not implement live config reload (it loads
+# config once at startup). Restart the service after editing config.yaml.
+ExecStart=/usr/local/bin/crowdsec-dashboard --config /etc/crowdsec-dashboard/config.yaml
+# Restart on failure and on a crash, with a short backoff.
+Restart=on-failure
+RestartSec=3s
+
+# Security hardening (best-effort). cscli must still be able to read its
+# config and talk to LAPI, so we avoid aggressive filesystem sandboxing that
+# could break cscli operations. Permission separation is done by the
+# dedicated service account and restricted file modes (see
+# deploy/install/README.md), not by blocking /etc or /usr writes.
+NoNewPrivileges=true
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

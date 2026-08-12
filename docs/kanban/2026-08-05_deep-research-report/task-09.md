@@ -52,3 +52,10 @@ Next.js dashboard developer and Backend Developer.
 
 ## Out of scope
 Unapproved CrowdSec mutations, direct database access, real-time streaming, and new backend endpoints not defined in task 03.
+
+## Coordinator status
+- Status: completed
+- Completed by: Next.js dashboard agent (coordinator-reviewed; coordinator resolved a shared-config blocker left by task 11's `output: "export"` change and followed up on the agent's truncated output)
+- Completed at: 2026-08-12T14:35:00Z
+- Verification: `npm run lint`, `npm run typecheck`, `npm run format:check`, and `npm run build` all passed in `frontend/` (13 static routes; `/alerts` 4.59 kB, `/decisions` 4.03 kB). Alerts page uses `alerts.list` (limit-only page mode, no cursor/offset invented) + `alerts.inspect`; decisions page uses `decisions.list` + `decisions.add`/`decisions.delete` mutations. Every mutation goes through the two-step `useMutation` flow (`issueConfirmation` → `execute`) and renders the server-issued `action` + `command_label` in `ConfirmationModal`. No `decisions.inspect` call (detail stays list-based). No controls for explicitly unsupported rows (`alerts.delete`, `decisions.import`, delete-by-ID, `--all`, `--origin`, `--scenario`, `--bypass-allowlist`). Static search confirms no shell/exec/flag construction and no command text in browser requests. The shared-config blocker (task-11 `output: "export"` vs `icon.tsx` `next/og` `ImageResponse`) was resolved by the coordinator by replacing `icon.tsx` with a static `icon.svg` (asset-delivery boundary fix); the alerts/decisions files themselves are clean.
+- Commit or artifact reference: frontend/src/app/(dashboard)/alerts/page.tsx, frontend/src/app/(dashboard)/alerts/_components/ (alerts-filters.tsx, alerts-table.tsx, alert-detail.tsx), frontend/src/app/(dashboard)/decisions/page.tsx, frontend/src/app/(dashboard)/decisions/_components/ (decisions-filters.tsx, decisions-table.tsx, decision-add-form.tsx, decision-delete-form.tsx, operation-outcome.ts); working tree
