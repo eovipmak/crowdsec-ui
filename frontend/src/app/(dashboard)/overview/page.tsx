@@ -14,7 +14,14 @@ export default function OverviewPage() {
       title="Overview"
       description="CrowdSec status, machines, and current alert/decision counts (REQ-021)."
       workflowOwner="task 08 — overview, machines, status, and statistics views"
-      operations={["alerts.list", "decisions.list", "machines.list", "lapi.status", "capi.status", "metrics.show"]}
+      operations={[
+        "alerts.list",
+        "decisions.list",
+        "machines.list",
+        "lapi.status",
+        "capi.status",
+        "metrics.show",
+      ]}
     />
   );
 }

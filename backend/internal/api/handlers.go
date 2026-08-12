@@ -164,7 +164,10 @@ func (s *Server) handleCollectionsList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleProfilesInspect(w http.ResponseWriter, r *http.Request) {
-	s.runOperation(w, r, adapter.OpProfilesInspect, "cscli profiles", adapter.ProfilesInspectRequest{}, nil)
+	// profiles.inspect is the read-only profiles.yaml file boundary (matrix §4),
+	// NOT a cscli command. The source.command label is a fixed operation label
+	// and never names a shell/cscli invocation.
+	s.runOperation(w, r, adapter.OpProfilesInspect, "profiles.yaml (read-only)", adapter.ProfilesInspectRequest{}, nil)
 }
 
 func (s *Server) handleSimulationStatus(w http.ResponseWriter, r *http.Request) {

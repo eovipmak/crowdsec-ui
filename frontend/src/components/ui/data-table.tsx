@@ -51,7 +51,10 @@ export function DataTable<T>({
               </th>
             ))}
             {actions ? (
-              <th scope="col" className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <th
+                scope="col"
+                className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
                 Actions
               </th>
             ) : null}
@@ -60,7 +63,10 @@ export function DataTable<T>({
         <tbody className="divide-y divide-slate-200">
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + (actions ? 1 : 0)} className="px-4 py-8 text-center text-sm text-slate-500">
+              <td
+                colSpan={columns.length + (actions ? 1 : 0)}
+                className="px-4 py-8 text-center text-sm text-slate-500"
+              >
                 {emptyMessage ?? "No items to display."}
               </td>
             </tr>
@@ -78,7 +84,9 @@ export function DataTable<T>({
                       col.hiddenOnMobile ? "hidden md:table-cell" : ""
                     } ${col.className ?? ""}`}
                   >
-                    {col.render ? col.render(row) : String((row as Record<string, unknown>)[col.key] ?? "")}
+                    {col.render
+                      ? col.render(row)
+                      : String((row as Record<string, unknown>)[col.key] ?? "")}
                   </td>
                 ))}
                 {actions ? <td className="px-4 py-3 text-right">{actions(row)}</td> : null}

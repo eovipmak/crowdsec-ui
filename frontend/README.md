@@ -18,16 +18,16 @@ CrowdSec data.
 
 Run from this directory (`frontend/`):
 
-| Command | Purpose |
-|---|---|
-| `npm install` | Install dependencies |
-| `npm run dev` | Start the Next.js dev server (default port 3000) |
-| `npm run build` | Production build (`next build`) |
-| `npm run start` | Serve the production build (`next start`) |
-| `npm run lint` | ESLint (`eslint .`) |
-| `npm run typecheck` | TypeScript check (`tsc --noEmit`) |
-| `npm run format` | Format with Prettier (write) |
-| `npm run format:check` | Format check (no writes) |
+| Command                | Purpose                                          |
+| ---------------------- | ------------------------------------------------ |
+| `npm install`          | Install dependencies                             |
+| `npm run dev`          | Start the Next.js dev server (default port 3000) |
+| `npm run build`        | Production build (`next build`)                  |
+| `npm run start`        | Serve the production build (`next start`)        |
+| `npm run lint`         | ESLint (`eslint .`)                              |
+| `npm run typecheck`    | TypeScript check (`tsc --noEmit`)                |
+| `npm run format`       | Format with Prettier (write)                     |
+| `npm run format:check` | Format check (no writes)                         |
 
 ## Development proxy
 

@@ -10,8 +10,8 @@ export default function RootPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">CrowdSec Dashboard</h1>
         <p className="max-w-xl text-sm leading-6 text-slate-600">
           Internal single-administrator dashboard. CrowdSec is the source of truth and is accessed
-          exclusively through approved <code className="rounded bg-slate-200 px-1 py-0.5">cscli</code>{" "}
-          commands.
+          exclusively through approved{" "}
+          <code className="rounded bg-slate-200 px-1 py-0.5">cscli</code> commands.
         </p>
         <div className="flex gap-3">
           <Link

@@ -30,7 +30,9 @@ export function Pagination({ pagination, onRefresh }: PaginationProps) {
     <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
       <p className="text-xs text-slate-500">
         Showing up to {pagination.limit} results
-        {pagination.has_more ? " — more results exist; this installation does not support paging past this point." : "."}
+        {pagination.has_more
+          ? " — more results exist; this installation does not support paging past this point."
+          : "."}
       </p>
       <Button variant="secondary" size="sm" onClick={onRefresh}>
         Refresh

@@ -51,3 +51,10 @@ Next.js dashboard developer.
 
 ## Out of scope
 Page-specific data workflows, backend implementation, external monitoring, notifications, and application persistence.
+
+## Coordinator status
+- Status: completed
+- Completed by: Next.js dashboard agent
+- Completed at: 2026-08-12T00:00:00Z
+- Verification: `npm run lint`, `npm run typecheck`, `npm run format:check`, and `npm run build` all passed in `frontend/` (13 static routes generated: login + 7 dashboard shells + root). API client payloads cross-checked against `docs/architecture.md` §3 — typed requests only, no command/flag construction. Unsupported matrix rows (`scenarios.install`, `collections.install/remove`, `simulation.enable/disable`) exist only as typed capability markers, never as functional controls (scenarios page confirms no install/remove/profile-edit controls). Shared states distinguish supported/unsupported/empty/loading/error/expired-session. eslint config fixed to ignore `.next`/build dirs and correct the prettier import.
+- Commit or artifact reference: frontend/*; working tree

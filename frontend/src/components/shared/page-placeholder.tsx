@@ -27,7 +27,12 @@ export interface PagePlaceholderProps {
   workflowOwner?: string;
 }
 
-export function PagePlaceholder({ title, description, operations, workflowOwner }: PagePlaceholderProps) {
+export function PagePlaceholder({
+  title,
+  description,
+  operations,
+  workflowOwner,
+}: PagePlaceholderProps) {
   const resource = useApiResource<CapabilitiesResponse>(apiClient.getCapabilities);
 
   return (
@@ -37,7 +42,10 @@ export function PagePlaceholder({ title, description, operations, workflowOwner 
         description={description}
         actions={
           resource.status === "success" ? (
-            <RefreshButton onClick={() => void resource.refresh()} disabled={resource.isRefreshing} />
+            <RefreshButton
+              onClick={() => void resource.refresh()}
+              disabled={resource.isRefreshing}
+            />
           ) : undefined
         }
       />
@@ -46,8 +54,8 @@ export function PagePlaceholder({ title, description, operations, workflowOwner 
         <div className="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
           <span className="font-medium text-slate-700">Shell placeholder.</span> Page-specific data
           workflows for this view are implemented in{" "}
-          <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">{workflowOwner}</code>. This page
-          currently establishes the shared states only.
+          <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">{workflowOwner}</code>. This
+          page currently establishes the shared states only.
         </div>
       ) : null}
 
@@ -60,9 +68,14 @@ export function PagePlaceholder({ title, description, operations, workflowOwner 
           onRetry={() => void resource.refresh()}
         />
       ) : (
-        <section aria-label="Operation support" className="rounded-md border border-slate-200 bg-white">
+        <section
+          aria-label="Operation support"
+          className="rounded-md border border-slate-200 bg-white"
+        >
           <div className="border-b border-slate-200 px-4 py-3">
-            <h2 className="text-sm font-semibold text-slate-900">Matrix operations for this page</h2>
+            <h2 className="text-sm font-semibold text-slate-900">
+              Matrix operations for this page
+            </h2>
             <p className="mt-0.5 text-xs text-slate-500">
               Support comes from the server&apos;s startup capability probe; rows marked unsupported
               will never offer a control.
@@ -70,7 +83,10 @@ export function PagePlaceholder({ title, description, operations, workflowOwner 
           </div>
           {operations.length === 0 ? (
             <div className="p-4">
-              <EmptyState title="No operations" message="This page does not consume any matrix operations." />
+              <EmptyState
+                title="No operations"
+                message="This page does not consume any matrix operations."
+              />
             </div>
           ) : (
             <ul className="divide-y divide-slate-100">

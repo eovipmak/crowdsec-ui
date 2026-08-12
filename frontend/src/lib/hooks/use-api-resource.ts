@@ -30,7 +30,11 @@ export function useApiResource<T>(
   options: UseApiResourceOptions<T> = {},
 ): ApiResourceState<T> & { refresh: () => Promise<void>; isRefreshing: boolean } {
   const { pollIntervalMs = 0, key, select } = options;
-  const [state, setState] = useState<ApiResourceState<T>>({ status: "loading", data: null, error: null });
+  const [state, setState] = useState<ApiResourceState<T>>({
+    status: "loading",
+    data: null,
+    error: null,
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;

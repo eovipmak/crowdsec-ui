@@ -39,7 +39,7 @@ function ShieldMark() {
   );
 }
 
-export function LoginForm() {
+function LoginForm() {
   const router = useRouter();
   const { state, refreshSession } = useSession();
   const [password, setPassword] = useState("");
@@ -71,7 +71,9 @@ export function LoginForm() {
       if (isApiError(err) && err.code === API_ERROR_CODES.INVALID_CREDENTIALS) {
         setError("Invalid username or password.");
       } else {
-        setError("The dashboard could not be reached. Make sure the backend is running, then try again.");
+        setError(
+          "The dashboard could not be reached. Make sure the backend is running, then try again.",
+        );
       }
     } finally {
       setIsSubmitting(false);

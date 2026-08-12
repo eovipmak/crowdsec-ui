@@ -78,7 +78,9 @@ export function useMutation() {
   );
 
   const execute = useCallback(
-    async (run: (token: string) => Promise<MutationEnvelope<MutationOperationId>>): Promise<boolean> => {
+    async (
+      run: (token: string) => Promise<MutationEnvelope<MutationOperationId>>,
+    ): Promise<boolean> => {
       const token = tokenRef.current;
       if (!token) {
         setState((prev) => ({
@@ -98,7 +100,13 @@ export function useMutation() {
       try {
         const result = await run(token);
         tokenRef.current = null;
-        setState((prev) => ({ ...prev, isPending: false, confirmation: null, outcome: { ok: true }, result }));
+        setState((prev) => ({
+          ...prev,
+          isPending: false,
+          confirmation: null,
+          outcome: { ok: true },
+          result,
+        }));
         return true;
       } catch (err) {
         tokenRef.current = null;

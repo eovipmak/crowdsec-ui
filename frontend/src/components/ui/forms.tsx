@@ -41,9 +41,7 @@ interface TextInputProps {
 const inputClasses = (error?: boolean) =>
   [
     "block w-full rounded-md border bg-white px-3 py-2 text-sm shadow-sm focus:outline-2 focus:outline-offset-1",
-    error
-      ? "border-red-400 focus:outline-red-500"
-      : "border-slate-300 focus:outline-slate-500",
+    error ? "border-red-400 focus:outline-red-500" : "border-slate-300 focus:outline-slate-500",
   ].join(" ");
 
 export function TextInput({

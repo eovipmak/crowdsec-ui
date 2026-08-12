@@ -36,8 +36,16 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/overview", label: "Overview", description: "Status, machines, counts" },
   { href: "/alerts", label: "Alerts", description: "Searchable alert table" },
   { href: "/decisions", label: "Decisions", description: "Active decisions" },
-  { href: "/machines", label: "Machines / status", description: "Registered machines and LAPI/CAPI status" },
-  { href: "/scenarios", label: "Scenarios / profiles / collections", description: "Read-only configuration views" },
+  {
+    href: "/machines",
+    label: "Machines / status",
+    description: "Registered machines and LAPI/CAPI status",
+  },
+  {
+    href: "/scenarios",
+    label: "Scenarios / profiles / collections",
+    description: "Read-only configuration views",
+  },
   { href: "/allowlists", label: "Allowlists", description: "Local allowlists" },
   { href: "/bouncers", label: "Bouncers", description: "Registered bouncers" },
 ];
@@ -96,12 +104,16 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 ${
-                      active ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      active
+                        ? "bg-slate-100 text-slate-900"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     {item.label}
                   </Link>
-                  {active ? <p className="mt-1 px-3 text-xs text-slate-400">{item.description}</p> : null}
+                  {active ? (
+                    <p className="mt-1 px-3 text-xs text-slate-400">{item.description}</p>
+                  ) : null}
                 </li>
               );
             })}

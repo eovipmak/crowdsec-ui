@@ -8,7 +8,10 @@ interface LoadingStateProps {
 /** Visible loading state with an accessible status announcement. */
 export function LoadingState({ label = "Loading…" }: LoadingStateProps) {
   return (
-    <div role="status" className="flex flex-col items-center justify-center gap-3 px-4 py-12 text-center">
+    <div
+      role="status"
+      className="flex flex-col items-center justify-center gap-3 px-4 py-12 text-center"
+    >
       <span
         aria-hidden="true"
         className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900"

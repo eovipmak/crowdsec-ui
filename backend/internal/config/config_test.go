@@ -186,8 +186,15 @@ func TestRedactedHidesHash(t *testing.T) {
 	if strings.Contains(s, cfg.Auth.AdminPasswordHash) {
 		t.Fatal("redacted config leaked the password hash")
 	}
-	if !strings.Contains(s, "<redacted>") {
-		t.Fatal("redacted config should mark the hash as redacted")
+	// Inspect the redacted view directly (json.Marshal HTML-escapes the
+	// surrounding markers to \u003c/\u003e, so the string form alone cannot
+	// assert the marker reliably).
+	auth, ok := red["auth"].(map[string]any)
+	if !ok {
+		t.Fatalf("redacted view missing auth section: %v", red)
+	}
+	if got := auth["admin_password_hash"]; got != "<redacted>" {
+		t.Fatalf("admin_password_hash should be redacted, got %v", got)
 	}
 }
 

@@ -62,7 +62,10 @@ export function ConfirmationModal({
       aria-describedby="confirmation-description"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
-      <div className="absolute inset-0 bg-slate-900/50" onClick={isPending ? undefined : onCancel} />
+      <div
+        className="absolute inset-0 bg-slate-900/50"
+        onClick={isPending ? undefined : onCancel}
+      />
       <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h2 id="confirmation-title" className="text-lg font-semibold text-slate-900">
           {title}
@@ -71,7 +74,8 @@ export function ConfirmationModal({
           <p>{action}</p>
           {commandLabel ? (
             <p className="text-xs text-slate-500">
-              Corresponding CrowdSec action: <code className="rounded bg-slate-100 px-1 py-0.5">{commandLabel}</code>
+              Corresponding CrowdSec action:{" "}
+              <code className="rounded bg-slate-100 px-1 py-0.5">{commandLabel}</code>
             </p>
           ) : null}
           {children ? <div className="pt-1">{children}</div> : null}

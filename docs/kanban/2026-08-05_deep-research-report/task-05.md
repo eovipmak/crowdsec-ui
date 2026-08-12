@@ -54,3 +54,10 @@ Go backend developer and Security reviewer.
 
 ## Out of scope
 Authentication implementation, UI pages, systemd, arbitrary command endpoints, and application persistence.
+
+## Coordinator status
+- Status: completed
+- Completed by: Go backend agent
+- Completed at: 2026-08-12T00:00:00Z
+- Verification: `gofmt -l backend/` empty; `go vet ./...`, `go build ./...`, `go test ./...` all passed (adapter, api, config, logging); `git diff --check` clean. Routes cross-checked against `docs/architecture.md` §3 — 24 supported/capability-gated endpoints with one-to-one method mapping, `/api/*` unknown → 404 JSON, no route for any matrix-unsupported row. `profiles.inspect` source.command label corrected to the read-only profiles.yaml boundary (not a cscli invocation). Static search confirms no `os/exec`/shell invocation in `backend/internal/api/` (exec owned by adapter). Asset boundary serves "assets not bundled" placeholder when nil and cannot shadow API routes.
+- Commit or artifact reference: backend/internal/api/*; working tree

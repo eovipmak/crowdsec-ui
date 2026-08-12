@@ -14,7 +14,13 @@
  * The frontend never constructs commands; every payload is typed and comes
  * from the fixed request builders.
  */
-import { ApiError, API_ERROR_CODES, errorMessage, type ApiErrorCode, type ApiErrorShape } from "@/lib/api/errors";
+import {
+  ApiError,
+  API_ERROR_CODES,
+  errorMessage,
+  type ApiErrorCode,
+  type ApiErrorShape,
+} from "@/lib/api/errors";
 import { apiRequests } from "@/lib/api/requests";
 import type {
   AlertsInspectRequest,
@@ -26,6 +32,7 @@ import type {
   AllowlistsRemoveRequest,
   BouncersDeleteRequest,
   CapabilitiesResponse,
+  CapiStatus,
   CollectionItem,
   CollectionResult,
   ConfirmationIssuanceRequest,
@@ -188,24 +195,43 @@ export interface ApiClient {
   getSessionStatus(): Promise<SessionResponse>;
   logout(csrfToken?: string): Promise<LogoutResponse>;
   getCapabilities(): Promise<CapabilitiesResponse>;
-  issueConfirmation(req: ConfirmationIssuanceRequest, csrfToken?: string): Promise<ConfirmationIssuanceResponse>;
+  issueConfirmation(
+    req: ConfirmationIssuanceRequest,
+    csrfToken?: string,
+  ): Promise<ConfirmationIssuanceResponse>;
 
   // alerts
-  listAlerts(req: AlertsListRequest): Promise<SuccessEnvelope<CollectionResult<import("@/lib/api/types").AlertItem>>>;
+  listAlerts(
+    req: AlertsListRequest,
+  ): Promise<SuccessEnvelope<CollectionResult<import("@/lib/api/types").AlertItem>>>;
   inspectAlert(req: AlertsInspectRequest): Promise<SuccessEnvelope<unknown>>;
 
   // decisions
-  listDecisions(req: DecisionsListRequest): Promise<SuccessEnvelope<CollectionResult<import("@/lib/api/types").DecisionItem>>>;
-  addDecision(req: DecisionsAddRequest, csrfToken?: string): Promise<MutationEnvelope<"decisions.add">>;
-  deleteDecision(req: DecisionsDeleteRequest, csrfToken?: string): Promise<MutationEnvelope<"decisions.delete">>;
+  listDecisions(
+    req: DecisionsListRequest,
+  ): Promise<SuccessEnvelope<CollectionResult<import("@/lib/api/types").DecisionItem>>>;
+  addDecision(
+    req: DecisionsAddRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"decisions.add">>;
+  deleteDecision(
+    req: DecisionsDeleteRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"decisions.delete">>;
 
   // machines
   listMachines(): Promise<SuccessEnvelope<CollectionResult<MachineItem>>>;
-  pruneMachines(req: MachinesPruneRequest, csrfToken?: string): Promise<MutationEnvelope<"machines.prune">>;
+  pruneMachines(
+    req: MachinesPruneRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"machines.prune">>;
 
   // bouncers
   listBouncers(): Promise<SuccessEnvelope<CollectionResult<import("@/lib/api/types").BouncerItem>>>;
-  deleteBouncer(req: BouncersDeleteRequest, csrfToken?: string): Promise<MutationEnvelope<"bouncers.delete">>;
+  deleteBouncer(
+    req: BouncersDeleteRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"bouncers.delete">>;
 
   // hub / scenarios / collections / profiles
   listHub(req: HubListRequest): Promise<SuccessEnvelope<CollectionResult<HubItem>>>;
@@ -220,12 +246,26 @@ export interface ApiClient {
   getCapiStatus(): Promise<SuccessEnvelope<CapiStatus>>;
 
   // allowlists
-  listAllowlists(): Promise<SuccessEnvelope<CollectionResult<import("@/lib/api/types").AllowlistItem>>>;
+  listAllowlists(): Promise<
+    SuccessEnvelope<CollectionResult<import("@/lib/api/types").AllowlistItem>>
+  >;
   checkAllowlist(req: AllowlistsCheckRequest): Promise<SuccessEnvelope<unknown>>;
-  createAllowlist(req: AllowlistsCreateRequest, csrfToken?: string): Promise<MutationEnvelope<"allowlists.create">>;
-  addAllowlistEntry(req: AllowlistsAddRequest, csrfToken?: string): Promise<MutationEnvelope<"allowlists.add">>;
-  removeAllowlistEntry(req: AllowlistsRemoveRequest, csrfToken?: string): Promise<MutationEnvelope<"allowlists.remove">>;
-  deleteAllowlist(req: AllowlistsDeleteRequest, csrfToken?: string): Promise<MutationEnvelope<"allowlists.delete">>;
+  createAllowlist(
+    req: AllowlistsCreateRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"allowlists.create">>;
+  addAllowlistEntry(
+    req: AllowlistsAddRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"allowlists.add">>;
+  removeAllowlistEntry(
+    req: AllowlistsRemoveRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"allowlists.remove">>;
+  deleteAllowlist(
+    req: AllowlistsDeleteRequest,
+    csrfToken?: string,
+  ): Promise<MutationEnvelope<"allowlists.delete">>;
 
   // metrics
   showMetrics(component: MetricsComponent): Promise<SuccessEnvelope<unknown>>;

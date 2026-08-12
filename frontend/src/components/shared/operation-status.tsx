@@ -17,7 +17,11 @@ interface OperationStatusProps {
  * or a secret-safe failure with a refresh control so the administrator can
  * respond (REQ-028).
  */
-export function OperationStatus({ outcome, onRefresh, successMessage = "Operation completed." }: OperationStatusProps) {
+export function OperationStatus({
+  outcome,
+  onRefresh,
+  successMessage = "Operation completed.",
+}: OperationStatusProps) {
   const [dismissed, setDismissed] = useState(false);
 
   if (!outcome || dismissed) {
@@ -26,7 +30,10 @@ export function OperationStatus({ outcome, onRefresh, successMessage = "Operatio
 
   if (outcome.ok) {
     return (
-      <div role="status" className="flex items-start justify-between gap-3 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+      <div
+        role="status"
+        className="flex items-start justify-between gap-3 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+      >
         <p className="font-medium">{successMessage}</p>
         <button
           type="button"
@@ -41,7 +48,10 @@ export function OperationStatus({ outcome, onRefresh, successMessage = "Operatio
 
   const error = outcome.error;
   return (
-    <div role="alert" className="flex items-start justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3">
+    <div
+      role="alert"
+      className="flex items-start justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3"
+    >
       <div className="text-sm text-red-800">
         <p className="font-medium">The operation did not complete.</p>
         <p className="mt-0.5 text-red-700">{error?.message ?? "An unexpected error occurred."}</p>

@@ -27,7 +27,13 @@ const SIZE_CLASSES: Record<Size, string> = {
  * Accessible button with variant/size styling. Disabled buttons carry
  * aria-disabled semantics through the native disabled attribute.
  */
-export function Button({ variant = "secondary", size = "md", className = "", children, ...rest }: ButtonProps) {
+export function Button({
+  variant = "secondary",
+  size = "md",
+  className = "",
+  children,
+  ...rest
+}: ButtonProps) {
   const classes = [
     "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors",
     "disabled:cursor-not-allowed disabled:opacity-50",

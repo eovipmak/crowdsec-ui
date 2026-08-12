@@ -50,15 +50,18 @@ export const apiRequests = {
   logout: (opts: HttpOptions = {}): [string, RequestInit] =>
     del("/session", { csrfToken: opts.csrfToken }),
   capabilities: () => get("/capabilities"),
-  issueConfirmation: (req: ConfirmationIssuanceRequest, opts: HttpOptions = {}): [string, RequestInit] =>
-    post("/confirmations", req, { csrfToken: opts.csrfToken }),
+  issueConfirmation: (
+    req: ConfirmationIssuanceRequest,
+    opts: HttpOptions = {},
+  ): [string, RequestInit] => post("/confirmations", req, { csrfToken: opts.csrfToken }),
 
   // --- alerts ---
   alertsList: (req: AlertsListRequest) => getWithParams("/alerts", alertsListParams(req)),
   alertsInspect: (req: AlertsInspectRequest) => get(`/alerts/${req.id}`),
 
   // --- decisions ---
-  decisionsList: (req: DecisionsListRequest) => getWithParams("/decisions", decisionsListParams(req)),
+  decisionsList: (req: DecisionsListRequest) =>
+    getWithParams("/decisions", decisionsListParams(req)),
   decisionsAdd: (req: DecisionsAddRequest, opts: HttpOptions = {}): [string, RequestInit] =>
     post("/decisions", { operation: "decisions.add", request: req }, { csrfToken: opts.csrfToken }),
   decisionsDelete: (req: DecisionsDeleteRequest, opts: HttpOptions = {}): [string, RequestInit] =>
@@ -70,12 +73,19 @@ export const apiRequests = {
   // --- machines ---
   machinesList: () => get("/machines"),
   machinesPrune: (req: MachinesPruneRequest, opts: HttpOptions = {}): [string, RequestInit] =>
-    post("/machines/prune", { operation: "machines.prune", request: req }, { csrfToken: opts.csrfToken }),
+    post(
+      "/machines/prune",
+      { operation: "machines.prune", request: req },
+      { csrfToken: opts.csrfToken },
+    ),
 
   // --- bouncers ---
   bouncersList: () => get("/bouncers"),
   bouncersDelete: (req: BouncersDeleteRequest, opts: HttpOptions = {}): [string, RequestInit] =>
-    del("/bouncers", { body: { operation: "bouncers.delete", request: req }, csrfToken: opts.csrfToken }),
+    del("/bouncers", {
+      body: { operation: "bouncers.delete", request: req },
+      csrfToken: opts.csrfToken,
+    }),
 
   // --- hub / scenarios / collections / profiles ---
   hubList: (req: HubListRequest) => {
@@ -102,16 +112,27 @@ export const apiRequests = {
     return getWithParams("/allowlists/check", params);
   },
   allowlistsCreate: (req: AllowlistsCreateRequest, opts: HttpOptions = {}): [string, RequestInit] =>
-    post("/allowlists", { operation: "allowlists.create", request: req }, { csrfToken: opts.csrfToken }),
+    post(
+      "/allowlists",
+      { operation: "allowlists.create", request: req },
+      { csrfToken: opts.csrfToken },
+    ),
   allowlistsAdd: (req: AllowlistsAddRequest, opts: HttpOptions = {}): [string, RequestInit] =>
-    post("/allowlists/entries", { operation: "allowlists.add", request: req }, { csrfToken: opts.csrfToken }),
+    post(
+      "/allowlists/entries",
+      { operation: "allowlists.add", request: req },
+      { csrfToken: opts.csrfToken },
+    ),
   allowlistsRemove: (req: AllowlistsRemoveRequest, opts: HttpOptions = {}): [string, RequestInit] =>
     del("/allowlists/entries", {
       body: { operation: "allowlists.remove", request: req },
       csrfToken: opts.csrfToken,
     }),
   allowlistsDelete: (req: AllowlistsDeleteRequest, opts: HttpOptions = {}): [string, RequestInit] =>
-    del("/allowlists", { body: { operation: "allowlists.delete", request: req }, csrfToken: opts.csrfToken }),
+    del("/allowlists", {
+      body: { operation: "allowlists.delete", request: req },
+      csrfToken: opts.csrfToken,
+    }),
 
   // --- metrics ---
   metricsShow: (component: MetricsComponent) => get(`/metrics/${component}`),

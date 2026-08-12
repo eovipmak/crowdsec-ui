@@ -21,6 +21,9 @@ export function capabilityFor(
   return caps.capabilities[operation] ?? "unknown";
 }
 
-export function isCapabilitySupported(caps: CapabilitiesResponse | null, operation: OperationId): boolean {
+export function isCapabilitySupported(
+  caps: CapabilitiesResponse | null,
+  operation: OperationId,
+): boolean {
   return capabilityFor(caps, operation) === "supported";
 }

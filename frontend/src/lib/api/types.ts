@@ -315,7 +315,9 @@ export interface MutationResult {
   refreshed: string[];
 }
 
-export interface MutationEnvelope<T extends MutationOperationId> extends SuccessEnvelope<MutationResult> {
+export interface MutationEnvelope<
+  T extends MutationOperationId,
+> extends SuccessEnvelope<MutationResult> {
   operation: T;
   request: MutationRequestMap[T];
 }
@@ -327,7 +329,14 @@ export interface HubItem {
   status: string;
   version: string;
   description: string;
-  type: "parsers" | "postoverflows" | "scenarios" | "contexts" | "appsec-configs" | "appsec-rules" | "collections";
+  type:
+    | "parsers"
+    | "postoverflows"
+    | "scenarios"
+    | "contexts"
+    | "appsec-configs"
+    | "appsec-rules"
+    | "collections";
 }
 
 export interface HubListRequest {
