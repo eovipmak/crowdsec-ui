@@ -50,3 +50,11 @@ Development Lead, Security reviewer, and CrowdSec domain reviewer.
 
 ## Out of scope
 Adding new features, formal penetration testing, deployment to shared infrastructure, destructive cleanup, and changing requirements without a new approved plan.
+
+## Coordinator status
+- Status: completed
+- Completed by: Review agent (crowdsec-documentation-reviewer, coordinator-reviewed)
+- Completed at: 2026-08-12T22:45:00Z
+- Verification: Independently re-ran by coordinator — Backend: `gofmt -l .` empty, `go vet ./...`/`go build ./...`/`go test ./...` all pass (adapter, api, auth, config). Frontend: `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm run build` all pass (13 static routes; /alerts 4.59 kB, /allowlists 5.26 kB, /bouncers 2.05 kB, /decisions 4.03 kB, /machines 3.43 kB, /overview 3.01 kB, /scenarios 4.19 kB, /login 2.1 kB). Static scans: no shell invocation (`sh -c`/`/bin/sh`/`/bin/bash`) anywhere in Go/TS code; no docker/podman/prometheus/grafana imports (the sole `prometheus/grafana` mention is a negative/prohibitive comment in overview metric-panel); no `database/sql`; `os/exec` imported only by `backend/internal/adapter` (api/config/auth layers contain only comments documenting the invariant). `git diff --check` clean; only untracked file is the new review record.
+- Commit or artifact reference: docs/security-scope-review.md (337 lines, review record under docs/); working tree
+- Findings: No high- or medium-severity findings; all 12 cross-artifact checks pass. One documented info-level follow-up: task-02 CrowdSec-domain reviewer sign-off remains pending for mutation behavior and target-environment verification — surfaced in review record §6 and §8 as a documented remaining limitation (not a task-13 blocker, since task-13's job is to surface it, not resolve it by editing code). No code/doc fixes routed to owning tasks.
