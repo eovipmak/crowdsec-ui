@@ -2,7 +2,6 @@
 name: kanban-task-coordinator
 description: Coordinate agents to execute a dependency-aware task set from a docs/kanban directory, including reviewing tasks, assigning work, collecting changes, verifying results, and handling blockers. Use when asked to execute or coordinate a kanban plan such as docs/kanban/2026-08-04_deep-research-report.
 argument-hint: "<docs/kanban/plan-directory>"
-model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"
 ---
 
 # Kanban Task Coordinator
