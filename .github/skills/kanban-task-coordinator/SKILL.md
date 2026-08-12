@@ -2,12 +2,12 @@
 name: kanban-task-coordinator
 description: Coordinate agents to execute a dependency-aware task set from a docs/kanban directory, including reviewing tasks, assigning work, collecting changes, verifying results, and handling blockers. Use when asked to execute or coordinate a kanban plan such as docs/kanban/2026-08-04_deep-research-report.
 argument-hint: "<docs/kanban/plan-directory>"
-model: deepseek-v4-flash-0731
+model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"
 ---
 
 # Kanban Task Coordinator
 
-Execute an existing kanban plan through specialized delegated agents. Every delegated agent must run on `deepseek-v4-flash-0731`.
+Execute an existing kanban plan through specialized delegated agents. Every delegated agent must run on `DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)`.
 
 ## Input
 
@@ -48,7 +48,7 @@ When a task passes review and verification, immediately append or update its com
 
 For each ready task, choose the narrowest available specialized agent by domain. If no specialized agent fits, use `general`; use `explore` only for read-only investigation. Delegate through the agent tool with this exact model override on every call:
 
-`model: "deepseek-v4-flash-0731"`
+`model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"`
 
 The delegation prompt must include:
 
@@ -69,7 +69,7 @@ After each agent result:
 1. Inspect the reported files and diff.
 2. Check acceptance criteria and scope boundaries from the task file.
 3. Run relevant formatter, lint, typecheck, build, or focused verification commands discovered in the repository. Do not invent commands when none exist; report that verification is unavailable.
-4. If incomplete or incorrect, delegate a focused follow-up to the same domain using `deepseek-v4-flash-0731`.
+4. If incomplete or incorrect, delegate a focused follow-up to the same domain using `DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)`.
 5. Mark a task complete only after implementation and verification satisfy its acceptance criteria. Keep it blocked/in progress when evidence is incomplete.
 6. Continue to the next dependency wave until all executable tasks are complete or explicitly blocked.
 
@@ -77,7 +77,7 @@ Use a durable task ledger only when persistence, dependency edges, or ownership 
 
 ## Safety and scope rules
 
-- Never delegate with another model; the required execution model is always `deepseek-v4-flash-0731`.
+- Never delegate with another model; the required execution model is always `DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)`.
 - Never create arbitrary shell execution, bypass authentication, weaken permissions, or ignore task acceptance criteria.
 - Never overwrite unfamiliar user changes, delete files, reset branches, commit, push, or alter shared infrastructure without explicit approval.
 - Preserve the original plan’s exclusions. If a missing requirement is discovered, stop the affected task and create a clearly reported follow-up instead of silently expanding scope.

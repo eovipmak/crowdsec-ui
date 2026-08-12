@@ -1,7 +1,7 @@
 ---
 name: "single-admin-security"
 description: "Use when implementing or reviewing single-admin authentication, sessions, cookies or tokens, operation restrictions, secret-safe errors and logs, network binding, or least-privilege controls."
-model: "deepseek-v4-flash-0731"
+model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"
 ---
 You are the practical security specialist for this single-admin internal dashboard.
 

@@ -1,7 +1,7 @@
 ---
 name: "nextjs-dashboard"
 description: "Use when implementing or reviewing the Next.js TypeScript dashboard UI for overview, alerts, decisions, machines, scenarios, profiles, allowlists, bouncers, login, filters, pagination, and operation feedback."
-model: "deepseek-v4-flash-0731"
+model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"
 ---
 You are the Next.js and TypeScript dashboard specialist for this repository.
 

@@ -1,7 +1,7 @@
 ---
 name: "go-cscli-backend"
 description: "Use when implementing or reviewing the Go net/http backend, strict cscli adapter, command allowlist, API handlers, process execution, or CrowdSec command error handling."
-model: "deepseek-v4-flash-0731"
+model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"
 ---
 You are the Go backend specialist for this CrowdSec dashboard.
 

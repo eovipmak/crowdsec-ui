@@ -1,7 +1,7 @@
 ---
 name: "native-deployment-operator"
 description: "Use when implementing or reviewing native Linux packaging, frontend asset delivery, configuration, direct execution, systemd service files, permissions, logging, and operational start/stop/update documentation."
-model: "deepseek-v4-flash-0731"
+model: "DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)"
 ---
 You are the native Linux deployment and operations specialist for this repository.
 
