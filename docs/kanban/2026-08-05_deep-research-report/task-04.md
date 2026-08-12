@@ -54,3 +54,10 @@ Go backend developer and CrowdSec domain reviewer.
 
 ## Out of scope
 HTTP routing, sessions, UI, packaging, systemd, and unsupported CrowdSec commands.
+
+## Coordinator status
+- Status: completed
+- Completed by: Go backend agent
+- Completed at: 2026-08-12T00:00:00Z
+- Verification: `gofmt -l backend/` empty; `go vet ./...` passed; `go build ./...` passed; `go test ./...` passed (adapter unit + fake-cscli integration tests). Static search confirmed no shell invocation (`sh -c`, `/bin/sh`, `/bin/bash`) and no executable handler for any matrix-unsupported row (they exist only as `OperationID` constants). Argument vectors are built internally from validated typed parameters via `exec.CommandContext`.
+- Commit or artifact reference: backend/ (go.mod, internal/adapter/*); working tree

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Fake cscli used by the adapter integration test. It is a test fixture only
+# and is never part of the production boundary. It simulates the structured
+# output of the real cscli for a small set of fixed argument vectors so the
+# real exec.CommandContext path can be exercised without a CrowdSec install.
+set -euo pipefail
+
+# Read arguments into a safe array.
+args=("$@")
+
+# alerts list -o json [-l N]
+if [[ "${args[0]:-}" == "alerts" && "${args[1]:-}" == "list" ]]; then
+  printf '[{"id":1,"start_at":"2026-08-05T09:58:00Z","scenario":"crowdsecurity/ssh-bf","scope":"Ip","value":"198.51.100.7","decisions":[{"type":"ban","duration":"4h"}]}]\n'
+  exit 0
+fi
+
+# decisions list -o json [-l N]
+if [[ "${args[0]:-}" == "decisions" && "${args[1]:-}" == "list" ]]; then
+  printf '[{"id":7,"origin":"cscli","type":"ban","scope":"Ip","value":"198.51.100.7"}]\n'
+  exit 0
+fi
+
+# decisions add --ip --duration --reason : success text
+if [[ "${args[0]:-}" == "decisions" && "${args[1]:-}" == "add" ]]; then
+  printf 'Decision successfully added\n'
+  exit 0
+fi
+
+# decisions delete --ip : success text
+if [[ "${args[0]:-}" == "decisions" && "${args[1]:-}" == "delete" ]]; then
+  printf 'Decision successfully deleted\n'
+  exit 0
+fi
+
+# machines list -o json
+if [[ "${args[0]:-}" == "machines" && "${args[1]:-}" == "list" ]]; then
+  printf '[]\n'
+  exit 0
+fi
+
+# hub list -o raw
+if [[ "${args[0]:-}" == "hub" && "${args[1]:-}" == "list" ]]; then
+  printf 'crowdsecurity/ssh-bf,installed,1.0.0,SSH brute force,scenarios\n'
+  exit 0
+fi
+
+# scenarios list -o json
+if [[ "${args[0]:-}" == "scenarios" && "${args[1]:-}" == "list" ]]; then
+  printf '{"scenarios":[{"name":"crowdsecurity/ssh-bf","description":"SSH brute force"}]}\n'
+  exit 0
+fi
+
+# simulation status : human text
+if [[ "${args[0]:-}" == "simulation" && "${args[1]:-}" == "status" ]]; then
+  printf 'Global simulation: disabled\n'
+  exit 0
+fi
+
+# lapi status
+if [[ "${args[0]:-}" == "lapi" && "${args[1]:-}" == "status" ]]; then
+  printf 'LAPI: OK\n'
+  exit 0
+fi
+
+# Unknown command -> non-zero exit with stderr.
+printf 'Error: unknown command %s\n' "${args[*]}" >&2
+exit 1

@@ -50,3 +50,10 @@ Development Lead and Security reviewer.
 
 ## Out of scope
 Implementation of the server, adapter, authentication, UI, systemd, or installation procedures.
+
+## Coordinator status
+- Status: completed
+- Completed by: Architecture agent
+- Completed at: 2026-08-12T00:00:00Z
+- Verification: `docs/architecture.md` cross-checked against `docs/command-matrix.md` §4 — 35 matrix rows, 24 supported/capability-gated endpoints with one-to-one method/page-mode/confirmation/refresh mapping, 11 unsupported rows with no endpoint (404), 6 fixed application routes; no-database and strict-allowlist constraints preserved; config schema has safe defaults (bind `127.0.0.1`, no default password hash); `git diff --check` clean.
+- Commit or artifact reference: docs/architecture.md; working tree
