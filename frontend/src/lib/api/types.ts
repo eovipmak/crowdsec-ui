@@ -383,21 +383,6 @@ export type MetricsComponent = "acquisition" | "appsec" | "lapi";
 // Query parameter builders (architecture §6.1)
 // ---------------------------------------------------------------------------
 
-export interface AlertFilterValues {
-  scenario?: string;
-  ip?: string;
-  scope?: string;
-  kind?: string;
-}
-
-export interface DecisionFilterValues {
-  ip?: string;
-  scope?: string;
-  type?: string;
-  origin?: string;
-  scenario?: string;
-}
-
 function appendQuery(
   params: URLSearchParams,
   key: string,

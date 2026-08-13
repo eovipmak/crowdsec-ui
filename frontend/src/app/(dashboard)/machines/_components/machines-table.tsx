@@ -36,8 +36,7 @@ const COLUMNS: Column<MachineItem>[] = [
     key: "last_heartbeat",
     header: "Last heartbeat",
     hiddenOnMobile: true,
-    render: (row) =>
-      row.last_heartbeat ? new Date(row.last_heartbeat).toLocaleString() : "—",
+    render: (row) => (row.last_heartbeat ? new Date(row.last_heartbeat).toLocaleString() : "—"),
   },
 ];
 
