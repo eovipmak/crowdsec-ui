@@ -1,1 +1,5 @@
 Review-2026!
+
+```
+backend/build.sh && ./backend/bin/crowdsec-dashboard --config ./config.yaml
+```

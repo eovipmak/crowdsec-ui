@@ -145,3 +145,15 @@ vite.config.ts.timestamp-*
 
 # Go build output (backend/build.sh)
 backend/bin/
+
+# Frontend static export staged by backend/build.sh into the Go embed package.
+# Each `build.sh` run regenerates this tree (hashed filenames change across
+# builds), so tracking it produces noisy diffs and merge conflicts. The binary
+# embeds whatever is present at build time; CI/release builds reproduce the
+# bundle from source via `npm run build` in frontend/.
+backend/internal/assets/bundle/
+
+# Local dashboard config (contains admin password hash — even dev values
+# must not be tracked). Copy deploy/config.example.yaml -> config.yaml and
+# set your own auth.admin_password_hash.
+/config.yaml
