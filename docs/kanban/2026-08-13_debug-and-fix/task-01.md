@@ -122,8 +122,8 @@ Go backend developer and Security reviewer.
   alerts/decisions contracts (task 02).
 
 ## Coordinator status
-- Status: not started
-- Completed by: <agent name>
-- Completed at: <timestamp>
-- Verification: <summary of checks run>
-- Commit or artifact reference: <commit SHA or file list>
+- Status: completed
+- Completed by: go-cscli-backend agent (DeepSeek-V4-Flash-0731) + coordinator review
+- Completed at: 2026-08-13T00:00:00Z
+- Verification: `gofmt -l internal/adapter/probe.go internal/adapter/adapter_test.go` clean; `go vet ./internal/adapter/...` pass; `go build ./...` pass; `go test ./internal/adapter/...` pass (ok adapter). Verbosely ran `TestMetricsShowProbeOverrideUnsetProbeSucceeds`, `TestMetricsShowProbeOverrideUnsetProbeFails`, `TestMetricsShowProbeNonZeroExitMapsToUnsupported`, `TestMetricsShowProbeOverrideTrueRunsNoProbeCommand`, `TestMetricsShowProbeOverrideFalseRunsNoProbeCommand` — all PASS. Static check: `grep -n "CapabilityGated" probe.go` — `OpMetricsShow` no longer assigned `CapabilityGated` anywhere (removed from structured-output loop at ~L66; dedicated probe block at ~L125 maps success→Supported, non-zero exit→Unsupported, never CapabilityGated). Override path (`opts.supportsMetrics != nil`) byte-for-byte unchanged and runs no extra probe command. Pre-existing `internal/assets/assets.go` gofmt drift left untouched (out of allowed files). `handlers.go`, `main.go`, matrix row, `MetricsShowRequest` enum untouched.
+- Commit or artifact reference: working tree (uncommitted). Modified: backend/internal/adapter/{probe,adapter_test}.go.

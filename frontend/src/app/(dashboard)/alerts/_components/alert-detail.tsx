@@ -6,6 +6,7 @@
  * (architecture §7). Distinct loading / empty / error / unsupported states
  * are shown, and the caller owns capability gating.
  */
+import { useEffect } from "react";
 import { useApiResource } from "@/lib/hooks/use-api-resource";
 import { apiClient } from "@/lib/api/client";
 import type { SuccessEnvelope } from "@/lib/api/types";
@@ -32,48 +33,72 @@ export function AlertDetail({ id, capability, onClose }: AlertDetailProps) {
 
   const data = resource.status === "success" ? resource.data.result : null;
 
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return (
-    <section
+    <div
+      role="dialog"
+      aria-modal="true"
       aria-labelledby="alert-detail-heading"
-      className="rounded-md border border-slate-200 bg-white p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 id="alert-detail-heading" className="text-sm font-semibold text-slate-900">
-          Alert detail
-        </h2>
-        <div className="flex items-center gap-2">
-          <CapabilityBadge state={capability} />
-          <Button variant="secondary" size="sm" onClick={onClose}>
-            Close
-          </Button>
+      <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
+      <div className="relative flex max-h-[80vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl">
+        <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-6 py-4">
+          <h2 id="alert-detail-heading" className="text-lg font-semibold text-slate-900">
+            Alert detail
+          </h2>
+          <div className="flex items-center gap-2">
+            <CapabilityBadge state={capability} />
+            <Button variant="secondary" size="sm" onClick={onClose} aria-label="Close alert detail">
+              ✕
+            </Button>
+          </div>
+        </div>
+
+        <div className="overflow-y-auto px-6 py-4">
+          {capability === "unsupported" ? (
+            <p className="text-sm text-slate-500">
+              Alert inspection is not supported by this installation. No control is available.
+            </p>
+          ) : resource.status === "loading" ? (
+            <LoadingState label="Loading alert…" />
+          ) : resource.status === "error" ? (
+            <ErrorState
+              title="Could not load this alert"
+              error={resource.error}
+              onRetry={() => void resource.refresh()}
+            />
+          ) : (
+            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <DetailItem label="ID" value={readString(data, "id")} />
+              <DetailItem label="Started" value={formatDate(readString(data, "start_at"))} />
+              <DetailItem label="Created" value={formatDate(readString(data, "created_at"))} />
+              <DetailItem label="Scenario" value={readString(data, "scenario")} />
+              <DetailItem label="Reason" value={readString(data, "reason")} />
+              <DetailItem label="Scope" value={readString(data, "scope")} />
+              <DetailItem label="Value" value={readString(data, "value")} />
+              <DetailItem label="Kind" value={readString(data, "kind")} />
+              <DetailItem label="Country" value={readString(data, "country")} />
+              <DetailItem
+                label="AS"
+                value={formatAs(readString(data, "as_number"), readString(data, "as_name"))}
+              />
+              <DetailItem label="Machine" value={readString(data, "machine")} />
+              <DetailItem label="Decisions" value={formatDecisions(readArray(data, "decisions"))} />
+            </dl>
+          )}
         </div>
       </div>
-
-      <div className="mt-3">
-        {capability === "unsupported" ? (
-          <p className="text-sm text-slate-500">
-            Alert inspection is not supported by this installation. No control is available.
-          </p>
-        ) : resource.status === "loading" ? (
-          <LoadingState label="Loading alert…" />
-        ) : resource.status === "error" ? (
-          <ErrorState
-            title="Could not load this alert"
-            error={resource.error}
-            onRetry={() => void resource.refresh()}
-          />
-        ) : (
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <DetailItem label="ID" value={readString(data, "id")} />
-            <DetailItem label="Started" value={formatDate(readString(data, "start_at"))} />
-            <DetailItem label="Scenario" value={readString(data, "scenario")} />
-            <DetailItem label="Scope" value={readString(data, "scope")} />
-            <DetailItem label="Value" value={readString(data, "value")} />
-            <DetailItem label="Decisions" value={formatDecisions(readArray(data, "decisions"))} />
-          </dl>
-        )}
-      </div>
-    </section>
+    </div>
   );
 }
 
@@ -111,6 +136,10 @@ function formatDate(value: string): string {
   }
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? value : d.toLocaleString();
+}
+
+function formatAs(asNumber: string, asName: string): string {
+  return [asNumber, asName].filter((p) => p && p.trim() !== "").join(" ");
 }
 
 function formatDecisions(decisions: Array<Record<string, unknown>>): string {

@@ -501,6 +501,102 @@ func TestUnsupportedOperationNeverRuns(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
+// metrics.show capability probe (task 01)
+// ---------------------------------------------------------------------------
+
+func TestMetricsShowProbeOverrideUnsetProbeSucceeds(t *testing.T) {
+	fake := newFakeRunner()
+	fake.scriptArgs([]string{"metrics", "show", "-o", "json"},
+		script{stdout: `{"acquisition":{}}`})
+	opts := Options{
+		ExecutablePath:           "/usr/bin/cscli",
+		Runner:                   fake,
+		supportsStructuredOutput: boolPtr(true), // isolate: only metrics probe runs
+		// supportsMetrics left nil: the probe must discover support live.
+	}
+	pr := runProbe(fake, opts)
+	if got := pr.capabilities[OpMetricsShow]; got != Supported {
+		t.Fatalf("expected OpMetricsShow Supported, got %s", got)
+	}
+	// The probe must run exactly the `metrics show -o json` command.
+	calls := fake.calls()
+	if len(calls) != 1 {
+		t.Fatalf("expected 1 probe command, got %d: %v", len(calls), calls)
+	}
+	if got := strings.Join(calls[0], " "); got != "cscli metrics show -o json" {
+		t.Fatalf("unexpected probe argv: %v", calls[0])
+	}
+}
+
+func TestMetricsShowProbeOverrideUnsetProbeFails(t *testing.T) {
+	fake := newFakeRunner()
+	opts := Options{
+		ExecutablePath:           "/usr/bin/cscli",
+		Runner:                   fake,
+		supportsStructuredOutput: boolPtr(true),
+		// supportsMetrics left nil.
+	}
+	// Missing executable → probe runner returns Unavailable error.
+	fake.missing = true
+	pr := runProbe(fake, opts)
+	if got := pr.capabilities[OpMetricsShow]; got != Unsupported {
+		t.Fatalf("expected OpMetricsShow Unsupported, got %s (must never be CapabilityGated)", got)
+	}
+}
+
+func TestMetricsShowProbeNonZeroExitMapsToUnsupported(t *testing.T) {
+	fake := newFakeRunner()
+	fake.scriptArgs([]string{"metrics", "show", "-o", "json"},
+		script{stdout: "", stderr: "prometheus: no config", exit: 1})
+	opts := Options{
+		ExecutablePath:           "/usr/bin/cscli",
+		Runner:                   fake,
+		supportsStructuredOutput: boolPtr(true),
+		// supportsMetrics left nil.
+	}
+	pr := runProbe(fake, opts)
+	if got := pr.capabilities[OpMetricsShow]; got != Unsupported {
+		t.Fatalf("expected OpMetricsShow Unsupported on non-zero exit, got %s", got)
+	}
+}
+
+func TestMetricsShowProbeOverrideTrueRunsNoProbeCommand(t *testing.T) {
+	fake := newFakeRunner()
+	on := true
+	opts := Options{
+		ExecutablePath:           "/usr/bin/cscli",
+		Runner:                   fake,
+		supportsStructuredOutput: boolPtr(true),
+		supportsMetrics:          &on,
+	}
+	pr := runProbe(fake, opts)
+	if got := pr.capabilities[OpMetricsShow]; got != Supported {
+		t.Fatalf("expected OpMetricsShow Supported, got %s", got)
+	}
+	if calls := fake.calls(); len(calls) != 0 {
+		t.Fatalf("override set: probe must NOT run a metrics command, got %v", calls)
+	}
+}
+
+func TestMetricsShowProbeOverrideFalseRunsNoProbeCommand(t *testing.T) {
+	fake := newFakeRunner()
+	off := false
+	opts := Options{
+		ExecutablePath:           "/usr/bin/cscli",
+		Runner:                   fake,
+		supportsStructuredOutput: boolPtr(true),
+		supportsMetrics:          &off,
+	}
+	pr := runProbe(fake, opts)
+	if got := pr.capabilities[OpMetricsShow]; got != Unsupported {
+		t.Fatalf("expected OpMetricsShow Unsupported, got %s", got)
+	}
+	if calls := fake.calls(); len(calls) != 0 {
+		t.Fatalf("override set: probe must NOT run a metrics command, got %v", calls)
+	}
+}
+
+// ---------------------------------------------------------------------------
 // Capabilities surface
 // ---------------------------------------------------------------------------
 
@@ -557,6 +653,9 @@ func TestProfilesReaderParsesFile(t *testing.T) {
 func writeFile(path, content string) error {
 	return writeFileImpl(path, content)
 }
+
+// boolPtr returns a pointer to v for forcing capability overrides in tests.
+func boolPtr(v bool) *bool { return &v }
 
 func TestExecutableNeverDerivedFromRequest(t *testing.T) {
 	fake := newFakeRunner()

@@ -58,12 +58,15 @@ func runProbe(runner CommandRunner, opts Options) *probeResult {
 		pr.limitFlag = *lf
 	}
 
-	// Refine read operations that depend on -o json.
+	// Refine read operations that depend on -o json. metrics.show is treated
+	// separately below because — unlike these always-on structured-output reads —
+	// it depends on the environment (a Prometheus config must be present), so
+	// its dedicated probe path is authoritative.
 	if pr.structuredOutput {
 		for _, op := range []OperationID{
 			OpAlertsList, OpAlertsInspect, OpDecisionsList, OpMachinesList,
 			OpBouncersList, OpScenariosList, OpScenariosInspect,
-			OpCollectionsList, OpAllowlistsList, OpMetricsShow,
+			OpCollectionsList, OpAllowlistsList,
 		} {
 			pr.capabilities[op] = Supported
 		}
@@ -114,7 +117,13 @@ func runProbe(runner CommandRunner, opts Options) *probeResult {
 		pr.capabilities[OpBouncersDelete] = CapabilityGated
 	}
 
-	// metrics.show is optional/environment-dependent.
+	// metrics.show is optional/environment-dependent: it requires a Prometheus
+	// config on the host, so it is discovered from a live probe rather than
+	// assumed from structured-output support. When the override is set, trust it
+	// without running an extra command. When unset, run a cheap, read-only,
+	// time-bounded probe (`cscli metrics show -o json`, matching the matrix §4
+	// metrics.show row) and map success to Supported, any failure (non-zero exit
+	// or malformed output) to Unsupported. Never leave it CapabilityGated.
 	if opts.supportsMetrics != nil {
 		if *opts.supportsMetrics {
 			pr.capabilities[OpMetricsShow] = Supported
@@ -122,7 +131,17 @@ func runProbe(runner CommandRunner, opts Options) *probeResult {
 			pr.capabilities[OpMetricsShow] = Unsupported
 		}
 	} else {
-		pr.capabilities[OpMetricsShow] = CapabilityGated
+		ctxMetrics, cancelMetrics := context.WithTimeout(context.Background(), probeTimeout)
+		_, merr := runner.Run(ctxMetrics, Command{
+			ExecutablePath: opts.ExecutablePath,
+			Args:           []string{"metrics", "show", "-o", "json"},
+		})
+		cancelMetrics()
+		if merr != nil {
+			pr.capabilities[OpMetricsShow] = Unsupported
+		} else {
+			pr.capabilities[OpMetricsShow] = Supported
+		}
 	}
 
 	// capi.status is optional/environment-dependent.

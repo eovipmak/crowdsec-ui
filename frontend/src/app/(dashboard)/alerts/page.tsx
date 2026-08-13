@@ -72,7 +72,6 @@ export default function AlertsPage() {
         capability={alertsCap}
         fetcher={fetcher}
         refreshKey={tick}
-        selectedId={selectedId}
         onSelect={setSelectedId}
       />
 

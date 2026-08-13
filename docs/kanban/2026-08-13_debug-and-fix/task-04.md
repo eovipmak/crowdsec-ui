@@ -149,8 +149,8 @@ Next.js dashboard developer and Backend Developer (contract conformance).
 - New shared Modal or DataTable dependencies.
 
 ## Coordinator status
-- Status: not started
-- Completed by: <agent name>
-- Completed at: <timestamp>
-- Verification: <summary of checks run>
-- Commit or artifact reference: <commit SHA or file list>
+- Status: completed
+- Completed by: nextjs-dashboard agent (DeepSeek-V4-Flash-0731) + coordinator review
+- Completed at: 2026-08-13T00:00:00Z
+- Verification: `npm run lint` pass; `npm run typecheck` pass; `npm run build` pass (`✓ Compiled successfully`; `/decisions` route compiled/exported, 12 static pages). `DecisionsListRequest["filter"]` confirmed exactly `{ ip?, type?, scenario? }` (no `origin`/`scope`). `decisionsListParams` emits only `filter.ip`/`filter.type`/`filter.scenario` (L431–433); `filter.scope`/`filter.origin` `appendQuery` lines removed. `DecisionItem` TS interface mirrors task 02 fields: `events?`, `alert_id?`, `country?`, `as_number?`, `as_name?` (plus existing `origin`/`scope`/`value`/`type`/`scenario`/`until`/`duration`). `grep "Scope\|Origin" decisions-filters.tsx` → no matches (exit 1); list-filter label relabeled to "IP"; grid stays `lg:grid-cols-3` for 3 remaining fields. Mutation forms untouched: `decision-add-form.tsx` (L43, L115) and `decision-delete-form.tsx` (L39, L91, L93) still say "IP or range" (5 matches) — accept CIDR per matrix contract. `git diff package.json` empty — no new deps. Backend Go files, `alerts/**`, `scenarios/**` untouched. COLUMNS match cscli `decisions list`: ID → Source(origin) → Scope:Value(join scope:value, fallback value) → Reason(scenario) → Action(type) → Country → AS(as_number+as_name) → Events → expiration(until→duration preserved) → Alert ID; low-priority cols `hiddenOnMobile`; `"—"` fallbacks preserved. Known pre-existing (NOT this task's): `machines-table.tsx` format:check drift — outside allowed-files, left for owner.
+- Commit or artifact reference: working tree (uncommitted). Modified: frontend/src/lib/api/types.ts, frontend/src/app/(dashboard)/decisions/_components/{decisions-table,decisions-filters}.tsx.

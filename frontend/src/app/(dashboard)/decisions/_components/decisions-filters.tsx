@@ -3,10 +3,10 @@
 /**
  * DecisionsFilters — typed filter inputs for `decisions.list` (matrix row).
  *
- * Only the matrix-approved filter fields are rendered: ip, scope, type,
- * origin, scenario (architecture §6.1). Values are typed strings; no
- * free-form flags, expressions, or SQL reach the adapter. The filter is
- * applied on submit and the page keeps its filter state across refresh.
+ * Only the matrix-approved filter fields are rendered: ip, type, scenario
+ * (architecture §6.1). Values are typed strings; no free-form flags,
+ * expressions, or SQL reach the adapter. The filter is applied on submit
+ * and the page keeps its filter state across refresh.
  */
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -25,9 +25,7 @@ const LIMIT_OPTIONS = [25, 50, 100];
 
 export function DecisionsFilters({ value, onChange, limit, onLimitChange }: DecisionsFiltersProps) {
   const [ip, setIp] = useState(value.ip ?? "");
-  const [scope, setScope] = useState(value.scope ?? "");
   const [type, setType] = useState(value.type ?? "");
-  const [origin, setOrigin] = useState(value.origin ?? "");
   const [scenario, setScenario] = useState(value.scenario ?? "");
 
   function applyFilters(e: FormEvent) {
@@ -36,14 +34,8 @@ export function DecisionsFilters({ value, onChange, limit, onLimitChange }: Deci
     if (ip.trim()) {
       next.ip = ip.trim();
     }
-    if (scope.trim()) {
-      next.scope = scope.trim();
-    }
     if (type.trim()) {
       next.type = type.trim();
-    }
-    if (origin.trim()) {
-      next.origin = origin.trim();
     }
     if (scenario.trim()) {
       next.scenario = scenario.trim();
@@ -53,9 +45,7 @@ export function DecisionsFilters({ value, onChange, limit, onLimitChange }: Deci
 
   function clearFilters() {
     setIp("");
-    setScope("");
     setType("");
-    setOrigin("");
     setScenario("");
     onChange({});
   }
@@ -67,20 +57,12 @@ export function DecisionsFilters({ value, onChange, limit, onLimitChange }: Deci
       aria-label="Filter decisions"
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label="IP or range" htmlFor="decisions-filter-ip">
+        <Field label="IP" htmlFor="decisions-filter-ip">
           <TextInput
             id="decisions-filter-ip"
             value={ip}
             onChange={(e) => setIp(e.target.value)}
             placeholder="e.g. 198.51.100.7"
-          />
-        </Field>
-        <Field label="Scope" htmlFor="decisions-filter-scope">
-          <TextInput
-            id="decisions-filter-scope"
-            value={scope}
-            onChange={(e) => setScope(e.target.value)}
-            placeholder="e.g. Ip"
           />
         </Field>
         <Field label="Type" htmlFor="decisions-filter-type">
@@ -89,14 +71,6 @@ export function DecisionsFilters({ value, onChange, limit, onLimitChange }: Deci
             value={type}
             onChange={(e) => setType(e.target.value)}
             placeholder="e.g. ban"
-          />
-        </Field>
-        <Field label="Origin" htmlFor="decisions-filter-origin">
-          <TextInput
-            id="decisions-filter-origin"
-            value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
-            placeholder="e.g. cscli"
           />
         </Field>
         <Field label="Scenario" htmlFor="decisions-filter-scenario">

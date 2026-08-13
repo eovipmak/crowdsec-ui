@@ -197,6 +197,15 @@ export interface AlertItem {
   scenario: string;
   scope: AlertScope;
   value: string;
+  /** Operator-facing columns from the cscli `-m` table (task 02 contract). All optional. */
+  country?: string;
+  as_number?: string;
+  as_name?: string;
+  events?: number;
+  machine?: string;
+  kind?: string;
+  reason?: string;
+  created_at?: string;
   decisions: AlertDecision[];
   /** Representative shape; the adapter may include extra fields — the UI renders known fields only. */
   [key: string]: unknown;
@@ -207,8 +216,6 @@ export interface AlertsListRequest {
   filter?: {
     scenario?: string;
     ip?: string;
-    scope?: string;
-    kind?: string;
   };
 }
 
@@ -230,6 +237,12 @@ export interface DecisionItem {
   created_at?: string;
   until?: string;
   duration?: string;
+  /** Task 02 fields from the parsed cscli blob. All optional. */
+  events?: number;
+  alert_id?: number;
+  country?: string;
+  as_number?: string;
+  as_name?: string;
   [key: string]: unknown;
 }
 
@@ -237,9 +250,7 @@ export interface DecisionsListRequest {
   limit?: number;
   filter?: {
     ip?: string;
-    scope?: string;
     type?: string;
-    origin?: string;
     scenario?: string;
   };
 }
@@ -408,8 +419,6 @@ export function alertsListParams(req: AlertsListRequest): URLSearchParams {
   if (req.filter) {
     appendQuery(params, "filter.scenario", req.filter.scenario);
     appendQuery(params, "filter.ip", req.filter.ip);
-    appendQuery(params, "filter.scope", req.filter.scope);
-    appendQuery(params, "filter.kind", req.filter.kind);
   }
   return params;
 }
@@ -420,9 +429,7 @@ export function decisionsListParams(req: DecisionsListRequest): URLSearchParams 
   appendQuery(params, "limit", req.limit);
   if (req.filter) {
     appendQuery(params, "filter.ip", req.filter.ip);
-    appendQuery(params, "filter.scope", req.filter.scope);
     appendQuery(params, "filter.type", req.filter.type);
-    appendQuery(params, "filter.origin", req.filter.origin);
     appendQuery(params, "filter.scenario", req.filter.scenario);
   }
   return params;

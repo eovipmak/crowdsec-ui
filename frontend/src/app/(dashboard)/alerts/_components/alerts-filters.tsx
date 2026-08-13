@@ -3,8 +3,8 @@
 /**
  * AlertsFilters — typed filter inputs for `alerts.list` (matrix row).
  *
- * Only the matrix-approved filter fields are rendered: scenario, ip, scope,
- * kind (architecture §6.1). Values are typed strings; no free-form flags,
+ * Only the matrix-approved filter fields are rendered: scenario, ip
+ * (architecture §6.1). Values are typed strings; no free-form flags,
  * expressions, or SQL reach the adapter. The filter is applied on submit and
  * the page keeps its filter/pagination state across refresh (task 09).
  */
@@ -26,8 +26,6 @@ const LIMIT_OPTIONS = [25, 50, 100];
 export function AlertsFilters({ value, onChange, limit, onLimitChange }: AlertsFiltersProps) {
   const [scenario, setScenario] = useState(value.scenario ?? "");
   const [ip, setIp] = useState(value.ip ?? "");
-  const [scope, setScope] = useState(value.scope ?? "");
-  const [kind, setKind] = useState(value.kind ?? "");
 
   function applyFilters(e: FormEvent) {
     e.preventDefault();
@@ -38,20 +36,12 @@ export function AlertsFilters({ value, onChange, limit, onLimitChange }: AlertsF
     if (ip.trim()) {
       next.ip = ip.trim();
     }
-    if (scope.trim()) {
-      next.scope = scope.trim();
-    }
-    if (kind.trim()) {
-      next.kind = kind.trim();
-    }
     onChange(next);
   }
 
   function clearFilters() {
     setScenario("");
     setIp("");
-    setScope("");
-    setKind("");
     onChange({});
   }
 
@@ -61,7 +51,7 @@ export function AlertsFilters({ value, onChange, limit, onLimitChange }: AlertsF
       className="rounded-md border border-slate-200 bg-white p-4"
       aria-label="Filter alerts"
     >
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Scenario" htmlFor="alerts-filter-scenario">
           <TextInput
             id="alerts-filter-scenario"
@@ -76,22 +66,6 @@ export function AlertsFilters({ value, onChange, limit, onLimitChange }: AlertsF
             value={ip}
             onChange={(e) => setIp(e.target.value)}
             placeholder="e.g. 198.51.100.7"
-          />
-        </Field>
-        <Field label="Scope" htmlFor="alerts-filter-scope">
-          <TextInput
-            id="alerts-filter-scope"
-            value={scope}
-            onChange={(e) => setScope(e.target.value)}
-            placeholder="e.g. Ip"
-          />
-        </Field>
-        <Field label="Kind" htmlFor="alerts-filter-kind">
-          <TextInput
-            id="alerts-filter-kind"
-            value={kind}
-            onChange={(e) => setKind(e.target.value)}
-            placeholder="e.g. alert"
           />
         </Field>
       </div>

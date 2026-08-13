@@ -28,38 +28,64 @@ interface DecisionsTableProps {
 const COLUMNS: Column<DecisionItem>[] = [
   { key: "id", header: "ID" },
   {
-    key: "value",
-    header: "IP / value",
-    render: (row) => row.value || "—",
-  },
-  {
-    key: "scope",
-    header: "Scope",
-    hiddenOnMobile: true,
-    render: (row) => row.scope || "—",
-  },
-  {
-    key: "type",
-    header: "Type",
-    render: (row) => row.type || "—",
-  },
-  {
     key: "origin",
-    header: "Origin",
-    hiddenOnMobile: true,
+    header: "Source",
     render: (row) => row.origin || "—",
   },
   {
+    key: "scope",
+    header: "Scope:Value",
+    render: (row) => {
+      if (row.scope) {
+        return `${row.scope}:${row.value}`;
+      }
+      return row.value || "—";
+    },
+  },
+  {
     key: "scenario",
-    header: "Scenario",
-    hiddenOnMobile: true,
+    header: "Reason",
     render: (row) => row.scenario || "—",
   },
   {
+    key: "type",
+    header: "Action",
+    render: (row) => row.type || "—",
+  },
+  {
+    key: "country",
+    header: "Country",
+    hiddenOnMobile: true,
+    render: (row) => row.country || "—",
+  },
+  {
+    key: "as_number",
+    header: "AS",
+    hiddenOnMobile: true,
+    render: (row) => {
+      if (row.as_number && row.as_name) {
+        return `${row.as_number} ${row.as_name}`;
+      }
+      return row.as_number || row.as_name || "—";
+    },
+  },
+  {
+    key: "events",
+    header: "Events",
+    hiddenOnMobile: true,
+    render: (row) => (row.events !== undefined ? String(row.events) : "—"),
+  },
+  {
     key: "until",
-    header: "Until",
+    header: "expiration",
     hiddenOnMobile: true,
     render: (row) => (row.until ? new Date(row.until).toLocaleString() : row.duration || "—"),
+  },
+  {
+    key: "alert_id",
+    header: "Alert ID",
+    hiddenOnMobile: true,
+    render: (row) => (row.alert_id !== undefined ? String(row.alert_id) : "—"),
   },
 ];
 

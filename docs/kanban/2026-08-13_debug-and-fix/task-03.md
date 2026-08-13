@@ -159,8 +159,8 @@ Next.js dashboard developer and Backend Developer (contract conformance).
   (reuse `ConfirmationModal` styling pattern only).
 
 ## Coordinator status
-- Status: not started
-- Completed by: <agent name>
-- Completed at: <timestamp>
-- Verification: <summary of checks run>
-- Commit or artifact reference: <commit SHA or file list>
+- Status: completed
+- Completed by: nextjs-dashboard agent (DeepSeek-V4-Flash-0731) + coordinator review
+- Completed at: 2026-08-13T00:00:00Z
+- Verification: `npm run lint` pass; `npm run typecheck` pass; `npm run build` pass (`/alerts` route compiled; all 7 pages exported). Modal accessibility confirmed in `alert-detail.tsx`: L48 `role="dialog"`, L49 `aria-modal="true"`, L50 `aria-labelledby`, L61 `aria-label="Close alert detail"` button (`onClose`), L38 Escape handler (`event.key === "Escape"` → `onClose`), L53 overlay-click (`onClick={onClose}`). `AlertsListRequest["filter"]` now `{ scenario?, ip? }` (L216); `alertsListParams` emits only `filter.scenario` and `filter.ip` (L416–417). `grep "Scope\|Kind" alerts-filters.tsx` → no matches (exit 1). `git diff package.json` empty — no new deps. COLUMNS order matches cscli `-m`: ID → value(scope:value) → reason → country → as(as_number+as_name) → decisions → created_at(fallback start_at) → kind → machine; low-priority cols `hiddenOnMobile`; per-cell `"—"` fallbacks preserved. Loading/empty/error/unsupported states preserved inside modal body. Backend Go files untouched. Known pre-existing (NOT this task's): `machines-table.tsx` format:check drift, orphan `AlertFilterValues` interface (still declares scope/kind, imported nowhere) — both outside allowed-files, left for owner.
+- Commit or artifact reference: working tree (uncommitted). Modified: frontend/src/lib/api/types.ts, frontend/src/app/(dashboard)/alerts/_components/{alerts-table,alerts-filters,alert-detail}.tsx, frontend/src/app/(dashboard)/alerts/page.tsx.

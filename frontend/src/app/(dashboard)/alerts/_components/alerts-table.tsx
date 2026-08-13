@@ -24,33 +24,41 @@ interface AlertsTableProps {
   capability: CapabilityState;
   fetcher: () => Promise<SuccessEnvelope<CollectionResult<AlertItem>>>;
   refreshKey: unknown;
-  selectedId: number | null;
-  onSelect: (id: number | null) => void;
+  onSelect: (id: number) => void;
 }
 
 const COLUMNS: Column<AlertItem>[] = [
   { key: "id", header: "ID" },
   {
-    key: "start_at",
-    header: "Started",
-    hiddenOnMobile: true,
-    render: (row) => (row.start_at ? new Date(row.start_at).toLocaleString() : "—"),
-  },
-  {
-    key: "scenario",
-    header: "Scenario",
-    render: (row) => row.scenario || "—",
-  },
-  {
-    key: "scope",
-    header: "Scope",
-    hiddenOnMobile: true,
-    render: (row) => row.scope || "—",
-  },
-  {
     key: "value",
     header: "Value",
-    render: (row) => row.value || "—",
+    render: (row) => {
+      const value = row.value || "";
+      if (row.scope) {
+        return value ? `${row.scope}:${value}` : row.scope;
+      }
+      return value || "—";
+    },
+  },
+  {
+    key: "reason",
+    header: "Reason",
+    render: (row) => row.reason || row.scenario || "—",
+  },
+  {
+    key: "country",
+    header: "Country",
+    hiddenOnMobile: true,
+    render: (row) => row.country || "—",
+  },
+  {
+    key: "as",
+    header: "AS",
+    hiddenOnMobile: true,
+    render: (row) => {
+      const parts = [row.as_number, row.as_name].filter((p) => p && p.trim() !== "");
+      return parts.length > 0 ? parts.join(" ") : "—";
+    },
   },
   {
     key: "decisions",
@@ -61,15 +69,32 @@ const COLUMNS: Column<AlertItem>[] = [
         ? row.decisions.map((d) => `${d.type}${d.duration ? ` (${d.duration})` : ""}`).join(", ")
         : "—",
   },
+  {
+    key: "created_at",
+    header: "Created",
+    hiddenOnMobile: true,
+    render: (row) =>
+      row.created_at ? new Date(row.created_at).toLocaleString() : formatStartAt(row),
+  },
+  {
+    key: "kind",
+    header: "Kind",
+    hiddenOnMobile: true,
+    render: (row) => row.kind || "—",
+  },
+  {
+    key: "machine",
+    header: "Machine",
+    hiddenOnMobile: true,
+    render: (row) => row.machine || "—",
+  },
 ];
 
-export function AlertsTable({
-  capability,
-  fetcher,
-  refreshKey,
-  selectedId,
-  onSelect,
-}: AlertsTableProps) {
+function formatStartAt(row: AlertItem): string {
+  return row.start_at ? new Date(row.start_at).toLocaleString() : "—";
+}
+
+export function AlertsTable({ capability, fetcher, refreshKey, onSelect }: AlertsTableProps) {
   const resource = useApiResource<SuccessEnvelope<CollectionResult<AlertItem>>>(fetcher, {
     key: refreshKey,
   });
@@ -120,12 +145,8 @@ export function AlertsTable({
               rowKey={(row) => String(row.id)}
               caption="CrowdSec alerts"
               actions={(row) => (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => onSelect(selectedId === row.id ? null : row.id)}
-                >
-                  {selectedId === row.id ? "Hide detail" : "View"}
+                <Button variant="secondary" size="sm" onClick={() => onSelect(row.id)}>
+                  View
                 </Button>
               )}
             />
