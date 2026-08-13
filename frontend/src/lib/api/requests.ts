@@ -20,11 +20,9 @@ import type {
   DecisionsAddRequest,
   DecisionsDeleteRequest,
   DecisionsListRequest,
-  HubListRequest,
   LoginRequest,
   MachinesPruneRequest,
   MetricsComponent,
-  ScenariosInspectRequest,
   SessionStatus,
 } from "@/lib/api/types";
 import { alertsListParams, decisionsListParams } from "@/lib/api/types";
@@ -87,21 +85,9 @@ export const apiRequests = {
       csrfToken: opts.csrfToken,
     }),
 
-  // --- hub / scenarios / collections / profiles ---
-  hubList: (req: HubListRequest) => {
-    const params = new URLSearchParams();
-    if (req.type) {
-      params.append("type", req.type);
-    }
-    return getWithParams("/hub", params);
-  },
-  scenariosList: () => get("/scenarios"),
-  scenariosInspect: (req: ScenariosInspectRequest) => get(`/scenarios/${req.scenario}`),
-  collectionsList: () => get("/collections"),
-  profilesInspect: () => get("/profiles"),
-
   // --- simulation / status ---
-  simulationStatus: () => get("/simulation"),
+  // The backend /api/v1/{scenarios,collections,profiles,simulation,hub} routes
+  // remain matrix-backed, but the dashboard UI no longer calls them.
   lapiStatus: () => get("/status/lapi"),
   capiStatus: () => get("/status/capi"),
 

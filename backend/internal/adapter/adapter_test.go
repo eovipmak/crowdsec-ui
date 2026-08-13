@@ -289,6 +289,164 @@ func TestMalformedJSONMapsToMalformedOutput(t *testing.T) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// v2 contract: expanded parsed shape (task 02)
+// ---------------------------------------------------------------------------
+
+func TestAlertsListSurfacesNewFields(t *testing.T) {
+	fake := newFakeRunner()
+	fake.scriptArgs([]string{"alerts", "list", "-o", "json", "-l", "50"},
+		script{stdout: `[
+  {
+    "capacity":5,
+    "created_at":"2026-08-05T09:59:00Z",
+    "decisions":[{"duration":"4h","type":"ban"}],
+    "events_count":6,
+    "id":1,
+    "kind":"crowdsec",
+    "machine_id":"test-machine",
+    "scenario":"crowdsecurity/ssh-bf",
+    "source":{"ip":"198.51.100.7","cn":"AU","as_number":"13335","as_name":"Cloudflare","scope":"Ip","value":"198.51.100.7"},
+    "start_at":"2026-08-05T09:58:00Z",
+    "stop_at":"2026-08-05T09:58:10Z"
+  }
+]`})
+	ex := newTestAdapter(t, fake)
+
+	res, opErr := ex.Run(context.Background(), OpAlertsList, AlertsListRequest{})
+	if opErr != nil {
+		t.Fatalf("unexpected error: %v", opErr)
+	}
+	alerts := res.(AlertsListResult)
+	if len(alerts.Items) != 1 {
+		t.Fatalf("expected 1 alert, got %d", len(alerts.Items))
+	}
+	it := alerts.Items[0]
+	// Existing fields preserved.
+	if it.ID != 1 || it.Scenario != "crowdsecurity/ssh-bf" || it.Scope != "Ip" || it.Value != "198.51.100.7" {
+		t.Fatalf("existing fields changed: %+v", it)
+	}
+	// New fields surfaced.
+	if it.Country != "AU" || it.ASNumber != "13335" || it.ASName != "Cloudflare" {
+		t.Fatalf("country/AS not surfaced: %+v", it)
+	}
+	if it.Events != 6 || it.Machine != "test-machine" || it.Kind != "crowdsec" {
+		t.Fatalf("events/machine/kind not surfaced: %+v", it)
+	}
+	if it.Reason != "crowdsecurity/ssh-bf" || it.CreatedAt != "2026-08-05T09:59:00Z" {
+		t.Fatalf("reason/created_at not surfaced: %+v", it)
+	}
+	if len(it.Decisions) != 1 || it.Decisions[0].Type != "ban" || it.Decisions[0].Duration != "4h" {
+		t.Fatalf("decisions not preserved: %+v", it.Decisions)
+	}
+}
+
+func TestDecisionsListSurfacesNewFieldsAndBlobFallback(t *testing.T) {
+	fake := newFakeRunner()
+	fake.scriptArgs([]string{"decisions", "list", "-o", "json", "-l", "100"},
+		script{stdout: `[
+  {
+    "id":7,
+    "scenario":"crowdsecurity/ssh-bf",
+    "created_at":"2026-08-05T09:59:00Z",
+    "events_count":6,
+    "source":{"ip":"198.51.100.7","cn":"AU","as_number":"13335","as_name":"Cloudflare","scope":"Ip","value":"198.51.100.7"},
+    "decisions":[{"origin":"cscli","type":"ban","scope":"Ip","value":"198.51.100.7","duration":"4h","until":"2026-08-05T13:59:00Z"}]
+  }
+]`})
+	ex := newTestAdapter(t, fake)
+
+	res, opErr := ex.Run(context.Background(), OpDecisionsList, DecisionsListRequest{})
+	if opErr != nil {
+		t.Fatalf("unexpected error: %v", opErr)
+	}
+	decisions := res.(DecisionsListResult)
+	if len(decisions.Items) != 1 {
+		t.Fatalf("expected 1 decision, got %d", len(decisions.Items))
+	}
+	it := decisions.Items[0]
+	if it.ID != 7 || it.Origin != "cscli" || it.Type != "ban" || it.Scope != "Ip" ||
+		it.Value != "198.51.100.7" || it.Duration != "4h" {
+		t.Fatalf("existing decision fields changed: %+v", it)
+	}
+	if it.Events != 6 || it.AlertID != 7 {
+		t.Fatalf("events/alert_id not surfaced: %+v", it)
+	}
+	if it.Country != "AU" || it.ASNumber != "13335" || it.ASName != "Cloudflare" {
+		t.Fatalf("country/AS not surfaced: %+v", it)
+	}
+	if it.Scenario != "crowdsecurity/ssh-bf" || it.CreatedAt != "2026-08-05T09:59:00Z" {
+		t.Fatalf("scenario/created_at not surfaced: %+v", it)
+	}
+}
+
+func TestDecisionsListFlatFallbackStillWorks(t *testing.T) {
+	fake := newFakeRunner()
+	fake.scriptArgs([]string{"decisions", "list", "-o", "json", "-l", "100"},
+		script{stdout: `[
+	  {"id":1,"origin":"cscli","type":"ban","scope":"Ip","value":"198.51.100.7","scenario":"crowdsecurity/ssh-bf","duration":"4h"}
+	]`})
+	ex := newTestAdapter(t, fake)
+
+	res, opErr := ex.Run(context.Background(), OpDecisionsList, DecisionsListRequest{})
+	if opErr != nil {
+		t.Fatalf("unexpected error: %v", opErr)
+	}
+	decisions := res.(DecisionsListResult)
+	if len(decisions.Items) != 1 {
+		t.Fatalf("expected 1 decision, got %d", len(decisions.Items))
+	}
+	it := decisions.Items[0]
+	if it.ID != 1 || it.Origin != "cscli" || it.Type != "ban" || it.Value != "198.51.100.7" {
+		t.Fatalf("flat fallback failed: %+v", it)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// v2 contract: dropped filter fields no longer emitted (task 02)
+// ---------------------------------------------------------------------------
+
+func TestAlertsListDropsScopeAndKindFilters(t *testing.T) {
+	// Stale request carrying the dropped fields must not produce --scope/--kind.
+	req := AlertsListRequest{
+		Limit: 50,
+		Filter: &AlertsFilter{
+			Scenario: "crowdsecurity/ssh-bf",
+			IP:       "198.51.100.7",
+		},
+	}
+	// adapter-level: AlertsFilter has no Scope/Kind fields anymore; construct
+	// the argv directly to assert no removed flags are emitted.
+	args := alertsListArgs(req)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--scope") || strings.Contains(joined, "--kind") {
+		t.Fatalf("dropped filter flags emitted: %v", args)
+	}
+	if !strings.Contains(joined, "--scenario crowdsecurity/ssh-bf") || !strings.Contains(joined, "--ip 198.51.100.7") {
+		t.Fatalf("kept filters missing: %v", args)
+	}
+}
+
+func TestDecisionsListDropsScopeAndOriginFilters(t *testing.T) {
+	req := DecisionsListRequest{
+		Limit: 100,
+		Filter: &DecisionsFilter{
+			IP:       "198.51.100.7",
+			Type:     "ban",
+			Scenario: "crowdsecurity/ssh-bf",
+		},
+	}
+	args := decisionsListArgs(req)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--scope") || strings.Contains(joined, "--origin") {
+		t.Fatalf("dropped filter flags emitted: %v", args)
+	}
+	if !strings.Contains(joined, "--ip 198.51.100.7") || !strings.Contains(joined, "--type ban") ||
+		!strings.Contains(joined, "--scenario crowdsecurity/ssh-bf") {
+		t.Fatalf("kept filters missing: %v", args)
+	}
+}
+
 func TestMissingExecutableMapsToUnavailable(t *testing.T) {
 	fake := newFakeRunner()
 	fake.missing = true

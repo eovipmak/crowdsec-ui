@@ -115,10 +115,11 @@ func parseMetricsJSON(op OperationID, out []byte) (map[string]any, *OpError) {
 // alert-shaped blobs, each carrying an embedded `decisions` array (see
 // matrix §4 `decisions.list`). Each row in `decisions[]` carries the actual
 // decision fields (origin/type/scope/value/duration) but no alert-level id or
-// scenario, so each output DecisionItem is a synthesis: identity/time/scenario
-// from the alert blob, and origin/type/scope/value/duration from the embedded
-// decision. An alert with no decisions (e.g. a simulated/none scenario) is
-// skipped. Malformed JSON is malformed_output; an empty input is an empty list.
+// scenario, so each output DecisionItem is a synthesis: identity/time/scenario/
+// events/alert_id/country/AS from the alert blob, and origin/type/scope/value/
+// duration from the embedded decision. An alert with no decisions (e.g. a
+// simulated/none scenario) is skipped. Malformed JSON is malformed_output; an
+// empty input is an empty list.
 func parseDecisionsList(op OperationID, out []byte) ([]DecisionItem, *OpError) {
 	trimmed := strings.TrimSpace(string(out))
 	if trimmed == "" {
@@ -137,7 +138,7 @@ func parseDecisionsList(op OperationID, out []byte) ([]DecisionItem, *OpError) {
 	items := make([]DecisionItem, 0, len(blobs))
 	for _, b := range blobs {
 		for _, d := range b.Decisions {
-			items = append(items, DecisionItem{
+			item := DecisionItem{
 				ID:        b.ID,
 				Origin:    d.Origin,
 				Type:      d.Type,
@@ -147,7 +148,15 @@ func parseDecisionsList(op OperationID, out []byte) ([]DecisionItem, *OpError) {
 				CreatedAt: b.CreatedAt,
 				Until:     d.Until,
 				Duration:  d.Duration,
-			})
+				Events:    b.Events,
+				AlertID:   b.ID,
+			}
+			if b.Source != nil {
+				item.Country = b.Source.Country
+				item.ASNumber = b.Source.ASNumber
+				item.ASName = b.Source.ASName
+			}
+			items = append(items, item)
 		}
 	}
 	if items == nil {
@@ -183,11 +192,89 @@ func tryParseFlatDecisions(out string) ([]DecisionItem, bool) {
 // cscliDecisionsEntry is the alert-blob shape emitted by `cscli decisions list
 // -o json`. Only the fields we synthesize DecisionItem from are decoded; the
 // remainder (events, meta, capacity) is ignored by the dashboard (matrix §4).
+// Country/AS come from the nested `source` object; events from `events_count`.
 type cscliDecisionsEntry struct {
-	ID        int64                  `json:"id"`
-	Scenario  string                 `json:"scenario"`
-	CreatedAt string                 `json:"created_at"`
+	ID        int64                   `json:"id"`
+	Scenario  string                  `json:"scenario"`
+	CreatedAt string                  `json:"created_at"`
+	Events    int64                   `json:"events_count"`
+	Source    *cscliSource            `json:"source,omitempty"`
 	Decisions []cscliEmbeddedDecision `json:"decisions"`
+}
+
+// cscliSource is the alert/decision blob `source` object. cscli 1.7.x nests
+// scope/value and the GeoIP enrichment (country/AS) here.
+type cscliSource struct {
+	Scope    string `json:"scope,omitempty"`
+	Value    string `json:"value,omitempty"`
+	Country  string `json:"cn,omitempty"`
+	ASNumber string `json:"as_number,omitempty"`
+	ASName   string `json:"as_name,omitempty"`
+}
+
+// cscliAlert is the raw alert-blob shape emitted by `cscli alerts list -o json`
+// (and `cscli alerts inspect`). It mirrors the authoritative models.Alert JSON
+// tags so the decoder is robust regardless of version: scope/value/country/AS
+// live under the nested `source` object, while events_count/machine_id/kind/
+// created_at are root fields. The Reason (table "reason" column) is the
+// scenario. Unknown/ignored fields are dropped.
+type cscliAlert struct {
+	ID          *int64          `json:"id,omitempty"`
+	StartAt     *string         `json:"start_at,omitempty"`
+	StopAt      *string         `json:"stop_at,omitempty"`
+	Scenario    *string         `json:"scenario,omitempty"`
+	CreatedAt   *string         `json:"created_at,omitempty"`
+	EventsCount *int64          `json:"events_count,omitempty"`
+	MachineID   *string         `json:"machine_id,omitempty"`
+	Kind        *string         `json:"kind,omitempty"`
+	Source      *cscliSource    `json:"source,omitempty"`
+	Decisions   []AlertDecision `json:"decisions,omitempty"`
+}
+
+// UnmarshalJSON flattens the cscli alert blob into the flat AlertItem shape the
+// dashboard exposes. Existing flat fields (id/start_at/scenario/scope/value/
+// decisions) are preserved; new operator-facing fields (country/as/as_name/
+// events/machine/kind/reason/created_at) are surfaced. Malformed JSON is left
+// to the collection parser, which returns malformed_output.
+func (a *AlertItem) UnmarshalJSON(data []byte) error {
+	var raw cscliAlert
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	if raw.ID != nil {
+		a.ID = *raw.ID
+	}
+	if raw.StartAt != nil {
+		a.StartAt = *raw.StartAt
+	}
+	if raw.StopAt != nil {
+		a.StopAt = *raw.StopAt
+	}
+	if raw.Scenario != nil {
+		a.Scenario = *raw.Scenario
+	}
+	if raw.CreatedAt != nil {
+		a.CreatedAt = *raw.CreatedAt
+	}
+	if raw.EventsCount != nil {
+		a.Events = *raw.EventsCount
+	}
+	if raw.MachineID != nil {
+		a.Machine = *raw.MachineID
+	}
+	if raw.Kind != nil {
+		a.Kind = *raw.Kind
+	}
+	if raw.Source != nil {
+		a.Scope = raw.Source.Scope
+		a.Value = raw.Source.Value
+		a.Country = raw.Source.Country
+		a.ASNumber = raw.Source.ASNumber
+		a.ASName = raw.Source.ASName
+	}
+	a.Reason = a.Scenario
+	a.Decisions = raw.Decisions
+	return nil
 }
 
 // cscliEmbeddedDecision is the per-decision record inside an alert blob. It

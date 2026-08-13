@@ -172,6 +172,45 @@ func TestAlertsListReadSuccess(t *testing.T) {
 	}
 }
 
+// v2 contract (task 02): dropped filter query params are ignored, not rejected
+// with 400, so stale cached browser requests keep working during rollout.
+
+func TestAlertsListIgnoresDroppedScopeAndKindFilters(t *testing.T) {
+	fake := newFakeAdapter()
+	ts := newTestServer(t, fake)
+	cookie, csrf := login(t, ts)
+	_ = csrf
+
+	// Dropped filter.scope/filter.kind must not 400 and must not be forwarded.
+	resp, out := doJSON(t, ts, "GET",
+		"/api/v1/alerts?limit=50&filter.scope=Ip&filter.kind=crowdsec&filter.scenario=crowdsecurity/ssh-bf&filter.ip=198.51.100.7",
+		"", cookie, "")
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("status: %d: %s", resp.StatusCode, out)
+	}
+	if !strings.Contains(out, `"operation":"alerts.list"`) {
+		t.Fatalf("missing operation: %s", out)
+	}
+}
+
+func TestDecisionsListIgnoresDroppedOriginAndScopeFilters(t *testing.T) {
+	fake := newFakeAdapter()
+	ts := newTestServer(t, fake)
+	cookie, csrf := login(t, ts)
+	_ = csrf
+
+	// Dropped filter.origin/filter.scope must not 400 and must not be forwarded.
+	resp, out := doJSON(t, ts, "GET",
+		"/api/v1/decisions?limit=100&filter.origin=cscli&filter.scope=Ip&filter.ip=198.51.100.7&filter.type=ban&filter.scenario=crowdsecurity/ssh-bf",
+		"", cookie, "")
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("status: %d: %s", resp.StatusCode, out)
+	}
+	if !strings.Contains(out, `"operation":"decisions.list"`) {
+		t.Fatalf("missing operation: %s", out)
+	}
+}
+
 // --- mutation route with confirmation flow -----------------------------------
 
 func TestDecisionsAddMutationFlow(t *testing.T) {

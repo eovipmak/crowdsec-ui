@@ -41,11 +41,6 @@ const NAV_ITEMS: NavItem[] = [
     label: "Machines / status",
     description: "Registered machines and LAPI/CAPI status",
   },
-  {
-    href: "/scenarios",
-    label: "Scenarios / profiles / collections",
-    description: "Read-only configuration views",
-  },
   { href: "/allowlists", label: "Allowlists", description: "Local allowlists" },
   { href: "/bouncers", label: "Bouncers", description: "Registered bouncers" },
 ];

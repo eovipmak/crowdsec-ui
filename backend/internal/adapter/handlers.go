@@ -476,6 +476,9 @@ func validateAlertsFilters(f *AlertsFilter) *OpError {
 	if f == nil {
 		return nil
 	}
+	// v2 contract (task 02): `scope`/`kind` filters were dropped from the UI.
+	// Stale cached browser requests may still carry them; they are ignored here
+	// (never validated, never mapped to argv) so the rollout is safe.
 	if f.Scenario != "" {
 		if err := validateIdentifier("filter.scenario", f.Scenario); err != nil {
 			return err
@@ -486,16 +489,6 @@ func validateAlertsFilters(f *AlertsFilter) *OpError {
 			return err
 		}
 	}
-	if f.Scope != "" {
-		if err := validateSafeToken("filter.scope", f.Scope); err != nil {
-			return err
-		}
-	}
-	if f.Kind != "" {
-		if err := validateSafeToken("filter.kind", f.Kind); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -503,23 +496,16 @@ func validateDecisionsFilters(f *DecisionsFilter) *OpError {
 	if f == nil {
 		return nil
 	}
+	// v2 contract (task 02): `scope`/`origin` filters were dropped from the UI.
+	// Stale cached browser requests may still carry them; they are ignored here
+	// so the rollout is safe.
 	if f.IP != "" {
 		if err := validateIPOrRange("filter.ip", f.IP); err != nil {
 			return err
 		}
 	}
-	if f.Scope != "" {
-		if err := validateSafeToken("filter.scope", f.Scope); err != nil {
-			return err
-		}
-	}
 	if f.Type != "" {
 		if err := validateSafeToken("filter.type", f.Type); err != nil {
-			return err
-		}
-	}
-	if f.Origin != "" {
-		if err := validateSafeToken("filter.origin", f.Origin); err != nil {
 			return err
 		}
 	}

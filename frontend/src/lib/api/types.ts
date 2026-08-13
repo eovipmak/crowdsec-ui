@@ -127,18 +127,10 @@ export type OperationId =
   | "bouncers.list"
   | "bouncers.add"
   | "bouncers.delete"
-  | "hub.list"
   | "hub.update"
-  | "scenarios.list"
-  | "scenarios.inspect"
   | "scenarios.install"
-  | "collections.list"
   | "collections.install"
   | "collections.remove"
-  | "profiles.inspect"
-  | "simulation.status"
-  | "simulation.enable"
-  | "simulation.disable"
   | "allowlists.list"
   | "allowlists.check"
   | "allowlists.create"
@@ -171,8 +163,6 @@ export type UnsupportedOperationId =
   | "scenarios.install"
   | "collections.install"
   | "collections.remove"
-  | "simulation.enable"
-  | "simulation.disable"
   | "allowlists.import";
 
 export const UNSUPPORTED_OPERATIONS: readonly UnsupportedOperationId[] = [
@@ -184,8 +174,6 @@ export const UNSUPPORTED_OPERATIONS: readonly UnsupportedOperationId[] = [
   "scenarios.install",
   "collections.install",
   "collections.remove",
-  "simulation.enable",
-  "simulation.disable",
   "allowlists.import",
 ] as const;
 
@@ -324,47 +312,8 @@ export interface MutationEnvelope<
 
 // --- other reads ------------------------------------------------------------
 
-export interface HubItem {
-  name: string;
-  status: string;
-  version: string;
-  description: string;
-  type:
-    | "parsers"
-    | "postoverflows"
-    | "scenarios"
-    | "contexts"
-    | "appsec-configs"
-    | "appsec-rules"
-    | "collections";
-}
-
-export interface HubListRequest {
-  type?: HubItem["type"];
-}
-
-export interface ScenariosInspectRequest {
-  scenario: string;
-}
-
 export interface AllowlistsCheckRequest {
   ip_or_range: string;
-}
-
-export interface ScenarioItem {
-  name: string;
-  description?: string;
-  version?: string;
-  status?: string;
-  [key: string]: unknown;
-}
-
-export interface CollectionItem {
-  name: string;
-  description?: string;
-  version?: string;
-  status?: string;
-  [key: string]: unknown;
 }
 
 export interface MachineItem {
@@ -402,18 +351,6 @@ export interface AllowlistItem {
   description?: string;
   source: string;
   entries: AllowlistEntry[];
-  [key: string]: unknown;
-}
-
-export interface ProfileItem {
-  name?: string;
-  filters?: string[];
-  decisions?: string[];
-  [key: string]: unknown;
-}
-
-export interface SimulationStatus {
-  simulation_enabled?: boolean;
   [key: string]: unknown;
 }
 

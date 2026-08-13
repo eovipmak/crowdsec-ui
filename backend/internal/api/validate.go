@@ -171,6 +171,11 @@ func validatePrune(duration *string, notValidatedOnly bool) error {
 
 // allowedQueryParams maps each read route to its allowed query keys (§6.1).
 // Any query key not listed yields a 400 invalid_parameters.
+//
+// v2 contract (task 02): `filter.scope`/`filter.kind` (alerts) and
+// `filter.origin`/`filter.scope` (decisions) were dropped from the UI. They
+// remain in the allowlist (not rejected) so stale cached browser requests work
+// during rollout, but the decoder ignores their values; they never reach argv.
 var allowedQueryParams = map[string]map[string]bool{
 	"alerts.list":       {"limit": true, "filter.scenario": true, "filter.ip": true, "filter.scope": true, "filter.kind": true},
 	"alerts.inspect":    {},
@@ -252,20 +257,9 @@ func decodeAlertsList(r *http.Request, limitSupported bool) (adapter.AlertsListR
 		f.IP = v
 		set = true
 	}
-	if v, ok := q["filter.scope"]; ok {
-		if err := validateSafeToken("filter.scope", v); err != nil {
-			return req, err
-		}
-		f.Scope = v
-		set = true
-	}
-	if v, ok := q["filter.kind"]; ok {
-		if err := validateSafeToken("filter.kind", v); err != nil {
-			return req, err
-		}
-		f.Kind = v
-		set = true
-	}
+	// v2 contract (task 02): filter.scope/filter.kind were dropped from the UI.
+	// They remain in allowedQueryParams so stale cached browser requests do not
+	// 400, but their values are intentionally ignored here.
 	if set {
 		req.Filter = f
 	}
@@ -296,9 +290,7 @@ func decodeDecisionsList(r *http.Request, limitSupported bool) (adapter.Decision
 	set := false
 	for _, fk := range []struct{ key, field string }{
 		{"filter.ip", "filter.ip"},
-		{"filter.scope", "filter.scope"},
 		{"filter.type", "filter.type"},
-		{"filter.origin", "filter.origin"},
 		{"filter.scenario", "filter.scenario"},
 	} {
 		if v, ok := q[fk.key]; ok {
@@ -317,18 +309,14 @@ func decodeDecisionsList(r *http.Request, limitSupported bool) (adapter.Decision
 				if err := validateSafeToken(fk.field, v); err != nil {
 					return req, err
 				}
-				switch fk.field {
-				case "filter.scope":
-					f.Scope = v
-				case "filter.type":
-					f.Type = v
-				case "filter.origin":
-					f.Origin = v
-				}
+				f.Type = v
 			}
 			set = true
 		}
 	}
+	// v2 contract (task 02): filter.origin/filter.scope were dropped from the
+	// UI. They remain in allowedQueryParams so stale cached browser requests do
+	// not 400, but their values are intentionally ignored here.
 	if set {
 		req.Filter = f
 	}

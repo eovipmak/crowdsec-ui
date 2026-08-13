@@ -33,7 +33,6 @@ import type {
   BouncersDeleteRequest,
   CapabilitiesResponse,
   CapiStatus,
-  CollectionItem,
   CollectionResult,
   ConfirmationIssuanceRequest,
   ConfirmationIssuanceResponse,
@@ -41,8 +40,6 @@ import type {
   DecisionsDeleteRequest,
   DecisionsListRequest,
   HealthStatus,
-  HubItem,
-  HubListRequest,
   LapiStatus,
   LoginRequest,
   LogoutResponse,
@@ -51,11 +48,7 @@ import type {
   MetricsComponent,
   MutationEnvelope,
   MutationOperationId,
-  ProfileItem,
-  ScenarioItem,
-  ScenariosInspectRequest,
   SessionResponse,
-  SimulationStatus,
   SuccessEnvelope,
 } from "@/lib/api/types";
 
@@ -233,15 +226,8 @@ export interface ApiClient {
     csrfToken?: string,
   ): Promise<MutationEnvelope<"bouncers.delete">>;
 
-  // hub / scenarios / collections / profiles
-  listHub(req: HubListRequest): Promise<SuccessEnvelope<CollectionResult<HubItem>>>;
-  listScenarios(): Promise<SuccessEnvelope<CollectionResult<ScenarioItem>>>;
-  inspectScenario(req: ScenariosInspectRequest): Promise<SuccessEnvelope<unknown>>;
-  listCollections(): Promise<SuccessEnvelope<CollectionResult<CollectionItem>>>;
-  inspectProfiles(): Promise<SuccessEnvelope<CollectionResult<ProfileItem>>>;
-
-  // simulation / status
-  getSimulationStatus(): Promise<SuccessEnvelope<SimulationStatus>>;
+  // The backend /api/v1/{scenarios,collections,profiles,simulation,hub} routes
+  // remain matrix-backed, but the dashboard UI no longer calls them.
   getLapiStatus(): Promise<SuccessEnvelope<LapiStatus>>;
   getCapiStatus(): Promise<SuccessEnvelope<CapiStatus>>;
 
@@ -295,13 +281,6 @@ export const apiClient: ApiClient = {
   listBouncers: () => run(apiRequests.bouncersList()),
   deleteBouncer: (req, csrfToken) => run(apiRequests.bouncersDelete(req, { csrfToken })),
 
-  listHub: (req) => run(apiRequests.hubList(req)),
-  listScenarios: () => run(apiRequests.scenariosList()),
-  inspectScenario: (req) => run(apiRequests.scenariosInspect(req)),
-  listCollections: () => run(apiRequests.collectionsList()),
-  inspectProfiles: () => run(apiRequests.profilesInspect()),
-
-  getSimulationStatus: () => run(apiRequests.simulationStatus()),
   getLapiStatus: () => run(apiRequests.lapiStatus()),
   getCapiStatus: () => run(apiRequests.capiStatus()),
 

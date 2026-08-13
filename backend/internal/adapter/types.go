@@ -11,20 +11,23 @@ package adapter
 // Common parameter types (matrix §3)
 // ---------------------------------------------------------------------------
 
-// AlertsFilter is the named, typed filter set for alerts.list.
+// AlertsFilter is the named, typed filter set for alerts.list. The v2
+// contract (task 02) dropped the `scope`/`kind` filters from the UI; the
+// dropped fields are still accepted by the API layer (cached browser requests
+// during rollout) but are ignored by validation and never translated into
+// cscli argv.
 type AlertsFilter struct {
 	Scenario string `json:"scenario,omitempty"` // hub identifier
 	IP       string `json:"ip,omitempty"`       // IP or CIDR
-	Scope    string `json:"scope,omitempty"`    // safe token
-	Kind     string `json:"kind,omitempty"`     // safe token
 }
 
-// DecisionsFilter is the named, typed filter set for decisions.list.
+// DecisionsFilter is the named, typed filter set for decisions.list. The v2
+// contract (task 02) dropped the `scope`/`origin` filters from the UI; the
+// dropped fields are still accepted by the API layer but are ignored by
+// validation and never translated into cscli argv.
 type DecisionsFilter struct {
 	IP       string `json:"ip,omitempty"`       // IP or CIDR
-	Scope    string `json:"scope,omitempty"`    // safe token
 	Type     string `json:"type,omitempty"`     // safe token
-	Origin   string `json:"origin,omitempty"`   // safe token
 	Scenario string `json:"scenario,omitempty"` // hub identifier
 }
 
@@ -220,6 +223,11 @@ type AlertDecision struct {
 }
 
 // AlertItem is a single alert record produced from `cscli alerts list -o json`.
+// The v2 contract (task 02) surfaced additional operator-facing columns from
+// the cscli `-m` table. cscli emits these at the alert blob root:
+// `events_count`, `machine_id`, `kind`, `created_at`; country and AS come from
+// the nested `source` object (`source.cn`, `source.as_name`, `source.as_number`).
+// All new fields are optional and use omitempty.
 type AlertItem struct {
 	ID        int64           `json:"id"`
 	StartAt   string          `json:"start_at"`
@@ -227,6 +235,14 @@ type AlertItem struct {
 	Scenario  string          `json:"scenario"`
 	Scope     string          `json:"scope"`
 	Value     string          `json:"value"`
+	Country   string          `json:"country,omitempty"`    // source.cn
+	ASNumber  string          `json:"as_number,omitempty"`  // source.as_number
+	ASName    string          `json:"as_name,omitempty"`    // source.as_name
+	Events    int64           `json:"events,omitempty"`     // events_count
+	Machine   string          `json:"machine,omitempty"`    // machine_id
+	Kind      string          `json:"kind,omitempty"`       // alert kind (crowdsec|waf|cscli|...)
+	Reason    string          `json:"reason,omitempty"`     // scenario (human "reason" column)
+	CreatedAt string          `json:"created_at,omitempty"` // alert creation time
 	Decisions []AlertDecision `json:"decisions"`
 }
 
@@ -242,6 +258,11 @@ type AlertsInspectResult struct {
 }
 
 // DecisionItem is a single decision record from `cscli decisions list -o json`.
+// cscli emits decisions as alert-blob rows, each with an embedded `decisions[]`
+// array (see parseDecisionsList). The v2 contract (task 02) surfaced the
+// additional `events` (alert events_count) and `alert_id` (blob id) columns in
+// addition to the existing origin/type/scope/value/duration mapping. All new
+// fields are optional and use omitempty.
 type DecisionItem struct {
 	ID        int64  `json:"id"`
 	Origin    string `json:"origin"`
@@ -252,6 +273,11 @@ type DecisionItem struct {
 	CreatedAt string `json:"created_at,omitempty"`
 	Until     string `json:"until,omitempty"`
 	Duration  string `json:"duration,omitempty"`
+	Events    int64  `json:"events,omitempty"`    // alert events_count
+	AlertID   int64  `json:"alert_id,omitempty"`  // the alert blob id
+	Country   string `json:"country,omitempty"`   // source.cn (blob-only)
+	ASNumber  string `json:"as_number,omitempty"` // source.as_number (blob-only)
+	ASName    string `json:"as_name,omitempty"`   // source.as_name (blob-only)
 }
 
 // DecisionsListResult is the typed result for decisions.list.
@@ -265,14 +291,14 @@ type DecisionsListResult struct {
 // machine blob root; earlier releases used snake_case. We expose the camelCase
 // shape that the currently verified cscli 1.7.8 returns.
 type MachineItem struct {
-	MachineID      string `json:"machineId"`
-	IPAddress      string `json:"ipAddress,omitempty"`
-	Version        string `json:"version,omitempty"`
-	LastHeartbeat  string `json:"last_heartbeat,omitempty"`
-	UpdatedAt      string `json:"updated_at,omitempty"`
-	IsValidated    bool   `json:"isValidated"`
-	AuthType        string `json:"auth_type,omitempty"`
-	OS              string `json:"os,omitempty"`
+	MachineID     string `json:"machineId"`
+	IPAddress     string `json:"ipAddress,omitempty"`
+	Version       string `json:"version,omitempty"`
+	LastHeartbeat string `json:"last_heartbeat,omitempty"`
+	UpdatedAt     string `json:"updated_at,omitempty"`
+	IsValidated   bool   `json:"isValidated"`
+	AuthType      string `json:"auth_type,omitempty"`
+	OS            string `json:"os,omitempty"`
 }
 
 // BouncerItem is a bouncer record from `cscli bouncers list -o json`.

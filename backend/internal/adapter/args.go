@@ -75,7 +75,8 @@ func buildArgs(op OperationID, req TypedRequest) []string {
 }
 
 // alertsListArgs builds `alerts list -o json` plus optional fixed -l and
-// supported filter flags.
+// supported filter flags. The v2 contract dropped `--scope`/`--kind`;
+// `--scenario` and `--ip` remain.
 func alertsListArgs(req TypedRequest) []string {
 	r := req.(AlertsListRequest)
 	args := []string{"alerts", "list", "-o", "json"}
@@ -83,23 +84,20 @@ func alertsListArgs(req TypedRequest) []string {
 	if r.Filter != nil {
 		args = appendFilter(args, "scenario", r.Filter.Scenario)
 		args = appendFilter(args, "ip", r.Filter.IP)
-		args = appendFilter(args, "scope", r.Filter.Scope)
-		args = appendFilter(args, "kind", r.Filter.Kind)
 	}
 	return args
 }
 
 // decisionsListArgs builds `decisions list -o json` plus optional fixed -l and
-// named filters.
+// named filters. The v2 contract dropped `--origin`/`--scope`; `--ip`,
+// `--type`, and `--scenario` remain.
 func decisionsListArgs(req TypedRequest) []string {
 	r := req.(DecisionsListRequest)
 	args := []string{"decisions", "list", "-o", "json"}
 	args = appendLimit(args, r.Limit)
 	if r.Filter != nil {
 		args = appendFilter(args, "ip", r.Filter.IP)
-		args = appendFilter(args, "scope", r.Filter.Scope)
 		args = appendFilter(args, "type", r.Filter.Type)
-		args = appendFilter(args, "origin", r.Filter.Origin)
 		args = appendFilter(args, "scenario", r.Filter.Scenario)
 	}
 	return args
