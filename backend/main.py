@@ -1,12 +1,28 @@
 from fastapi import FastAPI
 # Import your modules using relative or absolute positioning
-from routers import alerts
+from routers.alerts import list_router as alerts_list, inspect_router as alerts_inspect
+from routers.allowlists import (
+    list_router as allowlists_list,
+    inspect_router as allowlists_inspect,
+    check_router as allowlists_check,
+)
+from routers.decisions import list_router as decisions_list, check_router as decisions_check
+from routers.machines import list_router as machines_list, inspect_router as machines_inspect
+from routers.bouncers import list_router as bouncers_list, inspect_router as bouncers_inspect
 
 app = FastAPI(title="CrowdSec CLI Backend API", version="1.0.0")
-
 # Include the routers into the core FastAPI application
-app.include_router(alerts.router)
-
+app.include_router(alerts_list)
+app.include_router(alerts_inspect)
+app.include_router(allowlists_list)
+app.include_router(allowlists_inspect)
+app.include_router(allowlists_check)
+app.include_router(bouncers_list)
+app.include_router(bouncers_inspect)
+app.include_router(decisions_list)
+app.include_router(decisions_check)
+app.include_router(machines_list)
+app.include_router(machines_inspect)
 @app.get("/")
 async def root():
     return {"message": "Welcome to the main entry point!"}

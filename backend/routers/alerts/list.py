@@ -1,11 +1,9 @@
-import asyncio
 import json
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 
-router = APIRouter(
-    prefix="/alerts",
-    tags=["Alerts"]
-)
+from ..cscli import run_cscli
+
+router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 
 def extract_meta(alert):
@@ -27,16 +25,9 @@ async def get_alerts(
     log_type: str | None = None,
     source_ip: str | None = None,
 ):
-    process = await asyncio.create_subprocess_exec(
-        "cscli", "alerts", "list", "-m", "-l", str(limit), "-o", "json",
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
+    stdout = await run_cscli(
+        "alerts", "list", "-m", "-l", str(limit), "-o", "json"
     )
-
-    stdout, stderr = await process.communicate()
-
-    if process.returncode != 0:
-        raise HTTPException(status_code=500, detail=stderr.decode())
 
     raw_alerts = json.loads(stdout)
     alerts = []
