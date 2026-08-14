@@ -54,12 +54,12 @@ async def get_alerts(
             "as_name": source.get("as_name"),
             "events_count": alert.get("events_count"),
             "created_at": alert.get("created_at"),
-            "start_at": alert.get("start_at"),
-            "stop_at": alert.get("stop_at"),
+            #"start_at": alert.get("start_at"),
+            #"stop_at": alert.get("stop_at"),
             "log_type": meta.get("log_type"),
             "service": meta.get("service"),
             "machine": meta.get("machine"),
-            "target_user": meta.get("target_user"),
+            #"target_user": meta.get("target_user"),
         })
 
     # Filter (AND)

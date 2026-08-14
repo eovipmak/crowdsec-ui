@@ -157,4 +157,5 @@ backend/internal/assets/bundle/
 # must not be tracked). Copy deploy/config.example.yaml -> config.yaml and
 # set your own auth.admin_password_hash.
 backend/.venv
-backend/__pycache__
+backend/**/__pycache__/
+backend/__pycache__/
