@@ -156,4 +156,5 @@ backend/internal/assets/bundle/
 # Local dashboard config (contains admin password hash — even dev values
 # must not be tracked). Copy deploy/config.example.yaml -> config.yaml and
 # set your own auth.admin_password_hash.
-/config.yaml
+backend/.venv
+backend/__pycache__
