@@ -6,9 +6,11 @@ readme = "README.md"
 authors = [
     { name = "Your Name", email = "your_email@example.com" }
 ]
-requires-python = ">=3.14"
+# Relaxed from >=3.14 for broader host compatibility (e.g. Ubuntu 24.04 / Debian 13 ship 3.12+).
+requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.141.1",
+    "pyyaml>=6.0",
 ]
 
 [project.scripts]

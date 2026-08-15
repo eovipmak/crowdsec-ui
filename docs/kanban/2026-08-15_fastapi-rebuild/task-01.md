@@ -121,8 +121,8 @@ print('OK')"` → green (uses `TestClient` for a single smoke assertion — NOT 
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-15T12:00:00Z
+- Verification: `uv sync` green; `uv run python -c "import errors, envelope; ..."` prints correct shapes; `uv run python -c "from config import Config, load_config, resolve_cscli_path; ..."` returns default Config; invalid bind raises ValueError; TestClient GET /api/v1/health → 200 {"status":"ok"}
+- Commit or artifact reference: working tree

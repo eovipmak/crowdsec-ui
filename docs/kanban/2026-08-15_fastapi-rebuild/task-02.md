@@ -97,8 +97,8 @@ From `backend/`:
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-15T12:15:00Z
+- Verification: `grep subprocess_exec` confirms exec usage; `grep shell=True` no matches; `grep detail=stderr` no matches; CscliRunner(None,5.0).run → exec_missing=True → OK
+- Commit or artifact reference: working tree
