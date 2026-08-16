@@ -21,26 +21,28 @@ interface FiltersBarProps {
 
 export default function FiltersBar({ filters, limit, onLimitChange, onClear, children }: FiltersBarProps) {
   return (
-    <div className="flex flex-wrap items-end gap-4 mb-6">
+    <div className="flex flex-wrap items-end gap-3 rounded-md border border-[#232334] bg-[#0f0f17] p-3">
       {filters.map((f) => (
         <div key={f.key} className="flex flex-col gap-1.5">
-          <Label htmlFor={`filter-${f.key}`}>{f.label}</Label>
+          <Label htmlFor={`filter-${f.key}`} className="mono text-[11px] uppercase tracking-widest text-zinc-500">
+            {f.label}
+          </Label>
           <Input
             id={`filter-${f.key}`}
             value={f.value}
             onChange={(e) => f.onChange(e.target.value)}
             placeholder={f.placeholder}
-            className="w-48"
+            className="h-8 w-44 md:w-48"
           />
         </div>
       ))}
       {limit !== undefined && onLimitChange && (
         <div className="flex flex-col gap-1.5">
-          <Label>Limit</Label>
+          <Label className="mono text-[11px] uppercase tracking-widest text-zinc-500">Limit</Label>
           <select
             value={limit}
             onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+            className="h-8 rounded border border-[#232334] bg-[#09090f] px-2.5 text-xs text-zinc-300 focus:border-[#3f3f5a] focus:outline-none focus:ring-1 focus:ring-[#3f3f5a]"
           >
             {[25, 50, 100].map((n) => (
               <option key={n} value={n}>{n}</option>
@@ -48,12 +50,14 @@ export default function FiltersBar({ filters, limit, onLimitChange, onClear, chi
           </select>
         </div>
       )}
-      {onClear && (
-        <Button variant="outline" size="sm" onClick={onClear} className="mb-0.5">
-          Clear
-        </Button>
-      )}
-      {children}
+      <div className="ml-auto flex items-center gap-2">
+        {onClear && (
+          <Button variant="ghost" size="sm" onClick={onClear} className="mono text-xs">
+            Clear filters
+          </Button>
+        )}
+        {children}
+      </div>
     </div>
   );
 }

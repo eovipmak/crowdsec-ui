@@ -19,10 +19,10 @@ export default function App() {
         <Route path="/bouncers" element={<Bouncers />} />
         <Route path="/allowlists" element={<Allowlists />} />
         <Route path="*" element={
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <h2 className="text-xl font-bold">Page Not Found</h2>
-            <p className="text-muted-foreground mt-2">The page you're looking for doesn't exist.</p>
-            <a href="/overview" className="mt-4 text-primary underline">Go to Overview</a>
+          <div className="rounded-md border border-[#232334] bg-[#0f0f17] px-6 py-12 text-center">
+            <h2 className="text-sm font-semibold tracking-tight text-white">Not found</h2>
+            <p className="mono mt-2 text-xs text-zinc-500">That page doesn't exist.</p>
+            <a href="/overview" className="mono mt-4 inline-flex text-xs text-zinc-300 underline decoration-zinc-600 underline-offset-4 hover:text-white">Back to overview</a>
           </div>
         } />
       </Route>

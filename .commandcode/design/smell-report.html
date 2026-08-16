@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>crowdsec-ui — SMELL Report</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+		.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+		.report-section { border: 1px solid #222226; background: #0a0a0b; position: relative; }
+		.corner-box { position: absolute; width: 20px; height: 20px; border: 1px solid #222226; background: #000; }
+	</style>
+</head>
+<body class="bg-black text-[#fafafa]">
+	<main class="mx-auto w-full max-w-6xl px-5 py-8 md:px-10 md:py-12">
+
+		<header class="report-section mb-8 p-6 md:p-8">
+			<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+			<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+			<div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// SMELL</div>
+					<h1 class="text-4xl font-bold tracking-tight md:text-6xl">crowdsec-ui</h1>
+					<p class="mono mt-3 text-xs tracking-widest text-[#555]">FRONTEND / SRC — SECURITY OPS DASHBOARD</p>
+				</div>
+				<div class="mono text-left text-xs text-[#666] md:text-right">
+					<div>COMMANDCODE REPORT</div>
+					<div class="text-[#444]">2026-08-16</div>
+					<div class="mt-2 text-[#444]">frontend/src/**</div>
+				</div>
+			</div>
+		</header>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+			<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+			<div class="grid gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// OVERALL</div>
+					<div class="text-6xl font-bold tracking-tight md:text-7xl">3<span class="text-[#444]">/10</span></div>
+					<div class="mt-1 text-lg text-[#666]">STRONG — clustered template tells</div>
+					<div class="mt-4 inline-flex border border-[#f97316]/30 bg-[#f97316]/10 px-3 py-1 text-sm text-[#fb923c]">NEEDS CHANGES</div>
+					<p class="mono mt-3 text-xs text-[#555]">5 of 10 odors detected · 3 MEDIUM · 3 LOW</p>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">// TL;DR</div>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Four identical stat cards, monochrome zinc palette with no ops-semantic color, <span class="text-[#fafafa]">system sans with a flat scale</span>, and <span class="text-[#fafafa]">rounded-xl + shadow</span> as the only surface tool. Individually common — together they read as the median shadcn template, not a security-operations instrument.</p>
+					<p class="mt-4 border-l border-[#f97316] pl-4 text-sm leading-6 text-[#fb923c]">Fix lane: /design redesign for a prioritized Monitor composition + ops palette. Then /design typeset for a deliberate scale and tabular numerals.</p>
+					<div class="mt-5 flex flex-wrap gap-2">
+						<span class="mono border border-[#222226] bg-[#111113] px-2.5 py-1 text-xs text-[#888]">Stat monument</span>
+						<span class="mono border border-[#222226] bg-[#111113] px-2.5 py-1 text-xs text-[#888]">Icon topper</span>
+						<span class="mono border border-[#222226] bg-[#111113] px-2.5 py-1 text-xs text-[#888]">Default type</span>
+						<span class="mono border border-[#222226] bg-[#111113] px-2.5 py-1 text-xs text-[#888]">Center stack</span>
+						<span class="mono border border-[#222226] bg-[#111113] px-2.5 py-1 text-xs text-[#888]">Generic neutral</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// HEURISTIC SCORES — 1 = absent (good) · 0 = detected</div>
+			<div class="overflow-x-auto">
+				<table class="w-full min-w-[720px] border-collapse text-sm">
+					<thead>
+						<tr class="border-b border-[#222226] text-left mono text-xs text-[#666]">
+							<th class="py-3 pr-4 font-normal">#</th>
+							<th class="py-3 pr-4 font-normal">HEURISTIC</th>
+							<th class="py-3 pr-4 font-normal">SCORE</th>
+							<th class="py-3 font-normal">KEY FINDING</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">1</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Tech gradient</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#34d399]/20 bg-[#34d399]/10 px-2 py-0.5 text-xs text-[#34d399]">1</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">Absent — flat zinc/neutral, no indigo/cyan wash.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">2</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Generic tech hue</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#ef4444]/20 bg-[#ef4444]/10 px-2 py-0.5 text-xs text-[#ef4444]">0</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">Neutral zinc/black is the only "identity" for a security tool — unchosen, not branded.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">3</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Feature tile grid</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#34d399]/20 bg-[#34d399]/10 px-2 py-0.5 text-xs text-[#34d399]">1</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">No marketing tile grid — data tables are appropriately functional.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">4</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Accent rail</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#34d399]/20 bg-[#34d399]/10 px-2 py-0.5 text-xs text-[#34d399]">1</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">No decorative accent stripe on cards.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">5</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Unearned blur</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#34d399]/20 bg-[#34d399]/10 px-2 py-0.5 text-xs text-[#34d399]">1</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">No frosted glass panels.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">6</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Stat monument</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#ef4444]/20 bg-[#ef4444]/10 px-2 py-0.5 text-xs text-[#ef4444]">0</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">Four equal KPI cards (2xl numbers) dominate Overview — classic stat-monument bluff.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">7</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Icon topper</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#ef4444]/20 bg-[#ef4444]/10 px-2 py-0.5 text-xs text-[#ef4444]">0</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">Every stat card adds a muted 16px lucide icon top-right (Shield / AlertTriangle / Server / Activity).</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">8</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Bounce everywhere</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#34d399]/20 bg-[#34d399]/10 px-2 py-0.5 text-xs text-[#34d399]">1</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">No motion system present — nothing elastic to evaluate.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3.5 pr-4 text-[#555]">9</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Default type</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#ef4444]/20 bg-[#ef4444]/10 px-2 py-0.5 text-xs text-[#ef4444]">0</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">ui-sans-serif system stack, one heading size (text-2xl bold) everywhere — flat, uncommitted scale.</td>
+						</tr>
+						<tr>
+							<td class="py-3.5 pr-4 text-[#555]">10</td>
+							<td class="py-3.5 pr-4 text-[#fafafa]">Center stack</td>
+							<td class="py-3.5 pr-4"><span class="mono inline-flex border border-[#ef4444]/20 bg-[#ef4444]/10 px-2 py-0.5 text-xs text-[#ef4444]">0</span></td>
+							<td class="py-3.5 text-[#a0a0a0]">max-w-6xl mx-auto + space-y-6 stacking repeated identically across every page — safe centered column.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="mono mt-4 flex gap-4 text-xs">
+				<span class="text-[#34d399]">● 5 absent</span>
+				<span class="text-[#ef4444]">● 5 detected</span>
+				<span class="text-[#555]">Weighted to 3/10 — clustered, not isolated</span>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// SIGNAL</div>
+			<div class="grid gap-6 md:grid-cols-2">
+				<div>
+					<div class="mb-3 text-xl font-semibold text-[#fafafa]">Clustered template</div>
+					<ul class="space-y-3 text-sm text-[#a0a0a0]">
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>No tech gradient, no blur, no accent rail — avoids the loudest AI tells.</li>
+						<li><span class="mono mr-2 text-[#fbbf24]">WATCH</span>Animations absent entirely — motion character is unaddressed.</li>
+						<li><span class="mono mr-2 text-[#ef4444]">FAIL</span>Stat monument + icon topper + default type + center stack + generic neutral fire together.</li>
+						<li><span class="mono mr-2 text-[#ef4444]">FAIL</span>Overview fails the squint test — four equal rectangles with no lead element.</li>
+					</ul>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">// NEXT MODES — RUN SEPARATELY</div>
+					<div class="flex flex-wrap gap-2">
+						<span class="border border-[#f97316]/30 bg-[#f97316]/10 px-3 py-1.5 text-sm text-[#fb923c]">/design redesign</span>
+						<span class="border border-[#333] bg-[#111113] px-3 py-1.5 text-sm text-[#a0a0a0]">/design recolor</span>
+						<span class="border border-[#333] bg-[#111113] px-3 py-1.5 text-sm text-[#a0a0a0]">/design typeset</span>
+						<span class="border border-[#333] bg-[#111113] px-3 py-1.5 text-sm text-[#a0a0a0]">/design relayout</span>
+					</div>
+					<p class="mono mt-4 text-xs leading-5 text-[#555]">Fix lane ranked by leverage: redesign (Monitor composition + palette + surface) → typeset (scale + tabular numerals) → relayout (toolbar + inspector lane).</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// WHAT'S WORKING — KEEP IT</div>
+			<div class="grid gap-4 md:grid-cols-3">
+				<article class="border border-[#1f1f24] bg-[#0f0f10] p-4">
+					<h2 class="mb-2 text-sm font-semibold text-[#fafafa]">Functional table spine</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Alerts / Decisions / Machines / Bouncers share a clean <span class="text-[#d4d4d8]">DataTable + FiltersBar</span> pattern with proper table semantics. Not a marketing tile grid — good ops default to iterate on, not replace.</p>
+				</article>
+				<article class="border border-[#1f1f24] bg-[#0f0f10] p-4">
+					<h2 class="mb-2 text-sm font-semibold text-[#fafafa]">Toast & dialog plumbing</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Radix dialog, sonner toasts, query-based loading/error/empty are present. The interaction shell exists — it needs styling decisions, not new architecture.</p>
+				</article>
+				<article class="border border-[#1f1f24] bg-[#0f0f10] p-4">
+					<h2 class="mb-2 text-sm font-semibold text-[#fafafa]">No decoration debt</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">No gradients, no glass, no accent rails to unwind. Palette change is additive — the codebase is not fighting a bad visual commitment.</p>
+				</article>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// PRIORITY FINDINGS — ORDERED BY SEVERITY × LEVERAGE</div>
+			<div class="space-y-5">
+
+				<article class="border border-[#3d2518] bg-[#110b0d] p-5">
+					<div class="mono mb-2 flex items-center gap-2 text-xs">
+						<span class="border border-[#f97316]/30 bg-[#f97316]/10 px-2 py-0.5 text-[#fb923c]">MEDIUM</span>
+						<span class="text-[#666]">Surface + Layout — Overview monument</span>
+					</div>
+					<h2 class="mb-2 text-lg font-semibold text-[#fafafa]">1 — Four equal stat cards hide priority</h2>
+					<p class="mb-2 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-xs text-[#666]">LOCATION</span> <span class="mono text-xs text-[#d4d4d8]">frontend/src/pages/Overview.tsx:26-73</span> — grid of 4 identical <span class="mono text-xs text-[#d4d4d8]">Card</span> tiles: same <span class="mono text-xs text-[#d4d4d8]">CardHeader pb-2</span> muted label + right-aligned 16px icon, large <span class="mono text-xs text-[#d4d4d8]">text-2xl font-bold</span> count, no lead. LAPI/CAPI health is badges inside the last card.</p>
+					<p class="mb-4 text-sm leading-6 text-[#666]">Monitor composition expects a primary threat strip and a secondary health panel. Equalising all four metrics makes the operator compare numbers instead of acting.</p>
+					<div class="border-l border-[#f97316] pl-4 text-sm leading-6 text-[#fb923c]">FIX: Replace with a Monitor composition — primary incident/alert lane (alerts + decisions + sparkline), health lane for LAPI/CAPI with real status glyphs, supporting census for machines/bouncers. Vary mass, density and rhythm; stop equalising.</div>
+				</article>
+
+				<article class="border border-[#3d2518] bg-[#110b0d] p-5">
+					<div class="mono mb-2 flex items-center gap-2 text-xs">
+						<span class="border border-[#f97316]/30 bg-[#f97316]/10 px-2 py-0.5 text-[#fb923c]">MEDIUM</span>
+						<span class="text-[#666]">Color — monochrome neutral</span>
+					</div>
+					<h2 class="mb-2 text-lg font-semibold text-[#fafafa]">2 — No hue, no semantic color</h2>
+					<p class="mb-2 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-xs text-[#666]">LOCATION</span> <span class="mono text-xs text-[#d4d4d8]">frontend/src/index.css:3-24</span> + <span class="mono text-xs text-[#d4d4d8]">frontend/src/components/ui/card.tsx:8</span> — palette is <span class="mono text-xs text-[#d4d4d8]">#ffffff / #0a0a0a / #18181b / #f4f4f5 / #e4e4e7</span>, white canvas, gray <span class="mono text-xs text-[#d4d4d8]">rounded-xl border shadow</span> cards, black primary. No token maps to blocked / alerting / healthy.</p>
+					<p class="mb-4 text-sm leading-6 text-[#666]">A security dashboard where "42 decisions" and "CAPI: Down" look equally gray fails its primary informational job. Neutral-only reads as unchosen, not restrained.</p>
+					<div class="border-l border-[#f97316] pl-4 text-sm leading-6 text-[#fb923c]">FIX: Choose an ops-semantic palette — restrained base (tinted neutral, &lt;0.02 chroma) + one disciplined accent + fixed semantic tokens for blocked/alerting/healthy/degraded. Apply via CSS theme vars; stop relying on border+shadow for every card.</div>
+				</article>
+
+				<article class="border border-[#3d2518] bg-[#110b0d] p-5">
+					<div class="mono mb-2 flex items-center gap-2 text-xs">
+						<span class="border border-[#f97316]/30 bg-[#f97316]/10 px-2 py-0.5 text-[#fb923c]">MEDIUM</span>
+						<span class="text-[#666]">Type — flat scale</span>
+					</div>
+					<h2 class="mb-2 text-lg font-semibold text-[#fafafa]">3 — Default system sans, one heading size</h2>
+					<p class="mb-2 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-xs text-[#666]">LOCATION</span> <span class="mono text-xs text-[#d4d4d8]">frontend/src/index.css:36-37</span> + every page title + <span class="mono text-xs text-[#d4d4d8]">frontend/src/components/Layout.tsx:18</span> — global <span class="mono text-xs text-[#d4d4d8]">ui-sans-serif, system-ui</span>, every page <span class="mono text-xs text-[#d4d4d8]">text-2xl font-bold</span>, card labels <span class="mono text-xs text-[#d4d4d8]">text-sm font-medium text-muted-foreground</span>. No scale, no measure, no pairing rationale.</p>
+					<p class="mb-4 text-sm leading-6 text-[#666]">Hierarchy conveyed only by bold vs muted. Scan-ability is weak; the product has no typographic voice.</p>
+					<div class="border-l border-[#f97316] pl-4 text-sm leading-6 text-[#fb923c]">FIX: Define a compact product scale (12 / 13 / 14 / 18 / 24) with a display cut for titles, muted label style for meta, and tabular-nums for counts/IPs/timestamps. Earn system type with scale + contrast or assign a deliberate pairing.</div>
+				</article>
+
+				<article class="border border-[#222226] bg-[#0f0f10] p-5">
+					<div class="mono mb-2 flex items-center gap-2 text-xs">
+						<span class="border border-[#333] bg-[#1a1a1e] px-2 py-0.5 text-[#888]">LOW</span>
+						<span class="text-[#666]">Surface — card shell</span>
+					</div>
+					<h2 class="mb-2 text-base font-semibold text-[#fafafa]">4 — Rounded-xl + shadow is the only surface</h2>
+					<p class="mb-2 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-xs text-[#666]">LOCATION</span> <span class="mono text-xs text-[#d4d4d8]">frontend/src/components/ui/card.tsx:8</span> and every consumer — <span class="mono text-xs text-[#d4d4d8]">rounded-xl border bg-card shadow</span> applied to KPI tiles, Check-IP form, allowlist entries, and error panel alike.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Tighten radius on data-dense cards (rounded-lg / rounded-md), reserve shadow for true overlay depth, and use canvas contrast + dividers instead of a border+shadow on every block.</div>
+				</article>
+
+				<article class="border border-[#222226] bg-[#0f0f10] p-5">
+					<div class="mono mb-2 flex items-center gap-2 text-xs">
+						<span class="border border-[#333] bg-[#1a1a1e] px-2 py-0.5 text-[#888]">LOW</span>
+						<span class="text-[#666]">Layout — center stack</span>
+					</div>
+					<h2 class="mb-2 text-base font-semibold text-[#fafafa]">5 — Identical centered stack on every page</h2>
+					<p class="mb-2 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-xs text-[#666]">LOCATION</span> <span class="mono text-xs text-[#d4d4d8]">frontend/src/components/Layout.tsx:15-40</span> + <span class="mono text-xs text-[#d4d4d8]">frontend/src/pages/Alerts.tsx:42</span> + <span class="mono text-xs text-[#d4d4d8]">frontend/src/pages/Decisions.tsx:40</span> — <span class="mono text-xs text-[#d4d4d8]">max-w-6xl mx-auto</span> centered column, bordered header with pill nav, <span class="mono text-xs text-[#d4d4d8]">space-y-6</span> vertical stack (title → badge → filters → table) repeated five times.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Keep the table pattern but add a persistent toolbar lane and consider an inspector/detail lane where monitoring benefits. Use alignment and rule lines to create rhythm instead of repeating the same vertical stack.</div>
+				</article>
+
+				<article class="border border-[#222226] bg-[#0f0f10] p-5">
+					<div class="mono mb-2 flex items-center gap-2 text-xs">
+						<span class="border border-[#333] bg-[#1a1a1e] px-2 py-0.5 text-[#888]">LOW</span>
+						<span class="text-[#666]">Surface — empty/error states</span>
+					</div>
+					<h2 class="mb-2 text-base font-semibold text-[#fafafa]">6 — Identical diluted-icon empties</h2>
+					<p class="mb-2 text-sm leading-6 text-[#a0a0a0]"><span class="mono text-xs text-[#666]">LOCATION</span> <span class="mono text-xs text-[#d4d4d8]">frontend/src/components/EmptyState.tsx:11-12</span> + <span class="mono text-xs text-[#d4d4d8]">frontend/src/components/ErrorPanel.tsx:16-27</span> — every empty renders <span class="mono text-xs text-[#d4d4d8]">Inbox h-12 w-12 text-muted-foreground/40</span> + centered muted copy; errors are the same card with <span class="mono text-xs text-[#d4d4d8]">AlertTriangle</span> + outline Retry.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Differentiate per domain — empty Alerts teaches what creates an alert; empty Machines shows enrollment guidance. Keep iconography minimal and reserve illustration for actions the operator can take. Errors need stronger signal than empties.</div>
+				</article>
+
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// CONSIDERED BUT REJECTED</div>
+			<div class="overflow-x-auto">
+				<table class="w-full min-w-[640px] border-collapse text-sm">
+					<thead>
+						<tr class="border-b border-[#222226] text-left mono text-xs text-[#666]">
+							<th class="py-3 pr-4 font-normal">LOCATION</th>
+							<th class="py-3 pr-4 font-normal">CANDIDATE</th>
+							<th class="py-3 font-normal">REJECTED BECAUSE</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3 pr-4 mono text-xs text-[#888]">DataTable.tsx:22-48</td>
+							<td class="py-3 pr-4 text-[#a0a0a0]">Replace table chrome</td>
+							<td class="py-3 text-[#666]">Proper table semantics via shared ui/table — revisit only for density needs.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3 pr-4 mono text-xs text-[#888]">FiltersBar.tsx:40-49</td>
+							<td class="py-3 pr-4 text-[#a0a0a0]">Native select for Limit</td>
+							<td class="py-3 text-[#666]">Acceptable for product UI; belongs to interaction sweep, not smell.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3 pr-4 mono text-xs text-[#888]">Allowlists.tsx:32-63</td>
+							<td class="py-3 pr-4 text-[#a0a0a0]">Check-IP card uses Card</td>
+							<td class="py-3 text-[#666]">Mild; palette/type recalibration outranks it.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-3 pr-4 mono text-xs text-[#888]">CapabilityBadge.tsx:16-27</td>
+							<td class="py-3 pr-4 text-[#a0a0a0]">Capability pills as accent</td>
+							<td class="py-3 text-[#666]">Carries real runtime capability info — functional, not decorative.</td>
+						</tr>
+						<tr>
+							<td class="py-3 pr-4 mono text-xs text-[#888]">ui/button.tsx:6-32</td>
+							<td class="py-3 pr-4 text-[#a0a0a0]">cva buttonVariants as framework tell</td>
+							<td class="py-3 text-[#666]">Engineered design system, not a visual odor.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// VERIFICATION</div>
+			<div class="grid gap-6 md:grid-cols-2">
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#555]">CHECKS RUN</div>
+					<ul class="space-y-2 text-sm leading-6 text-[#a0a0a0]">
+						<li><span class="mono mr-2 text-[#34d399]">READ</span>index.css — neutral palette confirmed, no gradient.</li>
+						<li><span class="mono mr-2 text-[#34d399]">READ</span>Overview.tsx — 4-card monument + icon topper.</li>
+						<li><span class="mono mr-2 text-[#34d399]">READ</span>Layout.tsx — max-w-6xl centered column + pill nav.</li>
+						<li><span class="mono mr-2 text-[#34d399]">READ</span>card.tsx / EmptyState / ErrorPanel — rounded-xl+shadow + diluted icon empties.</li>
+						<li><span class="mono mr-2 text-[#34d399]">READ</span>Alerts / Decisions / Machines / Bouncers / Allowlists — repeated space-y-6 stack.</li>
+						<li><span class="mono mr-2 text-[#34d399]">GREP</span>gradient / bg-gradient / blur / backdrop — no tech-gradient or glass.</li>
+					</ul>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#555]">GAPS</div>
+					<ul class="space-y-2 text-sm leading-6 text-[#666]">
+						<li><span class="mono mr-2 text-[#fbbf24]">NOT VERIFIED</span>Visual render / screenshot — headless audit, no dev server running.</li>
+						<li><span class="mono mr-2 text-[#fbbf24]">NOT VERIFIED</span>Motion easing profile beyond file search — no animation system found.</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// VERDICT</div>
+					<div class="text-2xl font-bold tracking-tight text-[#fb923c]">NEEDS CHANGES — STRONG</div>
+					<p class="mt-2 text-sm leading-6 text-[#a0a0a0]">No HIGH blockers. The smell is systemic: five tells reinforce each other. Patch-up will not clear it — composition + palette need a committed direction.</p>
+				</div>
+				<div class="mono text-xs leading-6 text-[#555]">
+					<div>Score 3/10 — STRONG</div>
+					<div>Next: /design redesign</div>
+					<div>Then: /design typeset</div>
+				</div>
+			</div>
+		</section>
+
+		<footer class="mono py-8 text-center text-xs tracking-widest text-[#444]">
+			Generated with CommandCode — 2026-08-16 · .commandcode/design/smell-report.md + smell-report.html
+		</footer>
+
+	</main>
+</body>
+</html>

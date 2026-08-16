@@ -7,10 +7,7 @@ Never leaks stderr into response bodies — callers use classify_failure + envel
 
 import asyncio
 import logging
-import os
 from dataclasses import dataclass, field
-
-from fastapi import HTTPException
 
 import errors
 
@@ -115,39 +112,3 @@ def classify_failure(result: RunResult, *, malformed: bool = False) -> str:
     if result.exit_code != 0:
         return errors.CROWDSEC_FAILURE
     return errors.INTERNAL
-
-
-# ---------------------------------------------------------------------------
-# Backward-compat stub for existing routers that still import run_cscli.
-# tasks 06/07 migrate callers to CscliRunner.run; task-04 can then delete
-# this stub once all callers have migrated.
-# ---------------------------------------------------------------------------
-
-_default_runner: CscliRunner | None = None
-
-
-def set_default_runner(r: CscliRunner) -> None:
-    """Register a process-wide default runner (called by task-04 lifespan)."""
-    global _default_runner
-    _default_runner = r
-
-
-def _get_fallback_runner() -> CscliRunner:
-    """Build a lazy fallback runner using the probe-resolver fallback paths."""
-    for path in ["/usr/bin/cscli", "/usr/local/bin/cscli", "/opt/crowdsec/bin/cscli"]:
-        if os.path.isfile(path):
-            return CscliRunner(path, 30.0)
-    return CscliRunner(None, 30.0)
-
-
-async def run_cscli(*args) -> bytes:
-    """Legacy stub — preserves the old contract for un-migrated routers.
-
-    On success: returns stdout bytes.
-    On failure: raises HTTPException(500) with a GENERIC message — NEVER stderr.
-    """
-    runner = _default_runner or _get_fallback_runner()
-    result = await runner.run(list(args))
-    if result.exec_missing or result.eacces or result.deadline_exceeded or result.exit_code != 0:
-        raise HTTPException(status_code=500, detail="cscli invocation failed")
-    return result.stdout

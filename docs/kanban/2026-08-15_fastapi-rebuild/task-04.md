@@ -123,8 +123,8 @@ From `backend/`:
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-16T13:25:00Z
+- Verification: `uv sync` green; `uv run python -c "from fastapi.testclient import TestClient; from main import app; c=TestClient(app); ..."` smoke → `task-04 ALL CHECKS OK` (health 200 {"status":"ok"}; capabilities envelope 200; status/lapi 200; `alerts?limit=999` → 400 invalid_parameters; `alerts/inspect/abc` → 400 invalid_parameters; `POST /alerts` → 405 method_not_allowed; `GET /alerts` → 200); `DASHBOARD_CONFIG=../config.yaml uv run uvicorn main:app --port 8090` boots cleanly "Application startup complete"; `curl /api/v1/health` → 200 {"status":"ok"}; `curl /api/v1/capabilities` → envelope with 13 ops; `grep -rn 'detail=stderr' backend/` → no matches; `grep -nE 'APIRouter(prefix="/api/v1"|app.include_router(api)' backend/main.py` → both present at lines 75 & 89; legacy `run_cscli`/`set_default_runner` stubs deleted from `backend/routers/cscli.py` after grep confirmed zero callers
+- Commit or artifact reference: working tree

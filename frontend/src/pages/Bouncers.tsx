@@ -11,23 +11,36 @@ export default function Bouncers() {
 
   const columns: Column<Bouncer>[] = [
     { key: 'name', header: 'Name' },
-    { key: 'type', header: 'Type' },
-    { key: 'version', header: 'Version' },
-    { key: 'ip_address', header: 'IP Address' },
-    { key: 'last_pull', header: 'Last Pull' },
+    { key: 'type', header: 'Type', className: 'mono text-xs' },
+    { key: 'version', header: 'Version', className: 'mono text-xs' },
+    { key: 'ip_address', header: 'IP Address', className: 'mono tabular' },
+    { key: 'last_pull', header: 'Last Pull', className: 'mono text-xs tabular whitespace-nowrap' },
   ];
 
-  if (isLoading) return <><CapabilityBadge op="bouncers.list" /><LoadingSkeleton rows={8} /></>;
+  if (isLoading) return <><CapabilityBadge op="bouncers.list" /><div className="mt-3"><LoadingSkeleton rows={8} /></div></>;
   if (error) return <ErrorPanel error={error} onRetry={() => refetch()} />;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Bouncers</h1>
-      <CapabilityBadge op="bouncers.list" />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-white">Bouncers</h1>
+          <p className="mono mt-1 text-xs text-zinc-500">Enforcement points that pull decisions from LAPI — firewall, nginx, traefik.</p>
+        </div>
+        <CapabilityBadge op="bouncers.list" />
+      </div>
+
       {!data || data.length === 0 ? (
-        <EmptyState title="No bouncers" description="No bouncers registered." />
+        <EmptyState
+          title="No bouncers"
+          description="No bouncers are registered. Add one with cscli bouncers add and configure it on the target."
+          action="Bouncers poll LAPI for decisions; check last_pull to confirm they are live."
+        />
       ) : (
-        <DataTable data={data} columns={columns} rowKey={(row) => row.name} />
+        <>
+          <div className="mono text-xs text-zinc-500">{data.length} bouncer{data.length !== 1 ? 's' : ''} · sorted by last pull</div>
+          <DataTable data={data} columns={columns} rowKey={(row) => row.name} />
+        </>
       )}
     </div>
   );

@@ -1,0 +1,16 @@
+# CrowdSec Dashboard — dev-friendly defaults.
+# Full schema documented at docs/architecture.md.
+
+server:
+  bind: 127.0.0.1
+  port: 8090
+  static_dir: ../frontend/dist
+
+cscli:
+  # executable_path: omitted → backend probes /usr/bin/cscli, /usr/local/bin/cscli, /opt/crowdsec/bin/cscli
+  timeout: 30s
+
+logging:
+  level: info
+  format: text
+  output: stderr

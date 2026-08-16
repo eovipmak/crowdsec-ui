@@ -180,8 +180,8 @@ From repo root:
 - Tests/pytest (D12 — `backend/build.sh` does NOT run pytest).
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: native-deployment-operator (via coordinator)
+- Completed at: 2026-08-16T13:30:00Z
+- Verification: All 7 deliverables present (`backend/build.sh`, `deploy/crowdsec-dashboard.service`, `deploy/config.example.yaml`, `deploy/install/README.md`, root `config.yaml`, `docs/architecture.md`, `docs/operations-reference.md`); `test -x backend/build.sh` → exec-bit OK; `head -1 backend/build.sh` → `#!/usr/bin/env bash`; `head -1 deploy/crowdsec-dashboard.service` → `[Unit]`; `bash backend/build.sh` → exit 0 (uv sync + npm ci + vite build; 1723 modules; dist/index.html + assets present); `systemd-analyze verify deploy/crowdsec-dashboard.service` → exit 0 (no errors, no warnings); `grep -nE 'admin_password_hash|session\.ttl|auth\.session|/api/v1/session|/api/v1/metrics' deploy/config.example.yaml config.yaml` → no matches; `grep -rnE '/api/v1/session|/api/v1/metrics|/docs/command-matrix\.md|backend/internal/|backend/cmd/|backend/go\.mod|frontend/src/app/' docs/architecture.md docs/operations-reference.md deploy/ config.yaml` → no matches; `grep -rnE 'next/|from "axios"|useMutation|X-CSRF-Token' docs/architecture.md docs/operations-reference.md deploy/ config.yaml` → no matches; `grep -E '^[a-z_]+:' deploy/config.example.yaml config.yaml` → only `server:`/`cscli:`/`logging:` (slim schema); `docs/operations-reference.md` endpoint table has 15 rows + error-code table has all 10 codes (4 request-level + 6 operation-level) with verbatim safe messages; `docs/architecture.md` has required sections (Goal/Pieces/cscli execution model/Config schema/Validation rules/Response envelopes/Static serving rules/Out of scope citing plan §11); step 8 stale task-12/13 deletion confirmed no-op (files already absent, verified with `ls docs/kanban/2026-08-15_fastapi-rebuild/`); end-to-end integration boot with new root `config.yaml`: `DASHBOARD_CONFIG=../config.yaml uv run uvicorn main:app --port 8090` boots cleanly, `curl /api/v1/health` → 200 `{"status":"ok"}`, `curl /` → 200 `text/html` + `cache-control: no-store` (task-04 lifespan + task-08 static + task-10 dist all assembled), `curl /api/v1/status/lapi` → `{"operation":"status.lapi","result":{"healthy":true}}`
+- Commit or artifact reference: working tree

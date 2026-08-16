@@ -1,0 +1,16 @@
+# CrowdSec Dashboard configuration — run `htpasswd`/etc. is NOT needed (login deferred).
+# Schema documented at docs/architecture.md.
+
+server:
+  bind: 127.0.0.1            # NOT 0.0.0.0 (forces loopback or NIC IP — never wildcard)
+  port: 8090                 # NOT 8080 (reserved for CrowdSec LAPI)
+  static_dir: ../frontend/dist  # path to the built SPA; default <repo>/frontend/dist
+
+cscli:
+  executable_path: /usr/bin/cscli  # optional; falls back to /usr/local/bin/cscli or /opt/crowdsec/bin/cscli
+  timeout: 30s               # 1s..120s
+
+logging:
+  level: info                # debug|info|warn|error
+  format: text               # text|json
+  output: stderr             # stderr|stdout|<file path>

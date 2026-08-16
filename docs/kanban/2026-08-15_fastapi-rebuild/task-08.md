@@ -128,8 +128,8 @@ If `frontend/dist` not built yet (task-09/10 in progress): temporarily `mkdir -p
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: native-deployment-operator (via coordinator)
+- Completed at: 2026-08-16T13:25:00Z
+- Verification: `from static import mount_static` → import OK; functional TestClient smoke → `task-08 functional CHECKS OK` (API route hits handler NOT static 200 {"status":"ok"}; SPA root 200 + `Cache-Control: no-store`; `/assets/app.js` 200 + `public, max-age=31536000, immutable`; unknown client route → 200 SPA fallback NOT 404; `POST /` → 405 method_not_allowed envelope; `/%2e%2e/%2e%2e/etc/passwd` → 404 not_found envelope); missing-dist smoke → `static_dir not found: ... SPA serving disabled` + `no-raise OK`; integration with task-04 confirmed: `uvicorn main:app` boots, task-04 lifespan try-guard calls `mount_static(app, cfg)`, real `frontend/dist/index.html` served with `cache-control: no-store` while `/api/v1/health` returns 200 {"status":"ok"}
+- Commit or artifact reference: working tree

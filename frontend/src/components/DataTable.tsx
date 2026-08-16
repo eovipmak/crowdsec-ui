@@ -19,10 +19,10 @@ export default function DataTable<T extends Record<string, any>>({
   data, columns, onRowClick, rowKey,
 }: DataTableProps<T>) {
   return (
-    <div className="rounded-md border">
+    <div className="overflow-hidden rounded-md border border-[#232334] bg-[#12121a]">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-transparent">
             {columns.map((col) => (
               <TableHead key={col.key} className={col.className}>{col.header}</TableHead>
             ))}
@@ -32,12 +32,12 @@ export default function DataTable<T extends Record<string, any>>({
           {data.map((row, i) => (
             <TableRow
               key={rowKey ? rowKey(row) : i}
-              className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+              className={onRowClick ? 'cursor-pointer hover:bg-[#181825]' : ''}
               onClick={() => onRowClick?.(row)}
             >
               {columns.map((col) => (
                 <TableCell key={col.key} className={col.className}>
-                  {col.render ? col.render(row) : (row[col.key] ?? '—')}
+                  {col.render ? col.render(row) : (row[col.key] ?? <span className="text-zinc-600">—</span>)}
                 </TableCell>
               ))}
             </TableRow>

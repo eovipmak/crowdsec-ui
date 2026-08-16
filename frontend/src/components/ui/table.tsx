@@ -14,7 +14,7 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
+  <thead ref={ref} className={cn('border-b border-[#232334] bg-[#0f0f17]/60', className)} {...props} />
 ));
 TableHeader.displayName = 'TableHeader';
 
@@ -32,7 +32,7 @@ const TableFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
-    className={cn('border-t bg-muted/50 font-medium [&>tr]:last:border-b-0', className)}
+    className={cn('border-t border-[#232334] bg-[#12121a] font-medium [&>tr]:last:border-b-0', className)}
     {...props}
   />
 ));
@@ -43,7 +43,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
     <tr
       ref={ref}
       className={cn(
-        'border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
+        'border-b border-[#181825] transition-colors hover:bg-[#12121a] data-[state=selected]:bg-[#181825]',
         className,
       )}
       {...props}
@@ -59,7 +59,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      'h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
+      'mono h-8 px-3 text-left align-middle text-[11px] font-medium uppercase tracking-widest text-zinc-500 [&:has([role=checkbox])]:pr-0',
       className,
     )}
     {...props}
@@ -73,7 +73,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn('p-2 align-middle [&:has([role=checkbox])]:pr-0', className)}
+    className={cn('px-3 py-2.5 align-middle text-[13px] text-zinc-300 [&:has([role=checkbox])]:pr-0', className)}
     {...props}
   />
 ));
@@ -83,7 +83,7 @@ const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
-  <caption ref={ref} className={cn('mt-4 text-sm text-muted-foreground', className)} {...props} />
+  <caption ref={ref} className={cn('mt-4 text-sm text-zinc-500', className)} {...props} />
 ));
 TableCaption.displayName = 'TableCaption';
 

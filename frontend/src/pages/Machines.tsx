@@ -11,25 +11,38 @@ export default function Machines() {
   const { data, isLoading, error, refetch } = useMachines();
 
   const columns: Column<Machine>[] = [
-    { key: 'machine_id', header: 'Machine ID' },
-    { key: 'ip_address', header: 'IP Address' },
-    { key: 'validated', header: 'Validated', render: (row) => row.validated ? <Badge variant="default">Yes</Badge> : <Badge variant="outline">No</Badge> },
-    { key: 'version', header: 'Version' },
-    { key: 'last_heartbeat', header: 'Last Heartbeat' },
-    { key: 'last_push', header: 'Last Push' },
+    { key: 'machine_id', header: 'Machine ID', className: 'mono text-xs' },
+    { key: 'ip_address', header: 'IP Address', className: 'mono tabular' },
+    { key: 'validated', header: 'Validated', render: (row) => row.validated ? <Badge variant="success">validated</Badge> : <Badge variant="muted">pending</Badge> },
+    { key: 'version', header: 'Version', className: 'mono text-xs' },
+    { key: 'last_heartbeat', header: 'Last Heartbeat', className: 'mono text-xs tabular whitespace-nowrap' },
+    { key: 'last_push', header: 'Last Push', className: 'mono text-xs tabular whitespace-nowrap' },
   ];
 
-  if (isLoading) return <><CapabilityBadge op="machines.list" /><LoadingSkeleton rows={8} /></>;
+  if (isLoading) return <><CapabilityBadge op="machines.list" /><div className="mt-3"><LoadingSkeleton rows={8} /></div></>;
   if (error) return <ErrorPanel error={error} onRetry={() => refetch()} />;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Machines</h1>
-      <CapabilityBadge op="machines.list" />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-white">Machines</h1>
+          <p className="mono mt-1 text-xs text-zinc-500">Agents registered to this LAPI. Heartbeat shows liveness.</p>
+        </div>
+        <CapabilityBadge op="machines.list" />
+      </div>
+
       {!data || data.length === 0 ? (
-        <EmptyState title="No machines" description="No registered machines found." />
+        <EmptyState
+          title="No machines"
+          description="No agents have registered yet. Install crowdsec on a host and enroll it with cscli machines add."
+          action="Validated machines can push alerts and pull decisions."
+        />
       ) : (
-        <DataTable data={data} columns={columns} rowKey={(row) => row.machine_id} />
+        <>
+          <div className="mono text-xs text-zinc-500">{data.length} machine{data.length !== 1 ? 's' : ''} registered</div>
+          <DataTable data={data} columns={columns} rowKey={(row) => row.machine_id} />
+        </>
       )}
     </div>
   );
