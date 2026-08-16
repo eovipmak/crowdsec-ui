@@ -13,13 +13,14 @@ interface DataTableProps<T> {
   columns: Column<T>[];
   onRowClick?: (row: T) => void;
   rowKey?: (row: T) => string | number;
+  noHorizontalScroll?: boolean;
 }
 
 export default function DataTable<T extends Record<string, any>>({
-  data, columns, onRowClick, rowKey,
+  data, columns, onRowClick, rowKey, noHorizontalScroll,
 }: DataTableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-md border border-[#232334] bg-[#12121a]">
+    <div className={noHorizontalScroll ? "overflow-x-hidden rounded-md border border-[#232334] bg-[#12121a]" : "overflow-x-auto rounded-md border border-[#232334] bg-[#12121a]"}>
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">

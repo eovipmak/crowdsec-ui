@@ -14,13 +14,13 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
   const { data, isLoading, error, refetch } = useAlert(id);
 
   const eventColumns: Column<any>[] = [
-    { key: 'timestamp', header: 'Timestamp', className: 'mono text-xs tabular whitespace-nowrap' },
-    { key: 'log_type', header: 'Log Type', className: 'mono text-xs' },
-    { key: 'service', header: 'Service', className: 'mono text-xs' },
-    { key: 'machine', header: 'Machine', className: 'mono text-xs' },
-    { key: 'source_ip', header: 'Source IP', className: 'mono tabular' },
-    { key: 'target_user', header: 'Target User', className: 'mono text-xs' },
-    { key: 'datasource_path', header: 'Datasource', className: 'mono text-xs max-w-[180px] truncate' },
+    { key: 'timestamp', header: 'Timestamp', className: 'mono text-xs tabular whitespace-normal break-words' },
+    { key: 'log_type', header: 'Log Type', className: 'mono text-xs break-words' },
+    { key: 'service', header: 'Service', className: 'mono text-xs break-words' },
+    { key: 'machine', header: 'Machine', className: 'mono text-xs break-words' },
+    { key: 'source_ip', header: 'Source IP', className: 'mono tabular break-all' },
+    { key: 'target_user', header: 'Target User', className: 'mono text-xs break-words' },
+    { key: 'datasource_path', header: 'Datasource', className: 'mono text-xs break-all' },
   ];
 
   return (
@@ -31,7 +31,7 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
           <DialogDescription>Raw alert payload and derived decisions.</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[68vh] overflow-y-auto px-5 py-4">
+        <div className="max-h-[68vh] overflow-y-auto overflow-x-hidden px-5 py-4">
           {isLoading && <LoadingSkeleton rows={4} />}
           {error && <ErrorPanel error={error} onRetry={() => refetch()} />}
           {data && (
@@ -58,9 +58,11 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
               )}
 
               {data.events && data.events.length > 0 && (
-                <div>
+                <div className="overflow-x-hidden">
                   <h4 className="mono mb-2 text-xs uppercase tracking-widest text-zinc-500">Events — {data.events.length}</h4>
-                  <DataTable data={data.events} columns={eventColumns} />
+                  <div className="max-h-[42vh] overflow-y-auto overflow-x-hidden rounded-md">
+                    <DataTable data={data.events} columns={eventColumns} noHorizontalScroll />
+                  </div>
                 </div>
               )}
             </div>
