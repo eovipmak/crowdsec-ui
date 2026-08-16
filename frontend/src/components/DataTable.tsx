@@ -19,7 +19,7 @@ export default function DataTable<T extends Record<string, any>>({
   data, columns, onRowClick, rowKey,
 }: DataTableProps<T>) {
   return (
-    <div className="overflow-hidden rounded-md border border-[#232334] bg-[#12121a]">
+    <div className="overflow-x-auto rounded-md border border-[#232334] bg-[#12121a]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -29,19 +29,35 @@ export default function DataTable<T extends Record<string, any>>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, i) => (
-            <TableRow
-              key={rowKey ? rowKey(row) : i}
-              className={onRowClick ? 'cursor-pointer hover:bg-[#181825]' : ''}
-              onClick={() => onRowClick?.(row)}
-            >
-              {columns.map((col) => (
-                <TableCell key={col.key} className={col.className}>
-                  {col.render ? col.render(row) : (row[col.key] ?? <span className="text-zinc-600">—</span>)}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
+          {data.map((row, i) => {
+            const clickable = !!onRowClick;
+            return (
+              <TableRow
+                key={rowKey ? rowKey(row) : i}
+                className={clickable ? 'cursor-pointer hover:bg-[#181825] focus-within:bg-[#181825]' : ''}
+                onClick={() => onRowClick?.(row)}
+                onKeyDown={(e) => {
+                  if (clickable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    onRowClick?.(row);
+                  }
+                }}
+                tabIndex={clickable ? 0 : undefined}
+                role={clickable ? 'button' : undefined}
+                aria-label={clickable ? `Inspect row ${rowKey ? rowKey(row) : i}` : undefined}
+              >
+                {columns.map((col) => (
+                  <TableCell
+                    key={col.key}
+                    className={col.className}
+                    title={typeof row[col.key] === 'string' ? (row[col.key] as string) : undefined}
+                  >
+                    {col.render ? col.render(row) : (row[col.key] ?? <span className="text-zinc-600">—</span>)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

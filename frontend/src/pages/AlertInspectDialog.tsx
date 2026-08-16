@@ -25,9 +25,9 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
 
   return (
     <Dialog open={id !== null} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="max-h-[82vh] max-w-3xl overflow-hidden p-0">
+      <DialogContent className="max-h-[82vh] w-[calc(100%-32px)] max-w-3xl overflow-hidden p-0 sm:w-full">
         <DialogHeader>
-          <DialogTitle className="mono text-sm">Alert #{id}</DialogTitle>
+          <DialogTitle className="mono pr-8 text-sm">Alert #{id}</DialogTitle>
           <DialogDescription>Raw alert payload and derived decisions.</DialogDescription>
         </DialogHeader>
 
@@ -36,14 +36,14 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
           {error && <ErrorPanel error={error} onRetry={() => refetch()} />}
           {data && (
             <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-3 rounded border border-[#232334] bg-[#0f0f17] p-3 text-sm">
-                <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">Scenario</span><div className="mt-1 text-zinc-200">{data.scenario}</div></div>
-                <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">Source IP</span><div className="mono mt-1 tabular text-zinc-200">{data.source_ip ?? '—'}</div></div>
+              <div className="grid grid-cols-1 gap-3 rounded border border-[#232334] bg-[#0f0f17] p-3 text-sm sm:grid-cols-2">
+                <div className="min-w-0"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Scenario</span><div className="mt-1 break-words text-zinc-200">{data.scenario}</div></div>
+                <div className="min-w-0"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Source IP</span><div className="mono mt-1 break-all tabular text-zinc-200">{data.source_ip ?? '—'}</div></div>
                 <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">Country</span><div className="mt-1 text-zinc-300">{data.country ?? '—'}</div></div>
-                <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">AS</span><div className="mt-1 text-zinc-300">{data.as_name ?? '—'}</div></div>
+                <div className="min-w-0"><span className="mono text-xs uppercase tracking-widest text-zinc-500">AS</span><div className="mt-1 break-words text-zinc-300">{data.as_name ?? '—'}</div></div>
                 <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">Events</span><div className="tabular mt-1 font-medium text-white">{data.events_count ?? 0}</div></div>
-                <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">Created</span><div className="mono mt-1 text-xs tabular text-zinc-400">{data.created_at ?? '—'}</div></div>
-                <div className="col-span-2 border-t border-[#232334] pt-3"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Message</span><div className="mt-1 text-sm leading-5 text-zinc-300">{data.message}</div></div>
+                <div className="min-w-0"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Created</span><div className="mono mt-1 break-words text-xs tabular text-zinc-400">{data.created_at ?? '—'}</div></div>
+                <div className="col-span-1 border-t border-[#232334] pt-3 sm:col-span-2"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Message</span><div className="mt-1 break-words text-sm leading-5 text-zinc-300">{data.message}</div></div>
               </div>
 
               {data.decisions && data.decisions.length > 0 && (

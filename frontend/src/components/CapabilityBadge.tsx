@@ -14,12 +14,12 @@ export default function CapabilityBadge({ op }: CapabilityBadgeProps) {
   return (
     <div className="flex items-center gap-2">
       {supported ? (
-        <span className="mono inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-zinc-600">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+        <span className="mono inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-zinc-500" aria-label="cscli ready">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
           cscli · ready
         </span>
       ) : (
-        <Badge variant="destructive" className="mono text-[11px]">Unsupported — cscli probe failed</Badge>
+        <Badge variant="destructive" className="mono text-[11px]" role="status">Unsupported — cscli probe failed</Badge>
       )}
     </div>
   );
