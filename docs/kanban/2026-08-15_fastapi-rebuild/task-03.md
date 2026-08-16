@@ -81,8 +81,8 @@ From `backend/`:
 - Tests/pytest (D12).
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-16T00:00:00Z
+- Verification: `uv run python -c "import capabilities, routers.capabilities"` → OK; `probe_capabilities(CscliRunner(None,5.0))` → 13 keys all `unsupported: false`; no stderr leaks; all imports clean
+- Commit or artifact reference: working tree

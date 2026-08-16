@@ -1,9 +1,14 @@
 import json
-from fastapi import APIRouter, Query
+import logging
+from fastapi import APIRouter, Query, Request
 
-from ..cscli import run_cscli
+from ..cscli import CscliRunner, RunResult, classify_failure
+from envelope import success, operation_error, ALERTS_LIST
+from errors import UNSUPPORTED
 
-router = APIRouter(prefix="/alerts", tags=["Alerts"])
+_logger = logging.getLogger("cscli.alerts")
+
+list_router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 
 def extract_meta(alert):
@@ -19,17 +24,28 @@ def extract_meta(alert):
     return meta
 
 
-@router.get("/")
-async def get_alerts(
-    limit: int = Query(5, ge=1, le=100),
-    log_type: str | None = None,
-    source_ip: str | None = None,
+@list_router.get("")
+async def list_alerts(
+    request: Request,
+    limit: int = Query(50, ge=1, le=100),
+    scenario: str | None = Query(None),
+    ip: str | None = Query(None),
 ):
-    stdout = await run_cscli(
-        "alerts", "list", "-m", "-l", str(limit), "-o", "json"
-    )
+    caps = getattr(request.app.state, "capabilities", {})
+    if not caps.get("alerts.list", {}).get("supported"):
+        return operation_error(ALERTS_LIST, UNSUPPORTED)
 
-    raw_alerts = json.loads(stdout)
+    runner: CscliRunner = request.app.state.runner
+    argv = ["alerts", "list", "-m", "-l", str(limit), "-o", "json"]
+    result = await runner.run(argv, timeout=runner.default_timeout)
+
+    if result.exec_missing or result.eacces or result.deadline_exceeded or result.exit_code != 0:
+        code = classify_failure(result)
+        if result.stderr:
+            _logger.warning("cscli alerts list stderr: %s", result.stderr.decode(errors="replace")[:500])
+        return operation_error(ALERTS_LIST, code)
+
+    raw_alerts = json.loads(result.stdout.decode()) if result.stdout else []
     alerts = []
 
     for alert in raw_alerts:
@@ -45,19 +61,16 @@ async def get_alerts(
             "as_name": source.get("as_name"),
             "events_count": alert.get("events_count"),
             "created_at": alert.get("created_at"),
-            #"start_at": alert.get("start_at"),
-            #"stop_at": alert.get("stop_at"),
             "log_type": meta.get("log_type"),
             "service": meta.get("service"),
             "machine": meta.get("machine"),
-            #"target_user": meta.get("target_user"),
         })
 
     # Filter (AND)
-    if log_type:
-        alerts = [a for a in alerts if a["log_type"] == log_type]
+    if scenario:
+        alerts = [a for a in alerts if a.get("scenario") == scenario]
 
-    if source_ip:
-        alerts = [a for a in alerts if a["source_ip"] == source_ip]
+    if ip:
+        alerts = [a for a in alerts if a.get("source_ip") == ip]
 
-    return alerts
+    return success(ALERTS_LIST, alerts)

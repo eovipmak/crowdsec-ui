@@ -101,8 +101,8 @@ From `backend/` after task-04 lands:
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-16T00:00:00Z
+- Verification: All 7 routers import cleanly; `grep -rnE 'detail=.*stderr|return.*stderr\.decode|PlainTextResponse'` → no matches; `grep -rnE 'HTTPException'` → no matches; `grep -rnE 'run_cscli'` → no matches; allowlists/check switched from PlainTextResponse to envelope `{"matched": bool}`
+- Commit or artifact reference: working tree

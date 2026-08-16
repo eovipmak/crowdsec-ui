@@ -1,17 +1,34 @@
 import json
-from fastapi import APIRouter
+import logging
+from fastapi import APIRouter, Request
 
-from ..cscli import run_cscli
+from ..cscli import CscliRunner, classify_failure
+from envelope import success, operation_error, DECISIONS_CHECK
+from errors import UNSUPPORTED
 
-router = APIRouter(prefix="/decisions/check", tags=["Decisions"])
+_logger = logging.getLogger("cscli.decisions")
+
+check_router = APIRouter(prefix="/decisions/check", tags=["Decisions"])
 
 
-@router.get("/{ip}")
-async def check_decision(ip: str):
-    stdout = await run_cscli("decisions", "list", "-v", ip, "-o", "json")
-    raw = json.loads(stdout)
+@check_router.get("/{ip}")
+async def check_decision(request: Request, ip: str):
+    caps = getattr(request.app.state, "capabilities", {})
+    if not caps.get("decisions.check", {}).get("supported"):
+        return operation_error(DECISIONS_CHECK, UNSUPPORTED)
 
-    return [
+    runner: CscliRunner = request.app.state.runner
+    argv = ["decisions", "list", "-v", ip, "-o", "json"]
+
+    result = await runner.run(argv, timeout=runner.default_timeout)
+    if result.exec_missing or result.eacces or result.deadline_exceeded or result.exit_code != 0:
+        code = classify_failure(result)
+        _logger.warning("cscli decisions check failed: %s", result.stderr.decode(errors="replace")[:500])
+        return operation_error(DECISIONS_CHECK, code)
+
+    raw = json.loads(result.stdout.decode()) if result.stdout else []
+
+    items = [
         {
             "id": d.get("id"),
             "scope": d.get("scope"),
@@ -24,3 +41,5 @@ async def check_decision(ip: str):
         for alert in raw
         for d in alert.get("decisions", [])
     ]
+
+    return success(DECISIONS_CHECK, items)

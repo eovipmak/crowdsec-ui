@@ -1,27 +1,43 @@
 import json
-from fastapi import APIRouter, Query
+import logging
+from fastapi import APIRouter, Query, Request
 
-from ..cscli import run_cscli
+from ..cscli import CscliRunner, classify_failure
+from envelope import success, operation_error, DECISIONS_LIST
+from errors import UNSUPPORTED
 
-router = APIRouter(prefix="/decisions", tags=["Decisions"])
+_logger = logging.getLogger("cscli.decisions")
+
+list_router = APIRouter(prefix="/decisions", tags=["Decisions"])
 
 
-@router.get("/")
+@list_router.get("")
 async def get_decisions(
-    limit: int = Query(5, ge=1, le=100),
+    request: Request,
+    limit: int = Query(50, ge=1, le=100),
     decision_type: str | None = Query(None, alias="type"),
     ip: str | None = None,
 ):
-    cmd = ["decisions", "list", "-l", str(limit), "-o", "json"]
+    caps = getattr(request.app.state, "capabilities", {})
+    if not caps.get("decisions.list", {}).get("supported"):
+        return operation_error(DECISIONS_LIST, UNSUPPORTED)
+
+    runner: CscliRunner = request.app.state.runner
+    argv = ["decisions", "list", "-l", str(limit), "-o", "json"]
 
     if decision_type:
-        cmd += ["-t", decision_type]
+        argv += ["-t", decision_type]
 
     if ip:
-        cmd += ["-i", ip]
+        argv += ["-i", ip]
 
-    stdout = await run_cscli(*cmd)
-    raw = json.loads(stdout)
+    result = await runner.run(argv, timeout=runner.default_timeout)
+    if result.exec_missing or result.eacces or result.deadline_exceeded or result.exit_code != 0:
+        code = classify_failure(result)
+        _logger.warning("cscli decisions list failed: %s", result.stderr.decode(errors="replace")[:500])
+        return operation_error(DECISIONS_LIST, code)
+
+    raw = json.loads(result.stdout.decode()) if result.stdout else []
     decisions = []
 
     for alert in raw:
@@ -44,4 +60,4 @@ async def get_decisions(
             "simulated": dec.get("simulated"),
         })
 
-    return decisions
+    return success(DECISIONS_LIST, decisions)

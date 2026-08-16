@@ -129,8 +129,8 @@ From `backend/` after task-04 lands (or a manual `TestClient` harness if task-04
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-16T00:00:00Z
+- Verification: `from routers.alerts import list_router, inspect_router` + `from routers.bouncers import list_router, inspect_router` → import OK; `grep -rnE 'detail=.*stderr|return.*stderr|run_cscli'` → no matches; `grep -rnE 'HTTPException'` → no matches; all 4 handlers use CscliRunner.run + envelope + capabilities short-circuit
+- Commit or artifact reference: working tree

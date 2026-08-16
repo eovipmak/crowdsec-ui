@@ -1,17 +1,35 @@
 import json
-from fastapi import APIRouter
+import logging
+from fastapi import APIRouter, Request
 
-from ..cscli import run_cscli
+from ..cscli import CscliRunner, RunResult, classify_failure
+from envelope import success, operation_error, BOUNCERS_LIST
+from errors import UNSUPPORTED
 
-router = APIRouter(prefix="/bouncers", tags=["Bouncers"])
+_logger = logging.getLogger("cscli.bouncers")
+
+list_router = APIRouter(prefix="/bouncers", tags=["Bouncers"])
 
 
-@router.get("/")
-async def get_bouncers():
-    stdout = await run_cscli("bouncers", "list", "-o", "json")
-    bouncers = json.loads(stdout)
+@list_router.get("")
+async def list_bouncers(request: Request):
+    caps = getattr(request.app.state, "capabilities", {})
+    if not caps.get("bouncers.list", {}).get("supported"):
+        return operation_error(BOUNCERS_LIST, UNSUPPORTED)
 
-    return [
+    runner: CscliRunner = request.app.state.runner
+    argv = ["bouncers", "list", "-o", "json"]
+    result = await runner.run(argv, timeout=runner.default_timeout)
+
+    if result.exec_missing or result.eacces or result.deadline_exceeded or result.exit_code != 0:
+        code = classify_failure(result)
+        if result.stderr:
+            _logger.warning("cscli bouncers list stderr: %s", result.stderr.decode(errors="replace")[:500])
+        return operation_error(BOUNCERS_LIST, code)
+
+    bouncers = json.loads(result.stdout.decode()) if result.stdout else []
+
+    items = [
         {
             "name": b.get("name"),
             "type": b.get("type"),
@@ -26,3 +44,5 @@ async def get_bouncers():
         }
         for b in bouncers
     ]
+
+    return success(BOUNCERS_LIST, items)
