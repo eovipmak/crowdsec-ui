@@ -1,25 +1,28 @@
-import { useCapabilities } from '@/hooks/useCapabilities';
 import { Badge } from '@/components/ui/badge';
+import { useCapabilities } from '@/hooks/useCapabilities';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
-type CapabilityBadgeProps = {
+interface CapabilityBadgeProps {
   op: string;
-};
+}
 
-/**
- * Per-section capability indicator (plan §7.1). When the section's op is
- * `supported: false`, call sites render this badge INSTEAD of the section so
- * no data fetch is attempted for disabled ops.
- */
 export default function CapabilityBadge({ op }: CapabilityBadgeProps) {
   const caps = useCapabilities();
   const supported = caps.data?.[op]?.supported;
 
-  if (supported === false) {
-    return (
-      <Badge variant="destructive">
-        Unsupported — cscli probe failed for {op}
-      </Badge>
-    );
-  }
-  return <Badge variant="secondary">Supported</Badge>;
+  if (supported === undefined) return null;
+
+  return (
+    <div className="flex items-center gap-2 py-2">
+      {supported ? (
+        <Badge variant="default" className="gap-1">
+          <CheckCircle2 className="h-3 w-3" /> Supported
+        </Badge>
+      ) : (
+        <Badge variant="destructive" className="gap-1">
+          <AlertCircle className="h-3 w-3" /> Unsupported — cscli probe failed
+        </Badge>
+      )}
+    </div>
+  );
 }

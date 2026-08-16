@@ -116,8 +116,8 @@ print(r.json())
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: crowdsec-command-mapper (via coordinator)
+- Completed at: 2026-08-16T00:30:00Z
+- Verification: `from routers.status import router` → import OK; `grep -nE 'detail=.*stderr|return.*stderr'` → no matches; `TestClient` smoke: both `/status/lapi` and `/status/capi` return `UNSUPPORTED` when cscli missing; no HTTPException, no run_cscli, no PlainTextResponse
+- Commit or artifact reference: working tree

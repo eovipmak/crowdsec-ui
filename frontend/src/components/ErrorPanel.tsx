@@ -1,29 +1,29 @@
-import { ApiError } from '@/lib/api/client';
-import { messageFor } from '@/lib/api/errors';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { AlertTriangle } from 'lucide-react';
+import { ApiError } from '@/lib/api/client';
 
-type ErrorPanelProps = {
-  error: ApiError | Error;
+interface ErrorPanelProps {
+  error: Error | ApiError;
   onRetry: () => void;
-};
+}
 
-/**
- * Readable operation-failure panel with a retry button (plan §7.1).
- * Falls back to the safe message table for unknown codes (plan §3.2).
- */
 export default function ErrorPanel({ error, onRetry }: ErrorPanelProps) {
-  const message =
-    error instanceof ApiError ? messageFor(error.code) : 'An unexpected error occurred.';
+  const code = error instanceof ApiError ? error.code : null;
+  const message = error.message || 'An unexpected error occurred.';
 
   return (
-    <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4">
-      <p className="text-sm font-medium text-destructive">{message}</p>
-      {error instanceof ApiError && error.code ? (
-        <p className="mt-1 text-xs text-muted-foreground">Code: {error.code}</p>
-      ) : null}
-      <Button variant="outline" size="sm" className="mt-3" onClick={onRetry}>
-        Retry
-      </Button>
-    </div>
+    <Card className="border-destructive/50">
+      <CardContent className="flex items-center gap-4 pt-6">
+        <AlertTriangle className="h-6 w-6 text-destructive shrink-0" />
+        <div className="flex-1">
+          <p className="font-medium text-destructive">Failed to load data</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {message}{code ? ` (Code: ${code})` : ''}
+          </p>
+        </div>
+        <Button variant="outline" onClick={onRetry}>Retry</Button>
+      </CardContent>
+    </Card>
   );
 }

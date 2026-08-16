@@ -1,53 +1,49 @@
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-export type Column<T> = {
-  key: keyof T & string;
+export interface Column<T> {
+  key: string;
   header: string;
   render?: (row: T) => ReactNode;
-};
+  className?: string;
+}
 
-type DataTableProps<T> = {
+interface DataTableProps<T> {
   data: T[];
   columns: Column<T>[];
   onRowClick?: (row: T) => void;
-};
+  rowKey?: (row: T) => string | number;
+}
 
-/**
- * Generic read-only data table (plan §7.1). Full page logic lands in task-10;
- * this is the typed skeleton consumed by every list page.
- */
-export default function DataTable<T>({ data, columns, onRowClick }: DataTableProps<T>) {
+export default function DataTable<T extends Record<string, any>>({
+  data, columns, onRowClick, rowKey,
+}: DataTableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-md border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b bg-muted/50">
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
             {columns.map((col) => (
-              <th
-                key={col.key}
-                className="px-3 py-2 text-left font-medium text-muted-foreground"
-              >
-                {col.header}
-              </th>
+              <TableHead key={col.key} className={col.className}>{col.header}</TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {data.map((row, i) => (
-            <tr
-              key={i}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
+            <TableRow
+              key={rowKey ? rowKey(row) : i}
               className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+              onClick={() => onRowClick?.(row)}
             >
               {columns.map((col) => (
-                <td key={col.key} className="px-3 py-2">
-                  {col.render ? col.render(row) : String(row[col.key] ?? '')}
-                </td>
+                <TableCell key={col.key} className={col.className}>
+                  {col.render ? col.render(row) : (row[col.key] ?? '—')}
+                </TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

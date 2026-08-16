@@ -160,8 +160,8 @@ From `frontend/`:
 - Editing the source plan.
 
 ## Coordinator status
-- Status: pending
-- Completed by: —
-- Completed at: —
-- Verification: —
-- Commit or artifact reference: —
+- Status: completed
+- Completed by: nextjs-dashboard (via coordinator)
+- Completed at: 2026-08-16T00:30:00Z
+- Verification: `npm run typecheck` → green; `npm run build` → green (1723 modules, dist/index.html + assets); `grep useMutation` → no matches; `grep 'X-CSRF-Token\|useAuth\|RequireAuth'` → no matches; `grep 'from "axios"\|from "next/"'` → no matches; all 6 pages + 6 hooks + 6 shared components implemented
+- Commit or artifact reference: working tree

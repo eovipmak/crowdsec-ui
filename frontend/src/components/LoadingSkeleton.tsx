@@ -1,17 +1,14 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-type LoadingSkeletonProps = {
-  rows: number;
-};
+interface LoadingSkeletonProps {
+  rows?: number;
+}
 
-/**
- * Table-shaped loading placeholder (plan §7.1).
- */
-export default function LoadingSkeleton({ rows }: LoadingSkeletonProps) {
+export default function LoadingSkeleton({ rows = 5 }: LoadingSkeletonProps) {
   return (
-    <div className="space-y-2">
-      {Array.from({ length: rows }, (_, i) => (
-        <Skeleton key={i} className="h-10 w-full" />
+    <div className="space-y-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <Skeleton key={i} className="h-12 w-full" />
       ))}
     </div>
   );
