@@ -17,6 +17,8 @@ export const NOT_FOUND = 'not_found';
 export const METHOD_NOT_ALLOWED = 'method_not_allowed';
 export const INTERNAL = 'internal';
 
+export const METRICS_SHOW = 'metrics.show';
+
 // Operation-level codes (HTTP 200, always safe message).
 export const CROWDSEC_FAILURE = 'crowdsec_failure';
 export const TIMEOUT = 'timeout';

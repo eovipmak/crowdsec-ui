@@ -7,16 +7,16 @@ Wire contract (all responses JSON, ``Cache-Control: no-store``):
 - request_error:   ``{"error": {code, message}}``                     HTTP 4xx/5xx
 - health:          ``{"status": "ok"}`` (raw, OUTSIDE the envelope)   HTTP 200
 
-The 15 wire routes of plan §3.3:
+The 16 wire routes of plan §3.3:
 
 - ``/health`` — raw ``{"status": "ok"}``, no operation label
 - ``capabilities.list``, ``alerts.list``, ``alerts.inspect``,
   ``decisions.list``, ``decisions.check``, ``machines.list``,
   ``machines.inspect``, ``bouncers.list``, ``bouncers.inspect``,
   ``allowlists.list``, ``allowlists.inspect``, ``allowlists.check``,
-  ``status.lapi``, ``status.capi``
+  ``status.lapi``, ``status.capi``, ``metrics.show``
 
-The 14 operation-label constants below are the single source of truth;
+The 15 operation-label constants below are the single source of truth;
 handlers must reference them instead of hardcoding string literals.
 """
 
@@ -53,6 +53,7 @@ def health_ok() -> dict:
 
 
 # Canonical operation labels (plan §3.3) — single source of truth.
+METRICS_SHOW = "metrics.show"
 ALERTS_LIST = "alerts.list"
 ALERTS_INSPECT = "alerts.inspect"
 DECISIONS_LIST = "decisions.list"

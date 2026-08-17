@@ -8,7 +8,7 @@
 - Wants implementation tasks to be self-contained and specific enough for agents to execute without clarification or uncertainty about scope. Confidence: 0.95
 - Organizes task artifacts under `docs/kanban/[$date]_[$plan-name]/task-[$number].md`. Confidence: 0.9
 - Prefers a reusable four-stage workflow: create a feature plan, edit/research an existing plan, break plans into executable kanban tasks, and coordinate agents to execute those tasks. Confidence: 0.95
-- Requires delegated kanban execution agents to use the exact model `deepseek/deepseek-v4-flash`. Confidence: 0.95
+- Requires delegated kanban execution agents to use the exact model `meta/muse-spark-1.2-contributor` instead of `deepseek/deepseek-v4-flash`. Confidence: 0.95
 - Prefers project-scoped skills under `.commandcode/skills/` with matching lowercase-hyphenated names and self-contained `SKILL.md` instructions. Confidence: 0.9
 - Prefers delegated-task completion to be verified from the agent's returned result/state and repository artifacts (including filesystem and git checks), rather than trusting a feed label such as “Done” alone. Confidence: 0.9
 - Prefers agent-orchestration problems to be diagnosed against authoritative Command Code documentation as well as local coordination skills and task artifacts, distinguishing runtime failures from workflow defects. Confidence: 0.9
