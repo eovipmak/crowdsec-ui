@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useBouncers } from '@/hooks/useBouncers';
 import DataTable, { type Column } from '@/components/DataTable';
 import ErrorPanel from '@/components/ErrorPanel';
@@ -5,9 +6,11 @@ import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import CapabilityBadge from '@/components/CapabilityBadge';
 import type { Bouncer } from '@/hooks/useBouncers';
+import BouncerInspectDialog from '@/pages/BouncerInspectDialog';
 
 export default function Bouncers() {
   const { data, isLoading, error, refetch } = useBouncers();
+  const [selectedName, setSelectedName] = useState<string | null>(null);
 
   const columns: Column<Bouncer>[] = [
     { key: 'name', header: 'Name' },
@@ -39,9 +42,10 @@ export default function Bouncers() {
       ) : (
         <>
           <div className="mono text-xs text-zinc-500">{data.length} bouncer{data.length !== 1 ? 's' : ''} · sorted by last pull</div>
-          <DataTable data={data} columns={columns} rowKey={(row) => row.name} />
+          <DataTable data={data} columns={columns} rowKey={(row) => row.name} onRowClick={(row) => setSelectedName(row.name)} />
         </>
       )}
+      <BouncerInspectDialog name={selectedName} onClose={() => setSelectedName(null)} />
     </div>
   );
 }

@@ -9,8 +9,15 @@ export interface Allowlist {
   size: number;
 }
 
+export interface AllowlistItem {
+  value: string;
+  description: string;
+  created_at: string;
+  expiration: string;
+}
+
 export interface AllowlistDetail extends Allowlist {
-  items: any[];
+  items: AllowlistItem[];
 }
 
 export function useAllowlists() {
@@ -25,5 +32,13 @@ export function useAllowlistCheck(ip: string | null) {
     enabled: ip !== null && ip.length > 0,
     queryKey: ['allowlists', 'check', ip],
     queryFn: () => apiGet<{ matched: boolean }>(`/allowlists/check/${encodeURIComponent(ip!)}`),
+  });
+}
+
+export function useAllowlistInspect(name: string | null) {
+  return useQuery<AllowlistDetail>({
+    enabled: name !== null && name.length > 0,
+    queryKey: ['allowlists', 'inspect', name],
+    queryFn: () => apiGet<AllowlistDetail>(`/allowlists/inspect/${encodeURIComponent(name!)}`),
   });
 }

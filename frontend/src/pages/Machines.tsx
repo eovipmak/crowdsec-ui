@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useMachines } from '@/hooks/useMachines';
 import DataTable, { type Column } from '@/components/DataTable';
 import ErrorPanel from '@/components/ErrorPanel';
@@ -6,9 +7,11 @@ import LoadingSkeleton from '@/components/LoadingSkeleton';
 import CapabilityBadge from '@/components/CapabilityBadge';
 import { Badge } from '@/components/ui/badge';
 import type { Machine } from '@/hooks/useMachines';
+import MachineInspectDialog from '@/pages/MachineInspectDialog';
 
 export default function Machines() {
   const { data, isLoading, error, refetch } = useMachines();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const columns: Column<Machine>[] = [
     { key: 'machine_id', header: 'Machine ID', className: 'mono text-xs' },
@@ -41,9 +44,10 @@ export default function Machines() {
       ) : (
         <>
           <div className="mono text-xs text-zinc-500">{data.length} machine{data.length !== 1 ? 's' : ''} registered</div>
-          <DataTable data={data} columns={columns} rowKey={(row) => row.machine_id} />
+          <DataTable data={data} columns={columns} rowKey={(row) => row.machine_id} onRowClick={(row) => setSelectedId(row.machine_id)} />
         </>
       )}
+      <MachineInspectDialog machineId={selectedId} onClose={() => setSelectedId(null)} />
     </div>
   );
 }
