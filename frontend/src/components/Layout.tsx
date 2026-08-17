@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/machines', label: 'Machines' },
   { to: '/bouncers', label: 'Bouncers' },
   { to: '/allowlists', label: 'Allowlists' },
+  { to: '/metrics', label: 'Metrics' },
 ];
 
 function StatusDot({ ok, label }: { ok: boolean; label: string }) {

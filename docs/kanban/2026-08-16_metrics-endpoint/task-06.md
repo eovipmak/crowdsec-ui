@@ -78,3 +78,10 @@ From project root:
 - Adding config keys (`config.yaml`, `backend/config.py`) or `cscli` flag docs (`--url`, `--no-unit`).
 - Editing the source plan `docs/plans/2026-08-16_metrics-endpoint.md`.
 - pytest / `backend/tests/` (none exist — D12).
+
+## Coordinator status
+- Status: completed
+- Completed by: muse-spark-1.2-contributor
+- Completed at: 2026-08-17T10:02:29Z
+- Verification summary: prerequisites verified (backend/main.py imports metrics_router + api.include_router(metrics_router) under /api/v1 prefix; frontend/src/App.tsx has /metrics inside Layout; envelope.py METRICS_SHOW=="metrics.show", capabilities.py Probe #4 ["metrics","show","acquisition","-o","json"] 5s, show.py ALLOWLIST 14 types — all match plan); docs updated: architecture.md now 165 lines — 4 probes listed, 14 ops + health, route table with GET /api/v1/metrics + GET /api/v1/metrics/{component} and frontend /metrics, Dropped section revived in 2026-08-16_metrics-endpoint; operations-reference.md now 115 lines — endpoint rows for GET /api/v1/metrics and GET /api/v1/metrics/{component}, 14-type allowlist, validation (unknown/duplicate query key -> 400, invalid component -> 400 without spawning), success + operation_error + request 400 envelope examples, dashboard-JSON vs Prometheus distinction note; deploy/config.example.yaml commented note above cscli.timeout governing metrics and Probe #4, no metrics: key; verifications: grep metrics.show hits both files, grep GET.*metrics hits both rows, grep /api/v1/metrics shows only intended rows, error codes reused (invalid_parameters/unsupported/malformed_output), 14/acquisition present, Out of scope revived annotation present, Prometheus only in not-in-scope note, 10-code taxonomy and single-port 8090 no-DB posture preserved
+- Commit reference: working tree (docs/architecture.md, docs/operations-reference.md, deploy/config.example.yaml) — HEAD 18e4378330d9a0848ab707df57b8377664c5a506 + 3 modified files (7 files in broader working tree incl. task-05 frontend changes pre-existing)

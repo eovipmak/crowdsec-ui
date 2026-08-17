@@ -8,6 +8,7 @@ server:
 
 cscli:
   executable_path: /usr/bin/cscli  # optional; falls back to /usr/local/bin/cscli or /opt/crowdsec/bin/cscli
+  # timeout governs all cscli handlers and Probe #4 (metrics.show → ["metrics","show","acquisition","-o","json"] 5s); no metrics: key needed
   timeout: 30s               # 1s..120s
 
 logging:

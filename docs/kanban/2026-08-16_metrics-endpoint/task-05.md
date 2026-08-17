@@ -92,3 +92,10 @@ From `frontend/`:
 - Prometheus text exposition, Grafana dashboards, push/mutation, history/persistence/aggregation, auth/session, DB, Docker/K8s, new config keys, separate databases, or systemd units.
 - Alias handling in the selector — only "All" + 14 canonical types.
 - Strict TS typing of every metrics payload shape (keep `Record<string, unknown>`).
+
+## Coordinator status
+- Status: completed
+- Completed by: muse-spark-1.2-contributor
+- Completed at: 2026-08-17T09:58:00Z
+- Verification summary: task-04 contracts verified (useMetrics + METRICS_SHOW); Metrics.tsx exports default Metrics, selector All+14 in plan §5.2 order, degraded unsupported badge + "Metrics unavailable (cscli missing)" via useCapabilities metrics.show, LoadingSkeleton/ErrorPanel/Retry, per-section lean tables with <pre className="mono"> fallback, empty "No data yet"/"No metrics yet", auto-refresh toggle defaults off with 30s interval effect + manual Refresh, no stderr leak; App.tsx has /metrics inside Layout group; Layout.tsx appends Metrics nav item; router.tsx doc comment updated to mention metrics; npm run typecheck green (tsc --noEmit); npm run build green (vite 6.4.3, 1726 modules, dist/index.html + dist/assets/index-C67YpcyT.js); grep Metrics|/metrics hits all four files; grep useMetrics/METRICS_SHOW wired; queryKey ['metrics', component ?? 'all'] so All -> GET /api/v1/metrics and All->bouncers -> GET /api/v1/metrics/bouncers via useMetrics.
+- Commit reference: working tree (frontend/src/pages/Metrics.tsx, frontend/src/App.tsx, frontend/src/router.tsx, frontend/src/components/Layout.tsx)
