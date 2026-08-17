@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
@@ -9,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/bouncers', label: 'Bouncers' },
   { to: '/allowlists', label: 'Allowlists' },
   { to: '/metrics', label: 'Metrics' },
+  { to: '/hub', label: 'Hub', icon: Package },
 ];
 
 function StatusDot({ ok, label }: { ok: boolean; label: string }) {
@@ -45,23 +47,27 @@ export default function Layout() {
           </div>
 
           <nav aria-label="Primary" className="flex w-full items-center gap-1 overflow-x-auto pb-1 md:w-auto md:pb-0">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                aria-label={item.label}
-                className={({ isActive }) =>
-                  cn(
-                    'mono min-h-[32px] whitespace-nowrap rounded px-2.5 py-1.5 text-xs font-medium tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366f1] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090f]',
-                    isActive
-                      ? 'bg-[#1c1c26] text-white'
-                      : 'text-zinc-500 hover:bg-[#12121a] hover:text-zinc-200',
-                  )
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const Icon = (item as { icon?: React.ComponentType<{ className?: string }> }).icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  aria-label={item.label}
+                  className={({ isActive }) =>
+                    cn(
+                      'mono inline-flex min-h-[32px] items-center gap-1.5 whitespace-nowrap rounded px-2.5 py-1.5 text-xs font-medium tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366f1] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090f]',
+                      isActive
+                        ? 'bg-[#1c1c26] text-white'
+                        : 'text-zinc-500 hover:bg-[#12121a] hover:text-zinc-200',
+                    )
+                  }
+                >
+                  {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden /> : null}
+                  {item.label}
+                </NavLink>
+              );
+            })}
           </nav>
 
           <div className="ml-auto hidden items-center gap-4 md:flex">

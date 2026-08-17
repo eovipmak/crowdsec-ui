@@ -19,6 +19,22 @@ export const INTERNAL = 'internal';
 
 export const METRICS_SHOW = 'metrics.show';
 
+export const HUB_LIST = "hub.list";
+
+export interface HubItem {
+  name: string;
+  description?: string;
+  version?: string;
+  latest_version?: string;
+  status?: string;
+  tainted?: boolean;
+  missing?: boolean;
+  type?: string;
+  [key: string]: unknown;
+}
+
+export type HubInventory = Record<string, HubItem[]>;
+
 // Operation-level codes (HTTP 200, always safe message).
 export const CROWDSEC_FAILURE = 'crowdsec_failure';
 export const TIMEOUT = 'timeout';

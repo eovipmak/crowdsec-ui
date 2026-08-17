@@ -30,6 +30,7 @@ async def probe_capabilities(runner: CscliRunner) -> dict[str, dict[str, bool]]:
     caps["status.lapi"] = {"supported": False}
     caps["status.capi"] = {"supported": False}
     caps[envelope.METRICS_SHOW] = {"supported": False}
+    caps[envelope.HUB_LIST] = {"supported": False}
 
     # Probe #1: structured reads (alerts list -o json -l 1, 5s timeout)
     result = await runner.run(["alerts", "list", "-o", "json", "-l", "1"], timeout=5.0)
@@ -71,6 +72,19 @@ async def probe_capabilities(runner: CscliRunner) -> dict[str, dict[str, bool]]:
             _logger.warning("Probe #4: metrics show acquisition returned malformed JSON; marking metrics.show unsupported")
     else:
         _logger.warning("Probe #4 (metrics show acquisition) failed (exit_code=%d, exec_missing=%s, deadline_exceeded=%s)",
+                        result.exit_code, result.exec_missing, result.deadline_exceeded)
+
+    # Probe #5: hub list -o json (5s timeout)
+    result = await runner.run(["hub", "list", "-o", "json"], timeout=5.0)
+    if result.exit_code == 0 and not result.deadline_exceeded and not result.exec_missing:
+        try:
+            if result.stdout:
+                json.loads(result.stdout)
+            caps[envelope.HUB_LIST] = {"supported": True}
+        except (json.JSONDecodeError, ValueError):
+            _logger.warning("Probe #5: hub list returned malformed JSON; marking hub.list unsupported")
+    else:
+        _logger.warning("Probe #5 (hub list) failed (exit_code=%d, exec_missing=%s, deadline_exceeded=%s)",
                         result.exit_code, result.exec_missing, result.deadline_exceeded)
 
     return caps

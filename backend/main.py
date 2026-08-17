@@ -30,6 +30,7 @@ from routers.cscli import CscliRunner
 from routers.decisions import check_router as decisions_check, list_router as decisions_list
 from routers.machines import inspect_router as machines_inspect, list_router as machines_list
 from routers.metrics.show import router as metrics_router
+from routers.hub.list import router as hub_router
 from routers.status import router as status_router
 
 import errors
@@ -88,6 +89,7 @@ api.include_router(allowlists_check)
 api.include_router(status_router)
 api.include_router(capabilities_router)
 api.include_router(metrics_router)
+api.include_router(hub_router)
 app.include_router(api)
 
 

@@ -18,7 +18,7 @@ frontend team's API reference for the read-only endpoints under `/api/v1/*`.
 | Method | Path | Operation | Params | Success-result shape |
 |---|---|---|---|---|
 | GET | `/api/v1/health` | (none — raw) | — | `{"status":"ok"}` |
-| GET | `/api/v1/capabilities` | `capabilities.list` | — | `dict[op, {"supported": bool}]` (14 probed ops: 11 structured reads + `status.lapi` + `status.capi` + `metrics.show`; Probe #4 `["metrics","show","acquisition","-o","json"]` 5 s) |
+| GET | `/api/v1/capabilities` | `capabilities.list` | — | `dict[op, {"supported": bool}]` (15 probed ops: 11 structured reads + `status.lapi` + `status.capi` + `metrics.show` + `hub.list`; Probe #4 `["metrics","show","acquisition","-o","json"]` 5 s; Probe #5 `["hub","list","-o","json"]` 5 s) |
 | GET | `/api/v1/alerts` | `alerts.list` | `limit:int` (50, 1..100), optional `scenario`, `ip` | list of flattened alerts |
 | GET | `/api/v1/alerts/inspect/{alert_id}` | `alerts.inspect` | path `alert_id` | flattened alert + events |
 | GET | `/api/v1/decisions` | `decisions.list` | `limit:int` (50, 1..100), optional `type`, `ip` | list of flattened decisions |
@@ -34,6 +34,7 @@ frontend team's API reference for the read-only endpoints under `/api/v1/*`.
 | GET | `/api/v1/status/capi` | `status.capi` | — | `{"enabled": bool}` |
 | GET | `/api/v1/metrics` | `metrics.show` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `Record<string, unknown>` — parsed `cscli metrics show -o json` object keyed by metric type; full snapshot; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
 | GET | `/api/v1/metrics/{component}` | `metrics.show` | path `component` ∈ 14 canonical types (see § Metrics allowlist); any query key → 400 | `Record<string, unknown>` — filtered `{"<component>": …}`; `Cache-Control: no-store` |
+| GET | `/api/v1/hub` | `hub.list` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `Record<string, HubItem[]>` — parsed `cscli hub list -o json` map with collections, parsers, scenarios, postoverflows, etc.; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
 
 ### Metrics allowlist and validation
 
@@ -66,6 +67,43 @@ Request-level error (HTTP 400 — invalid component or query):
 ```json
 { "error": { "code": "invalid_parameters", "message": "The request parameters are invalid." } }
 ```
+
+### Hub inventory
+
+- **Query validation:** `GET /api/v1/hub` accepts **no query parameters**. Any
+  query key (e.g. `?foo=1`, `?type=collections`) or duplicate query key
+  (e.g. `?a=1&a=2`) → `400 {error:{code:"invalid_parameters"}}` **without
+  spawning `cscli`**. Validated via `request.query_params` before the
+  capability gate and before the subprocess call.
+- **`cscli` argv:** `["hub", "list", "-o", "json"]` via
+  `CscliRunner.run(argv, timeout=CscliRunner.default_timeout)` where
+  `default_timeout` is parsed from `cscli.timeout` (1 s..120 s). The startup
+  probe (Probe #5) uses a fixed 5 s timeout.
+- **Success envelope** (`Cache-Control: no-store`,
+  `Content-Type: application/json; charset=utf-8`):
+  ```json
+  { "operation": "hub.list", "result": { "collections": [{"name":"crowdsecurity/base-http-scenarios","version":"0.9.1","latest_version":"0.9.2","status":"update-available","description":"HTTP base scenarios"}], "parsers": [], "scenarios": [], "postoverflows": [] } }
+  ```
+  `result` is the parsed `cscli hub list -o json` object — a
+  `Record<string, HubItem[]>` keyed by hub type (`collections`, `parsers`,
+  `scenarios`, `postoverflows`, etc.); each `HubItem` has at least
+  `name: string` and optional `description`, `version`, `latest_version`,
+  `status`, `tainted`, `missing`, `type`. Empty `cscli` stdout yields `{}`.
+  SPA page: `frontend/src/pages/Hub.tsx` at route `/hub` (via
+  `frontend/src/App.tsx` + `Layout`), per-type tables with version and status
+  badges (`tainted`/`missing`/`update-available`).
+- **Operation-level errors** (HTTP 200, `{"operation":"hub.list","error":{code,…}}`,
+  no `stderr` leaked — `stderr` is WARN-truncated to 500 chars):
+  `unsupported` (capability gate — `app.state.capabilities["hub.list"].supported
+  is False`, no subprocess), `timeout` (deadline exceeded),
+  `unavailable` (`executable_path is None` / spawn failure),
+  `crowdsec_failure` (non-zero exit), `permission_denied` (`EACCES`),
+  `malformed_output` (stdout is not valid JSON) — all via `classify_failure`
+  / `envelope.operation_error`.
+- **Request-level error** (HTTP 400 — query rejected):
+  ```json
+  { "error": { "code": "invalid_parameters", "message": "The request parameters are invalid." } }
+  ```
 
 ### Notes
 

@@ -7,6 +7,7 @@ import Machines from './pages/Machines';
 import Bouncers from './pages/Bouncers';
 import Allowlists from './pages/Allowlists';
 import Metrics from './pages/Metrics';
+import Hub from './pages/Hub';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/bouncers" element={<Bouncers />} />
         <Route path="/allowlists" element={<Allowlists />} />
         <Route path="/metrics" element={<Metrics />} />
+        <Route path="/hub" element={<Hub />} />
         <Route path="*" element={
           <div className="rounded-md border border-[#232334] bg-[#0f0f17] px-6 py-12 text-center">
             <h2 className="text-sm font-semibold tracking-tight text-white">Not found</h2>
