@@ -18,7 +18,7 @@ frontend team's API reference for the read-only endpoints under `/api/v1/*`.
 | Method | Path | Operation | Params | Success-result shape |
 |---|---|---|---|---|
 | GET | `/api/v1/health` | (none — raw) | — | `{"status":"ok"}` |
-| GET | `/api/v1/capabilities` | `capabilities.list` | — | `dict[op, {"supported": bool}]` (15 probed ops: 11 structured reads + `status.lapi` + `status.capi` + `metrics.show` + `hub.list`; Probe #4 `["metrics","show","acquisition","-o","json"]` 5 s; Probe #5 `["hub","list","-o","json"]` 5 s) |
+| GET | `/api/v1/capabilities` | `capabilities.list` | — | `dict[op, {"supported": bool}]` (16 probed ops: 11 structured reads + `status.lapi` + `status.capi` + `metrics.show` + `hub.list` + `simulation.status`; Probe #4 `["metrics","show","acquisition","-o","json"]` 5 s; Probe #5 `["hub","list","-o","json"]` 5 s; Probe #6 `["simulation","status"]` 5 s text check) |
 | GET | `/api/v1/alerts` | `alerts.list` | `limit:int` (50, 1..100), optional `scenario`, `ip` | list of flattened alerts |
 | GET | `/api/v1/alerts/inspect/{alert_id}` | `alerts.inspect` | path `alert_id` | flattened alert + events |
 | GET | `/api/v1/decisions` | `decisions.list` | `limit:int` (50, 1..100), optional `type`, `ip` | list of flattened decisions |
@@ -35,6 +35,7 @@ frontend team's API reference for the read-only endpoints under `/api/v1/*`.
 | GET | `/api/v1/metrics` | `metrics.show` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `Record<string, unknown>` — parsed `cscli metrics show -o json` object keyed by metric type; full snapshot; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
 | GET | `/api/v1/metrics/{component}` | `metrics.show` | path `component` ∈ 14 canonical types (see § Metrics allowlist); any query key → 400 | `Record<string, unknown>` — filtered `{"<component>": …}`; `Cache-Control: no-store` |
 | GET | `/api/v1/hub` | `hub.list` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `Record<string, HubItem[]>` — parsed `cscli hub list -o json` map with collections, parsers, scenarios, postoverflows, etc.; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
+| GET | `/api/v1/simulation` | `simulation.status` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `{"global": bool, "scenarios": string[], "raw": string}` — parsed `cscli simulation status` text (global vs per-scenario; `raw` truncated to 4096 chars); `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
 
 ### Metrics allowlist and validation
 
@@ -104,6 +105,67 @@ Request-level error (HTTP 400 — invalid component or query):
   ```json
   { "error": { "code": "invalid_parameters", "message": "The request parameters are invalid." } }
   ```
+
+### Simulation status
+
+- **Query validation:** `GET /api/v1/simulation` accepts **no query parameters**. Any
+  query key (e.g. `?foo=1`, `?type=global`) or duplicate query key
+  (e.g. `?a=1&a=2`) → `400 {error:{code:"invalid_parameters"}}` **without
+  spawning `cscli`**. Validated via `request.query_params` before the
+  capability gate and before the subprocess call.
+- **`cscli` argv:** `["simulation", "status"]` via
+  `CscliRunner.run(argv, timeout=CscliRunner.default_timeout)` where
+  `default_timeout` is parsed from `cscli.timeout` (1 s..120 s). The startup
+  probe (Probe #6) uses a fixed 5 s timeout and is considered supported only
+  when `exit_code == 0`, no `deadline_exceeded`/`exec_missing`, and stdout
+  contains `"simulation"` (case-insensitive, text check).
+- **Text parse (no `-o json`):** `cscli simulation status` is text-only.
+  `global` is `true` when lowercased stdout contains
+  `"global simulation: enabled"` or `"simulation is enabled"` or
+  (`"global:"` + `"enabled"` + `"simulation"`); otherwise `false`.
+  `scenarios` are lines after the `"simulation enabled for"` marker
+  (fallback: lines after the global line) that contain `"/"`, stripped of
+  leading `- ` / `* ` / `• `, contain no spaces/tabs, and match
+  `^[a-z0-9/_.-]+$` (case-insensitive); deduplicated via `seen` set. `raw` is
+  stdout truncated to 4096 chars; empty stdout → `{global:false, scenarios:[],
+  raw:""}`. `raw` is always present for fallback/debug.
+- **Success envelope** (`Cache-Control: no-store`,
+  `Content-Type: application/json; charset=utf-8`):
+  ```json
+  { "operation": "simulation.status", "result": { "global": false, "scenarios": [], "raw": "global simulation: disabled\nsimulation enabled for scenarios:\n" } }
+  ```
+  Global enabled:
+  ```json
+  { "operation": "simulation.status", "result": { "global": true, "scenarios": ["crowdsecurity/ssh-bf"], "raw": "global simulation: enabled\nsimulation enabled for scenarios:\n - crowdsecurity/ssh-bf" } }
+  ```
+  `result` is `{"global": bool, "scenarios": string[], "raw": string}`.
+  SPA surface: `frontend/src/pages/Overview.tsx` at route `/overview` (amber
+  banner when `global===true` or `scenarios.length>0`, with scenario count/list
+  and link to `/decisions`); `frontend/src/pages/Decisions.tsx` at route
+  `/decisions` (amber callout "Decisions are suppressed" with scenario list).
+  No new `/simulation` SPA route — banner-only. When simulation is OFF, banners
+  are hidden (no muted badge).
+- **Operation-level errors** (HTTP 200, `{"operation":"simulation.status","error":{code,…}}`,
+  no `stderr` leaked — `stderr` is WARN-truncated to 500 chars):
+  `unsupported` (capability gate — `app.state.capabilities["simulation.status"].supported
+  is False`, no subprocess):
+  ```json
+  { "operation": "simulation.status", "error": { "code": "unsupported", "message": "This operation is not supported." } }
+  ```
+  Other operation-level codes for `simulation.status`: `crowdsec_failure` (non-zero exit):
+  ```json
+  { "operation": "simulation.status", "error": { "code": "crowdsec_failure", "message": "The CrowdSec command failed." } }
+  ```
+  `timeout` (deadline exceeded):
+  ```json
+  { "operation": "simulation.status", "error": { "code": "timeout", "message": "The CrowdSec command timed out." } }
+  ```
+  `unavailable` (`executable_path is None` / spawn failure), `permission_denied` (`EACCES`) — all via `classify_failure` / `envelope.operation_error`. Degraded: if Probe #6 failed (cscli missing / text check failed), `GET /api/v1/simulation` returns `unsupported` without spawning.
+- **Request-level error** (HTTP 400 — query rejected or duplicate query key):
+  ```json
+  { "error": { "code": "invalid_parameters", "message": "The request parameters are invalid." } }
+  ```
+- **Read-only:** `simulation enable` / `simulation disable` (writes) are **not proxied** — read-only `status` only. Mutations remain out of scope per plan §11.
 
 ### Notes
 

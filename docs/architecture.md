@@ -37,13 +37,14 @@ flowchart LR
 - Every command has a **per-command timeout** (1s..120s, from
   `cscli.timeout`). A timeout yields the operation-level `timeout` error.
 - **Capability probes are cached at startup** in `app.state.capabilities`
-   (5 probes, each 5 s; if `cscli` cannot be resolved or fails to run,
-   all ops report `unsupported`):
-   - Probe #1 — `["alerts", "list", "-o", "json", "-l", "1"]` → 11 structured reads (`alerts.list`, `alerts.inspect`, `decisions.list`, `decisions.check`, `machines.list`, `machines.inspect`, `bouncers.list`, `bouncers.inspect`, `allowlists.list`, `allowlists.inspect`, `allowlists.check`)
-   - Probe #2 — `["lapi", "status"]` → `status.lapi`
-   - Probe #3 — `["capi", "status"]` → `status.capi`
-   - Probe #4 — `["metrics", "show", "acquisition", "-o", "json"]` → `metrics.show` (governed by `cscli.timeout` via `CscliRunner.default_timeout`; 5 s probe timeout)
-   - Probe #5 — `["hub", "list", "-o", "json"]` → `hub.list` (governed by `cscli.timeout` via `CscliRunner.default_timeout`; 5 s probe timeout)
+   (6 probes, each 5 s; if `cscli` cannot be resolved or fails to run,
+    all ops report `unsupported`):
+    - Probe #1 — `["alerts", "list", "-o", "json", "-l", "1"]` → 11 structured reads (`alerts.list`, `alerts.inspect`, `decisions.list`, `decisions.check`, `machines.list`, `machines.inspect`, `bouncers.list`, `bouncers.inspect`, `allowlists.list`, `allowlists.inspect`, `allowlists.check`)
+    - Probe #2 — `["lapi", "status"]` → `status.lapi`
+    - Probe #3 — `["capi", "status"]` → `status.capi`
+    - Probe #4 — `["metrics", "show", "acquisition", "-o", "json"]` → `metrics.show` (governed by `cscli.timeout` via `CscliRunner.default_timeout`; 5 s probe timeout)
+    - Probe #5 — `["hub", "list", "-o", "json"]` → `hub.list` (governed by `cscli.timeout` via `CscliRunner.default_timeout`; 5 s probe timeout)
+    - Probe #6 — `["simulation", "status"]` → `simulation.status` (governed by `cscli.timeout` via `CscliRunner.default_timeout`; 5 s probe timeout — text check for `"simulation"` substring)
 
 ## Config schema
 
@@ -83,26 +84,27 @@ The following exact `ValueError` messages come from `backend/config.py`:
 
 ## Response envelopes — operations and routes
 
-Fifteen operations plus health are wired (operation labels are the single
+Sixteen operations plus health are wired (operation labels are the single
 source of truth in `backend/envelope.py`):
 
 - `capabilities.list`, `alerts.list`, `alerts.inspect`, `decisions.list`,
   `decisions.check`, `machines.list`, `machines.inspect`, `bouncers.list`,
   `bouncers.inspect`, `allowlists.list`, `allowlists.inspect`,
   `allowlists.check`, `status.lapi`, `status.capi`, `metrics.show`,
-  `hub.list` — the last two added in `2026-08-16_metrics-endpoint`
-  (`METRICS_SHOW == "metrics.show"`) and `2026-08-17_hub-inventory`
-  (`HUB_LIST == "hub.list"`).
+  `hub.list`, `simulation.status` — the last three added in
+  `2026-08-16_metrics-endpoint` (`METRICS_SHOW == "metrics.show"`),
+  `2026-08-17_hub-inventory` (`HUB_LIST == "hub.list"`), and
+  `2026-08-18_simulation-status` (`SIMULATION_STATUS == "simulation.status"`).
   Health (`GET /api/v1/health` → `{"status":"ok"}`) is raw, outside the
-  envelope. The 15 probed operations reported by `GET /api/v1/capabilities`
+  envelope. The 16 probed operations reported by `GET /api/v1/capabilities`
   are the 11 structured reads + `status.lapi` + `status.capi` + `metrics.show`
-  + `hub.list` (Probe #5); `capabilities.list` itself is the meta-operation
-  that reports them.
+  + `hub.list` + `simulation.status` (Probe #6); `capabilities.list` itself is
+  the meta-operation that reports them.
 
 | Method | Path | Operation | Notes |
 |---|---|---|---|
 | GET | `/api/v1/health` | (none — raw) | `{"status":"ok"}`, no envelope |
-| GET | `/api/v1/capabilities` | `capabilities.list` | `dict[op, {"supported": bool}]` (15 probed ops) |
+| GET | `/api/v1/capabilities` | `capabilities.list` | `dict[op, {"supported": bool}]` (16 probed ops) |
 | GET | `/api/v1/alerts` | `alerts.list` | list of flattened alerts |
 | GET | `/api/v1/alerts/inspect/{alert_id}` | `alerts.inspect` | flattened alert + events |
 | GET | `/api/v1/decisions` | `decisions.list` | list of flattened decisions |
@@ -119,8 +121,11 @@ source of truth in `backend/envelope.py`):
 | GET | `/api/v1/metrics` | `metrics.show` | `Record<string, unknown>` — parsed `cscli metrics show -o json` (keys are metric types), `Cache-Control: no-store` |
 | GET | `/api/v1/metrics/{component}` | `metrics.show` | filtered — `component` ∈ 14 canonical types (see operations-reference), case-sensitive exact |
 | GET | `/api/v1/hub` | `hub.list` | `HubInventory` (`Record<string, HubItem[]>` — parsed `cscli hub list -o json` map with collections, parsers, scenarios, postoverflows, etc.), `Cache-Control: no-store` |
+| GET | `/api/v1/simulation` | `simulation.status` | `{"global": bool, "scenarios": string[], "raw": string}` — parsed `cscli simulation status` text (global vs per-scenario; `raw` truncated to 4096 chars), `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`; any query key → 400 `invalid_parameters` without spawning |
 | — | `frontend/src/pages/Metrics.tsx` | — | SPA route `/metrics` inside `Layout` (`frontend/src/App.tsx`), selector All + 14 types |
 | — | `frontend/src/pages/Hub.tsx` | — | SPA route `/hub` Hub Inventory inside `Layout` (`frontend/src/App.tsx`), per-type tables (collections/parsers/scenarios/postoverflows) with status badges (tainted/missing/update-available) |
+| — | `frontend/src/pages/Overview.tsx` | — | SPA route `/overview` shows amber simulation banner when `simulation.status` is active (`global: true` or `scenarios.length > 0`) with scenario list and link to `/decisions`; no new `/simulation` SPA route (banner-only) |
+| — | `frontend/src/pages/Decisions.tsx` | — | SPA route `/decisions` shows amber simulation callout when `simulation.status` is active ("Decisions suppressed") with scenario list; no new `/simulation` SPA route (banner-only) |
 
 All API responses except `/api/v1/health` use one of the three operation
 envelopes (no `source.command`, no `page` fields):

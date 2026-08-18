@@ -1,6 +1,7 @@
 import { useAlerts } from '@/hooks/useAlerts';
 import { useDecisions } from '@/hooks/useDecisions';
 import { useMachines } from '@/hooks/useMachines';
+import { useSimulation } from '@/hooks/useSimulation';
 import { useStatusLapi, useStatusCapi } from '@/hooks/useStatus';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,8 +51,13 @@ export default function Overview() {
   const alerts = useAlerts({ limit: 50 });
   const decisions = useDecisions({ limit: 50 });
   const machines = useMachines();
+  const simulation = useSimulation();
   const lapi = useStatusLapi();
   const capi = useStatusCapi();
+
+  const simActive = !!simulation.data && (simulation.data.global || simulation.data.scenarios.length > 0);
+  const simScenarios = simulation.data?.scenarios ?? [];
+  const simGlobal = !!simulation.data?.global;
 
   const loading = alerts.isLoading || decisions.isLoading || machines.isLoading;
   const error = alerts.error || decisions.error || machines.error;
@@ -97,6 +103,21 @@ export default function Overview() {
           <Badge variant={capiOk ? 'success' : 'muted'}>{capiOk ? 'Enabled' : 'Disabled'}</Badge>
         </div>
       </div>
+
+      {simActive && (
+        <div role="status" aria-live="polite" className="rounded border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="signal">Simulation ON</Badge>
+            <span className="text-sm text-amber-200">
+              {simGlobal ? 'Global simulation is enabled — decisions are suppressed.' : `${simScenarios.length} scenario${simScenarios.length!==1?'s':''} in simulation — decisions suppressed for: ${simScenarios.slice(0,4).join(', ')}${simScenarios.length>4?` +${simScenarios.length-4} more`:''}`}
+            </span>
+            <Link to="/decisions" className="mono ml-auto text-xs text-amber-300 underline decoration-amber-500/50 underline-offset-4 hover:text-amber-100">View decisions →</Link>
+          </div>
+          {simScenarios.length > 4 && (
+            <div className="mono mt-2 break-words text-xs text-amber-200/70">{simScenarios.join(', ')}</div>
+          )}
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[1.35fr_0.85fr]">
         <Card className="overflow-hidden">

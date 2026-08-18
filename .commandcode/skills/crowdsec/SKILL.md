@@ -28,7 +28,7 @@ Run probes in this order. Stop at the first match.
 
 ```bash
 # systemd / bare-metal
-systemctl list-unit-files crowdsec.service >/dev/null 2>&1 && systemctl is-enabled crowdsec >/dev/null 2>&1
+systemctl cat crowdsec.service >/dev/null 2>&1
 # docker
 docker ps --format '{{.Names}} {{.Image}}' 2>/dev/null | grep -E '(^|/)(crowdsec)([: ]|$)'
 # kubernetes
@@ -67,8 +67,8 @@ installed from the wrong source can be **years behind** — a Linux-distro-only 
 Compare the running engine to the latest published release:
 
 ```bash
-curl -s https://version.crowdsec.net/latest    # → {"tag_name":"v1.7.8",...}; parse tag_name
-cscli version                                  # bare-metal: prefix sudo
+curl -fsS https://version.crowdsec.net/latest    # parse tag_name from the JSON response
+cscli version                                      # bare-metal: prefix sudo
 ```
 
 Then check **where the package came from**:
@@ -165,7 +165,7 @@ These work in every environment. On bare-metal/systemd, prefix with `sudo` (unle
 | Replay a single log line | `cscli explain --log '<line>' --type <type>` |
 | Validate config after editing any yaml (acquisition/profiles/config) | `crowdsec -t` (bare-metal; also auto-runs on `systemctl reload`) — then confirm the source reads with `cscli metrics show acquisition` |
 | See simulation state (alerts but no decisions) | `cscli simulation status` |
-| Inspect decision profiles (filters / ban duration) | `cat /etc/crowdsec/profiles.yaml` — there is **no** `cscli profiles` command (through v1.7.8); see [references/configure/profiles.md](./references/configure/profiles.md) |
+| Inspect decision profiles (filters / ban duration) | `cat /etc/crowdsec/profiles.yaml` — verify available `cscli` profile commands against the installed version; see [references/configure/profiles.md](./references/configure/profiles.md) |
 
 Where things live on a default bare-metal install:
 

@@ -31,6 +31,7 @@ async def probe_capabilities(runner: CscliRunner) -> dict[str, dict[str, bool]]:
     caps["status.capi"] = {"supported": False}
     caps[envelope.METRICS_SHOW] = {"supported": False}
     caps[envelope.HUB_LIST] = {"supported": False}
+    caps[envelope.SIMULATION_STATUS] = {"supported": False}
 
     # Probe #1: structured reads (alerts list -o json -l 1, 5s timeout)
     result = await runner.run(["alerts", "list", "-o", "json", "-l", "1"], timeout=5.0)
@@ -86,5 +87,19 @@ async def probe_capabilities(runner: CscliRunner) -> dict[str, dict[str, bool]]:
     else:
         _logger.warning("Probe #5 (hub list) failed (exit_code=%d, exec_missing=%s, deadline_exceeded=%s)",
                         result.exit_code, result.exec_missing, result.deadline_exceeded)
+
+    # Probe #6: simulation status (5s timeout, text check)
+    result = await runner.run(["simulation", "status"], timeout=5.0)
+    if result.exit_code == 0 and not result.deadline_exceeded and not result.exec_missing:
+        try:
+            text = result.stdout.decode(errors="replace") if isinstance(result.stdout, (bytes, bytearray)) else (result.stdout or "")
+            if "simulation" in text.lower():
+                caps[envelope.SIMULATION_STATUS] = {"supported": True}
+            else:
+                _logger.warning("Probe #6: simulation status stdout missing 'simulation' marker; marking unsupported")
+        except Exception:
+            _logger.warning("Probe #6: simulation status probe decode failed; marking unsupported")
+    else:
+        _logger.warning("Probe #6 (simulation status) failed (exit_code=%d, exec_missing=%s, deadline_exceeded=%s)", result.exit_code, result.exec_missing, result.deadline_exceeded)
 
     return caps

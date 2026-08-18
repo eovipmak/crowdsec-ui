@@ -20,3 +20,10 @@
 - Prefers feature-development-planner to support two modes: planning an explicitly requested feature and exploratory research to propose new features from repo analysis (inventory existing features/gaps, enumerate candidates ranked by value/cost, select top proposal with rejected list). Confidence: 0.9
 - Expects all feature plans and bug reports generated via skills to explicitly exclude CI/CD, unit tests/testing infrastructure, and monitoring/observability (Grafana/Prometheus/alerting/dashboards) unless explicitly requested. Confidence: 0.95
 - Prefers bug handling via a dedicated research-only bug-report skill that investigates codebase evidence and writes an actionable English Markdown report under `docs/plans/` with `bug-`/`bugfix-` prefix, covering reproduction steps, expected vs actual, root cause, minimal fix proposal, and verification — without modifying source code during reporting. Confidence: 0.9
+- Prefers skill audits and edits to explicitly exclude ponytail-related skills. Confidence: 0.95
+- Requires existing sub-agent model assignments to remain unchanged when auditing or optimizing skills. Confidence: 0.95
+- Prioritizes low-token skill behavior: avoid unnecessary research, prompts, reports, and speculative workflow steps while preserving useful coverage. Confidence: 0.9
+- Prefers removing rarely used or redundant skills rather than replacing them when existing workflows already cover the need. Confidence: 0.85
+- Prefers plan breakdowns to produce the smallest useful set of cohesive, agent-sized tasks; avoid serial micro-tasks for trivial wiring, documentation syncs, or final checks, with small features generally staying around 2–4 tasks unless independent workstreams or risk boundaries justify more. Confidence: 0.95
+- Prefers kanban coordination to cap concurrent delegated work at three in-flight tasks, while allowing a completed slot to be safely refilled instead of imposing a three-task total per invocation. Confidence: 0.95
+- Prefers dependency-aware execution in waves: run independent tasks in parallel when they touch disjoint files, but serialize tasks across prerequisite boundaries. Confidence: 0.9

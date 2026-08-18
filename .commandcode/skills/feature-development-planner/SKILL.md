@@ -16,7 +16,7 @@ Create an implementation-ready plan without changing source code. Supports two m
    - **Explicit feature:** Search for related features, interfaces, conventions, deployment files, and documentation before proposing files or APIs.
 3. Extract requirements from the prompt and repository evidence. For default/exploratory mode, derive requirements from the ranked candidates and repo evidence. Record explicit assumptions for details that are not specified.
 4. Choose the smallest architecture that fits existing patterns. Preserve project constraints such as native deployment, single-admin security, or no database when they apply.
-5. Write an English Markdown plan under `docs/plans/` using a descriptive lowercase-hyphenated filename. Include the current date when the repository convention uses dates. **For default invocation:** write the plan to include the full ranked candidate list and clearly present options for the user to choose from — use `ask_user_question` to let the user pick a feature when interactive, and ensure the plan itself documents the recommendation and how to proceed with the selected feature. If the user picks one, refine the plan to detail that feature; if no pick is made, leave the research plan with all candidates and a recommended next step.
+5. Write an English Markdown plan under `docs/plans/` using a descriptive lowercase-hyphenated filename. Include the current date when the repository convention uses dates. For default invocation, include the ranked candidates and a recommendation in one plan; ask for a choice only when interactive selection is explicitly requested.
 
 ## Required plan content
 
@@ -37,7 +37,7 @@ Create an implementation-ready plan without changing source code. Supports two m
 - Prefer existing project patterns over new abstractions.
 - Keep scope lean and explicitly exclude unrelated infrastructure.
 - Explicitly exclude CI/CD, unit tests, testing infrastructure, and monitoring/observability (Grafana/Prometheus/logging platforms, alerting) unless the user explicitly requests them. Do not add pipeline files, test scaffolding, or dashboards to the plan.
-- **Default behavior:** When invoked without arguments, do NOT ask the user what to do — immediately start repository research and propose features. Never remain idle waiting for clarification in this mode.
+- **Default behavior:** When invoked without arguments, immediately research the repository and write the ranked proposal; do not pause for clarification or selection unless explicitly requested.
 - If requirements are materially ambiguous in explicit mode, ask focused questions; otherwise proceed with documented assumptions.
 - After writing, reread the plan and check that every requirement maps to a task and acceptance criterion.
 

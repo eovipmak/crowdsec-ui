@@ -21,6 +21,9 @@ export const METRICS_SHOW = 'metrics.show';
 
 export const HUB_LIST = "hub.list";
 
+export const SIMULATION_STATUS = "simulation.status";
+export type SimulationResult = { global: boolean; scenarios: string[]; raw: string };
+
 export interface HubItem {
   name: string;
   description?: string;

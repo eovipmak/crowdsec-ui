@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDecisions } from '@/hooks/useDecisions';
+import { useSimulation } from '@/hooks/useSimulation';
 import DataTable, { type Column } from '@/components/DataTable';
 import FiltersBar from '@/components/FiltersBar';
 import ErrorPanel from '@/components/ErrorPanel';
@@ -19,6 +20,11 @@ export default function Decisions() {
   const [limit, setLimit] = useState(50);
   const [type, setType] = useState('');
   const [ip, setIp] = useState('');
+
+  const simulation = useSimulation();
+  const simActive = !!simulation.data && (simulation.data.global || simulation.data.scenarios.length > 0);
+  const simScenarios = simulation.data?.scenarios ?? [];
+  const simGlobal = !!simulation.data?.global;
 
   const { data, isLoading, error, refetch } = useDecisions({
     limit,
@@ -51,6 +57,14 @@ export default function Decisions() {
         </div>
         <CapabilityBadge op="decisions.list" />
       </div>
+
+      {simActive && (
+        <div role="status" aria-live="polite" className="rounded border border-amber-500/30 bg-amber-500/10 px-3 py-2.5">
+          <span className="mono text-xs uppercase tracking-widest text-amber-300">Simulation active</span>
+          <span className="ml-2 text-sm text-amber-200">Decisions are suppressed{simGlobal ? ' (global)' : ` — ${simScenarios.length} scenario(s) in simulation`}.</span>
+          <span className="mono ml-2 break-words text-xs text-amber-200/70">{simScenarios.slice(0,6).join(', ')}</span>
+        </div>
+      )}
 
       <FiltersBar
         filters={[
