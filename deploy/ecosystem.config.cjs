@@ -38,7 +38,7 @@ module.exports = {
       script: 'bash',
       args: [
         '-c',
-        'cd backend && (uv sync --frozen 2>/dev/null || uv sync) && cd ../frontend && npm ci && npm run build && test -f dist/index.html',
+        'cd backend && (uv sync --frozen 2>/dev/null || uv sync) && cd ../frontend && npm ci --include=dev && npm run build && test -f dist/index.html',
       ],
       cwd: __dirname + '/..', // repo root (so `backend/` + `frontend/` resolve)
       interpreter: 'none',

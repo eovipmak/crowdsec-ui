@@ -25,11 +25,11 @@ export default function BouncerInspectDialog({ name, onClose }: BouncerInspectDi
           <DialogDescription>Bouncer registration, version, and last pull activity.</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[68vh] overflow-y-auto overflow-x-hidden px-5 py-4">
+        <div className="flex flex-col min-h-0 overflow-hidden px-5 py-4">
           {isLoading && <LoadingSkeleton rows={4} />}
           {error && <ErrorPanel error={error} onRetry={() => refetch()} />}
           {data && (
-            <div className="space-y-5">
+            <div className="space-y-5 flex flex-col min-h-0 overflow-hidden">
               <div className="grid grid-cols-1 gap-3 rounded border border-[#232334] bg-[#0f0f17] p-3 text-sm sm:grid-cols-2">
                 <div className="min-w-0">
                   <span className="mono text-xs uppercase tracking-widest text-zinc-500">Name</span>

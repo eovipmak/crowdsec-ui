@@ -31,12 +31,12 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
           <DialogDescription>Raw alert payload and derived decisions.</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[68vh] overflow-y-auto overflow-x-hidden px-5 py-4">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-4">
           {isLoading && <LoadingSkeleton rows={4} />}
           {error && <ErrorPanel error={error} onRetry={() => refetch()} />}
           {data && (
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 gap-3 rounded border border-[#232334] bg-[#0f0f17] p-3 text-sm sm:grid-cols-2">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden space-y-5">
+              <div className="grid shrink-0 grid-cols-1 gap-3 rounded border border-[#232334] bg-[#0f0f17] p-3 text-sm sm:grid-cols-2">
                 <div className="min-w-0"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Scenario</span><div className="mt-1 break-words text-zinc-200">{data.scenario}</div></div>
                 <div className="min-w-0"><span className="mono text-xs uppercase tracking-widest text-zinc-500">Source IP</span><div className="mono mt-1 break-all tabular text-zinc-200">{data.source_ip ?? '—'}</div></div>
                 <div><span className="mono text-xs uppercase tracking-widest text-zinc-500">Country</span><div className="mt-1 text-zinc-300">{data.country ?? '—'}</div></div>
@@ -47,7 +47,7 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
               </div>
 
               {data.decisions && data.decisions.length > 0 && (
-                <div>
+                <div className="shrink-0">
                   <h4 className="mono mb-2 text-xs uppercase tracking-widest text-zinc-500">Decisions</h4>
                   <div className="flex flex-wrap gap-2">
                     {data.decisions.map((d: any, i: number) => (
@@ -58,9 +58,9 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
               )}
 
               {data.events && data.events.length > 0 && (
-                <div className="overflow-x-hidden">
-                  <h4 className="mono mb-2 text-xs uppercase tracking-widest text-zinc-500">Events — {data.events.length}</h4>
-                  <div className="max-h-[42vh] overflow-y-auto overflow-x-hidden rounded-md">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md">
+                  <h4 className="mono mb-2 shrink-0 text-xs uppercase tracking-widest text-zinc-500">Events — {data.events.length}</h4>
+                  <div className="min-h-0 flex-1 overflow-y-auto">
                     <DataTable data={data.events} columns={eventColumns} noHorizontalScroll />
                   </div>
                 </div>

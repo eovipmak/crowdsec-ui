@@ -100,15 +100,20 @@ def mount_static(app: FastAPI, cfg: Config) -> None:
     """Serve the SPA dist directory as the last-resort catch-all route.
 
     Appends (not inserts) the ``/{path:path}`` route as the LAST route so
-    every previously-registered ``/api/v1/*`` route matches first. Non-fatal
-    when the dist directory is missing.
+    every previously-registered ``/api/v1/*`` route matches first. Always
+    mounted — even when dist is missing — so ``rm -rf frontend/dist`` +
+    rebuild recovers without a backend restart (handler returns 404
+    per-request until index.html reappears).
     """
     global STATIC_DIR
     STATIC_DIR = _resolve_static_dir(cfg)
 
     if not STATIC_DIR.exists():
-        logger.warning("static_dir not found: %s; SPA serving disabled", STATIC_DIR)
-        return
+        logger.warning(
+            "static_dir not found: %s; SPA will 404 until built "
+            "(run: pm2 start deploy/ecosystem.config.cjs --only crowdsec-dashboard-build)",
+            STATIC_DIR,
+        )
 
     app.router.routes.append(
         Route(
