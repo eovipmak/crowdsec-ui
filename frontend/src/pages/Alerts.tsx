@@ -8,18 +8,34 @@ import LoadingSkeleton from '@/components/LoadingSkeleton';
 import CapabilityBadge from '@/components/CapabilityBadge';
 import AlertInspectDialog from './AlertInspectDialog';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import type { Alert } from '@/hooks/useAlerts';
+
+function toIsoZ(v: string): string | undefined {
+  if (!v) return undefined;
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return undefined;
+  return d.toISOString();
+}
 
 export default function Alerts() {
   const [limit, setLimit] = useState(50);
   const [scenario, setScenario] = useState('');
   const [ip, setIp] = useState('');
+  const [since, setSince] = useState('');
+  const [until, setUntil] = useState('');
+  const [scenarioContains, setScenarioContains] = useState('');
+  const [offset, setOffset] = useState(0);
   const [inspecting, setInspecting] = useState<number | null>(null);
 
   const { data, isLoading, error, refetch } = useAlerts({
     limit,
     scenario: scenario || undefined,
     ip: ip || undefined,
+    since: toIsoZ(since),
+    until: toIsoZ(until),
+    scenario_contains: scenarioContains || undefined,
+    offset: offset || undefined,
   });
 
   const columns: Column<Alert>[] = [
@@ -56,12 +72,15 @@ export default function Alerts() {
 
       <FiltersBar
         filters={[
-          { key: 'scenario', label: 'Scenario', value: scenario, onChange: setScenario, placeholder: 'crowdsecurity/…' },
-          { key: 'ip', label: 'Source IP', value: ip, onChange: setIp, placeholder: '1.2.3.4' },
+          { key: 'scenario', label: 'Scenario', value: scenario, onChange: (v) => { setScenario(v); setOffset(0); }, placeholder: 'crowdsecurity/…' },
+          { key: 'ip', label: 'Source IP', value: ip, onChange: (v) => { setIp(v); setOffset(0); }, placeholder: '1.2.3.4' },
+          { key: 'scenario_contains', label: 'Scenario contains', value: scenarioContains, onChange: (v) => { setScenarioContains(v); setOffset(0); }, placeholder: 'ssh \u00b7 http \u00b7 bf', maxLength: 64 },
+          { key: 'since', label: 'Since', value: since, onChange: (v) => { setSince(v); setOffset(0); }, type: 'datetime-local' },
+          { key: 'until', label: 'Until', value: until, onChange: (v) => { setUntil(v); setOffset(0); }, type: 'datetime-local' },
         ]}
         limit={limit}
-        onLimitChange={setLimit}
-        onClear={() => { setScenario(''); setIp(''); }}
+        onLimitChange={(n) => { setLimit(n); setOffset(0); }}
+        onClear={() => { setScenario(''); setIp(''); setScenarioContains(''); setSince(''); setUntil(''); setOffset(0); }}
       />
 
       {!data || data.length === 0 ? (
@@ -84,6 +103,33 @@ export default function Alerts() {
           />
         </>
       )}
+      <div className="flex items-center justify-between gap-2">
+        <span className="mono text-xs text-zinc-500">
+          {!data || data.length === 0 ? 'No results' : `Showing ${offset + 1}\u2013${offset + (data?.length ?? 0)}`}
+        </span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={offset === 0}
+            onClick={() => setOffset((o) => Math.max(0, o - limit))}
+            aria-label="Previous page"
+            className="mono min-h-[32px] text-xs"
+          >
+            Prev
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!data || data.length < limit}
+            onClick={() => setOffset((o) => o + limit)}
+            aria-label="Next page"
+            className="mono min-h-[32px] text-xs"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
       <AlertInspectDialog id={inspecting} onClose={() => setInspecting(null)} />
     </div>
   );

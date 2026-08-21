@@ -17,7 +17,12 @@ export interface Decision {
   simulated?: boolean;
 }
 
-export function useDecisions(opts: { limit?: number; type?: string; ip?: string }) {
+export type DecisionsParams = {
+  limit?: number; type?: string; ip?: string;
+  since?: string; until?: string; scenario_contains?: string; offset?: number;
+};
+
+export function useDecisions(opts: DecisionsParams) {
   return useQuery<Decision[]>({
     queryKey: ['decisions', opts],
     queryFn: () => apiGet<Decision[]>('/decisions', opts as Record<string, string | number>),

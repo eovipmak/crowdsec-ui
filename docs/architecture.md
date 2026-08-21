@@ -37,9 +37,9 @@ flowchart LR
 - Every command has a **per-command timeout** (1s..120s, from
   `cscli.timeout`). A timeout yields the operation-level `timeout` error.
 - **Capability probes are cached at startup** in `app.state.capabilities`
-   (6 probes, each 5 s; if `cscli` cannot be resolved or fails to run,
-    all ops report `unsupported`):
-    - Probe #1 — `["alerts", "list", "-o", "json", "-l", "1"]` → 11 structured reads (`alerts.list`, `alerts.inspect`, `decisions.list`, `decisions.check`, `machines.list`, `machines.inspect`, `bouncers.list`, `bouncers.inspect`, `allowlists.list`, `allowlists.inspect`, `allowlists.check`)
+   (6 probes total — no new probe for time-range filtering — each 5 s; if `cscli` cannot be resolved or fails to run,
+     all ops report `unsupported`):
+     - Probe #1 — `["alerts", "list", "-o", "json", "-l", "1"]` → 11 structured reads (`alerts.list`, `alerts.inspect`, `decisions.list`, `decisions.check`, `machines.list`, `machines.inspect`, `bouncers.list`, `bouncers.inspect`, `allowlists.list`, `allowlists.inspect`, `allowlists.check`) — still covers `alerts.list` and `decisions.list` with `since`/`until`/`scenario_contains`/`offset` extensions (no new probe; 16 probed ops unchanged: 11 structured + `status.lapi` + `status.capi` + `metrics.show` + `hub.list` + `simulation.status`; `capabilities.list` is meta)
     - Probe #2 — `["lapi", "status"]` → `status.lapi`
     - Probe #3 — `["capi", "status"]` → `status.capi`
     - Probe #4 — `["metrics", "show", "acquisition", "-o", "json"]` → `metrics.show` (governed by `cscli.timeout` via `CscliRunner.default_timeout`; 5 s probe timeout)
@@ -105,9 +105,9 @@ source of truth in `backend/envelope.py`):
 |---|---|---|---|
 | GET | `/api/v1/health` | (none — raw) | `{"status":"ok"}`, no envelope |
 | GET | `/api/v1/capabilities` | `capabilities.list` | `dict[op, {"supported": bool}]` (16 probed ops) |
-| GET | `/api/v1/alerts` | `alerts.list` | list of flattened alerts |
+| GET | `/api/v1/alerts` | `alerts.list` | query `limit:int` 1..100 (default 50), `scenario:string` exact, `ip:string` exact, `since:string` ISO-8601 or `N[smhd]` optional, `until:string` same optional, `scenario_contains:string` 1..64 substring case-insensitive optional, `offset:int` 0..10000 (default 0); allowlist `{limit,scenario,ip,since,until,scenario_contains,offset}` — unknown/duplicate →400 `invalid_parameters` without spawn (before probe gate); `since`/`until` pass-through as `["--since",since]`/`["--until",until]` when A1-supported else server-side `created_at` fallback; `scenario_contains`/`offset` server-side only (never in argv); filtered AND then `offset`-sliced; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`, stderr never returned |
 | GET | `/api/v1/alerts/inspect/{alert_id}` | `alerts.inspect` | flattened alert + events |
-| GET | `/api/v1/decisions` | `decisions.list` | list of flattened decisions |
+| GET | `/api/v1/decisions` | `decisions.list` | query `limit:int` 1..100 (default 50), `type:string` alias for `decision_type` exact, `ip:string` exact, `since:string` ISO-8601 or `N[smhd]` optional, `until:string` same optional, `scenario_contains:string` 1..64 case-insensitive optional, `offset:int` 0..10000 (default 0); allowlist `{limit,type,ip,since,until,scenario_contains,offset}` — unknown/duplicate →400 `invalid_parameters` without spawn; `since`/`until` pass-through when A1-supported else `created_at` fallback; `scenario_contains`/`offset` server-side only; filtered AND then `offset`-sliced; `Cache-Control: no-store` |
 | GET | `/api/v1/decisions/check/{ip}` | `decisions.check` | list of flattened decisions for ip |
 | GET | `/api/v1/machines` | `machines.list` | list of machines |
 | GET | `/api/v1/machines/inspect/{machine_id}` | `machines.inspect` | machine detail |

@@ -83,4 +83,8 @@ From `frontend/`:
 
 ## Coordinator status
 
-- Status: pending
+- Status: completed
+- Completed by: coordinator
+- Completed at: 2026-08-21T00:00:00Z
+- Verification: grep AlertsParams/DecisionsParams/scenario_contains hits in both hooks; npm run typecheck green (tsc --noEmit zero errors); npm run build green (dist exists)
+- Commit or artifact reference: working tree (frontend/src/hooks/useAlerts.ts, frontend/src/hooks/useDecisions.ts)

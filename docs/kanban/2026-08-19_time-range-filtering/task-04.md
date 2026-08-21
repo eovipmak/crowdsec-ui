@@ -91,4 +91,8 @@ From `frontend/`:
 
 ## Coordinator status
 
-- Status: pending
+- Status: completed
+- Completed by: coordinator
+- Completed at: 2026-08-21T00:00:00Z
+- Verification: grep since/until/scenario_contains/offset hits 26 lines in Alerts.tsx+Decisions.tsx; grep datetime-local hits 4 (since+until x2 pages); npm run typecheck green (zero errors); npm run build green (1731 modules, dist/index.html+assets)
+- Commit or artifact reference: working tree (frontend/src/pages/Alerts.tsx, frontend/src/pages/Decisions.tsx, frontend/src/components/FiltersBar.tsx)

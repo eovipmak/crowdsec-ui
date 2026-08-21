@@ -138,4 +138,8 @@ From `backend/`:
 
 ## Coordinator status
 
-- Status: pending
+- Status: completed
+- Completed by: coordinator
+- Completed at: 2026-08-21T00:00:00Z
+- Verification: py_compile routers/alerts/list.py OK; grep ALLOWED_KEYS/scenario_contains/since/offset hits 38 lines; TestClient contract - unknown 400, duplicate 400, bad since 400, since>until 400, scenario_contains>64 400, offset -1 400, unsupported 200 no-spawn, valid since argv pass-through, scenario_contains case-insensitive, offset pagination, fallback paths verified
+- Commit or artifact reference: working tree (backend/routers/alerts/list.py)

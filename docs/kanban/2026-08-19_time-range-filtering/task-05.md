@@ -80,4 +80,8 @@ From repo root:
 
 ## Coordinator status
 
-- Status: pending
+- Status: completed
+- Completed by: coordinator
+- Completed at: 2026-08-21T00:00:00Z
+- Verification: grep scenario_contains hits in both docs; grep since.*until non-empty; grep GET /alerts and GET /decisions show extended param lists; grep 16 probed ops still 16; manual read confirms limit_for_cscli = min(100, limit+offset) and scenario_contains/offset never in argv
+- Commit or artifact reference: working tree (docs/architecture.md, docs/operations-reference.md)

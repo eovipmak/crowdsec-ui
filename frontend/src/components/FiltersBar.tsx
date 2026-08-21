@@ -9,6 +9,8 @@ interface FilterField {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  type?: string;
+  maxLength?: number;
 }
 
 interface FiltersBarProps {
@@ -32,9 +34,11 @@ export default function FiltersBar({ filters, limit, onLimitChange, onClear, chi
             </Label>
             <Input
               id={`filter-${f.key}`}
+              type={f.type ?? 'text'}
               value={f.value}
               onChange={(e) => f.onChange(e.target.value)}
               placeholder={f.placeholder}
+              maxLength={f.maxLength}
               aria-label={f.label}
               className="h-8 w-full min-w-0 sm:w-44 md:w-48"
             />

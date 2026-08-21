@@ -16,7 +16,12 @@ export interface Alert {
   decisions?: { type: string; duration: string }[];
 }
 
-export function useAlerts(opts: { limit?: number; scenario?: string; ip?: string }) {
+export type AlertsParams = {
+  limit?: number; scenario?: string; ip?: string;
+  since?: string; until?: string; scenario_contains?: string; offset?: number;
+};
+
+export function useAlerts(opts: AlertsParams) {
   return useQuery<Alert[]>({
     queryKey: ['alerts', opts],
     queryFn: () => apiGet<Alert[]>('/alerts', opts as Record<string, string | number>),

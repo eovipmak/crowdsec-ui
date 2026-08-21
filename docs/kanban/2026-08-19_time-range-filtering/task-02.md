@@ -122,4 +122,8 @@ From `backend/`:
 
 ## Coordinator status
 
-- Status: pending
+- Status: completed
+- Completed by: coordinator
+- Completed at: 2026-08-21T00:00:00Z
+- Verification: py_compile routers/decisions/list.py OK; grep ALLOWED_KEYS/scenario_contains/since/offset hits 46 lines; TestClient - unknown 400, duplicate 400, bad since 400, since>until 400, scenario_contains>64 400, unsupported 200, valid since/until argv pass-through, scenario_contains case-insensitive, offset pagination verified
+- Commit or artifact reference: working tree (backend/routers/decisions/list.py)

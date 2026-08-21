@@ -19,9 +19,9 @@ frontend team's API reference for the read-only endpoints under `/api/v1/*`.
 |---|---|---|---|---|
 | GET | `/api/v1/health` | (none — raw) | — | `{"status":"ok"}` |
 | GET | `/api/v1/capabilities` | `capabilities.list` | — | `dict[op, {"supported": bool}]` (16 probed ops: 11 structured reads + `status.lapi` + `status.capi` + `metrics.show` + `hub.list` + `simulation.status`; Probe #4 `["metrics","show","acquisition","-o","json"]` 5 s; Probe #5 `["hub","list","-o","json"]` 5 s; Probe #6 `["simulation","status"]` 5 s text check) |
-| GET | `/api/v1/alerts` | `alerts.list` | `limit:int` (50, 1..100), optional `scenario`, `ip` | list of flattened alerts |
+| GET | `/api/v1/alerts` | `alerts.list` | `limit:int` 1..100 (default 50), `scenario:string` exact, `ip:string` exact, `since:string` ISO-8601 or `N[smhd]` optional (32-char cap), `until:string` same optional, `scenario_contains:string` 1..64 substring case-insensitive optional, `offset:int` 0..10000 (default 0); allowlist `{limit,scenario,ip,since,until,scenario_contains,offset}` — strict unknown/duplicate →400 `invalid_parameters` without spawn; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` | `Alert[]` flattened (still `Alert[]`); filtered AND (exact `scenario` + exact `ip` + `scenario_contains` substring + `since`/`until` `created_at`) then `offset`-sliced (`alerts[offset:offset+limit]`) |
 | GET | `/api/v1/alerts/inspect/{alert_id}` | `alerts.inspect` | path `alert_id` | flattened alert + events |
-| GET | `/api/v1/decisions` | `decisions.list` | `limit:int` (50, 1..100), optional `type`, `ip` | list of flattened decisions |
+| GET | `/api/v1/decisions` | `decisions.list` | `limit:int` 1..100 (default 50), `type:string` alias for `decision_type` exact, `ip:string` exact, `since:string` ISO-8601 or `N[smhd]` optional, `until:string` same optional, `scenario_contains:string` 1..64 case-insensitive optional, `offset:int` 0..10000 (default 0); allowlist `{limit,type,ip,since,until,scenario_contains,offset}` — strict unknown/duplicate →400 `invalid_parameters` without spawn; `Cache-Control: no-store` | `Decision[]` flattened (still `Decision[]`); filtered AND then `offset`-sliced (`decisions[offset:offset+limit]`) |
 | GET | `/api/v1/decisions/check/{ip}` | `decisions.check` | path `ip` | list of flattened decisions for ip |
 | GET | `/api/v1/machines` | `machines.list` | — | list of machines |
 | GET | `/api/v1/machines/inspect/{machine_id}` | `machines.inspect` | path `machine_id` | machine detail |
@@ -36,6 +36,43 @@ frontend team's API reference for the read-only endpoints under `/api/v1/*`.
 | GET | `/api/v1/metrics/{component}` | `metrics.show` | path `component` ∈ 14 canonical types (see § Metrics allowlist); any query key → 400 | `Record<string, unknown>` — filtered `{"<component>": …}`; `Cache-Control: no-store` |
 | GET | `/api/v1/hub` | `hub.list` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `Record<string, HubItem[]>` — parsed `cscli hub list -o json` map with collections, parsers, scenarios, postoverflows, etc.; `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
 | GET | `/api/v1/simulation` | `simulation.status` | — (any query key → 400 `invalid_parameters`; duplicate query key → 400) | `{"global": bool, "scenarios": string[], "raw": string}` — parsed `cscli simulation status` text (global vs per-scenario; `raw` truncated to 4096 chars); `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8` |
+
+### Alerts and Decisions list — filtering, validation, and cscli mapping
+
+- **Allowlisted query keys (strict):**
+  - `GET /api/v1/alerts`: `{limit, scenario, ip, since, until, scenario_contains, offset}`.
+  - `GET /api/v1/decisions`: `{limit, type, ip, since, until, scenario_contains, offset}` where `type` is an alias for `decision_type` (query key is `type`; backend binds via `alias="type"`).
+  - Any **unknown key** (e.g. `?foo=1`, `?type` on alerts, `?scenario` on decisions) or **duplicate key** (e.g. `?since=2026-01-01&since=2026-01-02` or `?limit=10&limit=20`) → `400 {"error":{"code":"invalid_parameters","message":"The request parameters are invalid."}}` **without spawning `cscli`** (validated via `request.query_params` + raw `query_string` before the capability/probe gate).
+- **Field validation (all →400 `invalid_parameters` without spawn):**
+  - `limit:int` 1..100 (default 50), `offset:int` 0..10000 (default 0).
+  - `scenario_contains:string` 1..64 chars when present (empty string treated as absent); rejects `\r`, `\n`, `\0`, or any control char (`ord < 32`).
+  - `since`/`until:string` 32-char cap, **strict** `ISO-8601` (`datetime.fromisoformat(v.replace("Z","+00:00"))`) **or** Go duration `N[smhd]` (`^[0-9]+[smhd]$`); rejects shell metachars `; & | \` ` `$`, `\n`, `\r`, `\0`, and leading `-`.
+  - `since` after `until` →400 (only when both parse as ISO-8601 datetimes; duration bounds are pass-through only and skip server-side ordering check).
+  - `scenario` (exact) and `scenario_contains` (case-insensitive substring) may **coexist** — filtered with AND. `since`/`until` filter on `created_at` (ISO-8601).
+- **Filtering and pagination:** results are filtered with AND (exact `scenario`/`type`/`ip` + `scenario_contains` substring + `since`/`until` on `created_at`) then **offset-sliced** as `items[offset:offset+limit]`. Frontend resets `offset` to 0 on any filter change; `FiltersBar` `datetime-local` values are converted to ISO-8601 `Z` via `new Date(v).toISOString()` before being sent as `since`/`until`. Duration form `N[smhd]` is accepted by the API but not produced by the SPA.
+- **cscli argv mapping (per plan §5.3; `CscliRunner.run(argv, timeout=CscliRunner.default_timeout)`):**
+  - `GET /alerts` base `["alerts","list","-m","-l",str(limit_for_cscli),"-o","json"]` plus optional `["--since",since]` / `["--until",until]` when `CSCLI_SUPPORTS_SINCE_UNTIL` is true (A1). `limit_for_cscli = min(100, limit+offset)` when `offset>0` else `limit`. `scenario_contains` and `offset` **never enter argv** (server-side only: substring match via `_matches_scenario_contains`, pagination via slice).
+  - `GET /decisions` base `["decisions","list","-l",str(limit_for_cscli),"-o","json"]` plus optional `["-t",type]` / `["-i",ip]` plus same optional `["--since",since]` / `["--until",until]` when supported. Same `limit_for_cscli` rule; `scenario_contains`/`offset` never in argv.
+  - Pass-through vs fallback: when `CSCLI_SUPPORTS_SINCE_UNTIL` is true (current host), `since`/`until` are passed to cscli and server-side `created_at` fallback is skipped; when false, `since`/`until` are applied server-side against `created_at` (ISO-8601 bounds only; duration bounds yield no server-side filter).
+- **Headers and safety:** success sends `Cache-Control: no-store` and `Content-Type: application/json; charset=utf-8`; raw `cscli` stderr is **never returned** (WARN-truncated to 500 chars server-side).
+- **Success envelopes (HTTP 200):**
+  ```json
+  { "operation": "alerts.list", "result": [{ "id": 1, "scenario": "crowdsecurity/ssh-bf", "source_ip": "1.2.3.4", "created_at": "2026-08-19T12:00:00Z" }] }
+  ```
+  ```json
+  { "operation": "decisions.list", "result": [{ "id": 1, "scenario": "crowdsecurity/ssh-bf", "source_ip": "1.2.3.4", "type": "ban", "created_at": "2026-08-19T12:00:00Z" }] }
+  ```
+  Filtered AND then offset-sliced; empty result is `[]` with 200.
+- **Request-level errors (HTTP 400 — no spawn):**
+  Unknown key:
+  ```json
+  { "error": { "code": "invalid_parameters", "message": "The request parameters are invalid." } }
+  ```
+  `GET /api/v1/alerts?foo=bar` →400. Duplicate key `GET /api/v1/decisions?since=2026-01-01T00:00:00Z&since=2026-01-02T00:00:00Z` →400. Invalid `since`:
+  ```json
+  { "error": { "code": "invalid_parameters", "message": "The request parameters are invalid." } }
+  ```
+  `GET /api/v1/alerts?since=not-a-date` →400 (fails ISO-8601 and `N[smhd]`). `since` after `until` (both ISO-8601) →400. Operation-level errors for these routes remain `unsupported`/`timeout`/`unavailable`/`permission_denied`/`crowdsec_failure`/`malformed_output` via capability gate and `classify_failure`.
 
 ### Metrics allowlist and validation
 
