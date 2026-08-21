@@ -1,7 +1,6 @@
 import { useAlert } from '@/hooks/useAlerts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import DataTable, { type Column } from '@/components/DataTable';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ErrorPanel from '@/components/ErrorPanel';
 
@@ -10,18 +9,18 @@ interface AlertInspectDialogProps {
   onClose: () => void;
 }
 
+type AlertEvent = {
+  timestamp?: string;
+  log_type?: string;
+  service?: string;
+  machine?: string;
+  source_ip?: string;
+  target_user?: string;
+  datasource_path?: string;
+};
+
 export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogProps) {
   const { data, isLoading, error, refetch } = useAlert(id);
-
-  const eventColumns: Column<any>[] = [
-    { key: 'timestamp', header: 'Timestamp', className: 'mono text-xs tabular whitespace-normal break-words' },
-    { key: 'log_type', header: 'Log Type', className: 'mono text-xs break-words' },
-    { key: 'service', header: 'Service', className: 'mono text-xs break-words' },
-    { key: 'machine', header: 'Machine', className: 'mono text-xs break-words' },
-    { key: 'source_ip', header: 'Source IP', className: 'mono tabular break-all' },
-    { key: 'target_user', header: 'Target User', className: 'mono text-xs break-words' },
-    { key: 'datasource_path', header: 'Datasource', className: 'mono text-xs break-all' },
-  ];
 
   return (
     <Dialog open={id !== null} onOpenChange={(open) => { if (!open) onClose(); }}>
@@ -58,10 +57,47 @@ export default function AlertInspectDialog({ id, onClose }: AlertInspectDialogPr
               )}
 
               {data.events && data.events.length > 0 && (
-                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md">
-                  <h4 className="mono mb-2 shrink-0 text-xs uppercase tracking-widest text-zinc-500">Events — {data.events.length}</h4>
-                  <div className="min-h-0 flex-1 overflow-y-auto">
-                    <DataTable data={data.events} columns={eventColumns} noHorizontalScroll />
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-[#232334] bg-[#12121a]">
+                  <div className="flex shrink-0 items-center justify-between border-b border-[#232334] bg-[#0f0f17] px-3 py-2.5">
+                    <h4 className="mono text-xs font-medium uppercase tracking-widest text-zinc-400">Events</h4>
+                    <span className="mono rounded bg-[#232334] px-1.5 py-0.5 text-[11px] font-medium tabular text-zinc-300">{data.events.length}</span>
+                  </div>
+                  <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#3f3f5a_transparent]">
+                    <ul className="divide-y divide-[#232334]/60">
+                      {(data.events as AlertEvent[]).map((ev, idx) => (
+                        <li key={idx} className="px-3 py-3 transition-colors hover:bg-[#181825]">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="mono text-xs tabular text-zinc-400">{ev.timestamp ?? '—'}</span>
+                            <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" aria-hidden />
+                            {ev.log_type && (
+                              <span className="mono inline-flex rounded bg-[#1c1c26] px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-zinc-300">{ev.log_type}</span>
+                            )}
+                            {ev.service && (
+                              <span className="mono inline-flex rounded border border-[#232334] px-1.5 py-0.5 text-[11px] text-zinc-400">{ev.service}</span>
+                            )}
+                            <span className="mono ml-auto text-[11px] tabular text-zinc-600">#{idx + 1}</span>
+                          </div>
+                          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <div className="min-w-0">
+                              <div className="mono text-[10px] uppercase tracking-widest text-zinc-500">Source IP</div>
+                              <div className="mono mt-1 break-all text-xs font-medium tabular text-zinc-200" title={ev.source_ip}>{ev.source_ip ?? '—'}</div>
+                            </div>
+                            <div className="min-w-0">
+                              <div className="mono text-[10px] uppercase tracking-widest text-zinc-500">Target user</div>
+                              <div className="mono mt-1 break-words text-xs text-zinc-300" title={ev.target_user}>{ev.target_user ?? '—'}</div>
+                            </div>
+                            <div className="min-w-0">
+                              <div className="mono text-[10px] uppercase tracking-widest text-zinc-500">Machine</div>
+                              <div className="mono mt-1 break-words text-xs text-zinc-300" title={ev.machine}>{ev.machine ?? '—'}</div>
+                            </div>
+                          </div>
+                          <div className="mt-3 min-w-0 rounded bg-[#0f0f17] px-2.5 py-2">
+                            <div className="mono text-[10px] uppercase tracking-widest text-zinc-500">Datasource</div>
+                            <div className="mono mt-1 break-all text-xs leading-relaxed text-zinc-400" title={ev.datasource_path}>{ev.datasource_path ?? '—'}</div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               )}
