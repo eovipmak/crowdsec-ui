@@ -25,6 +25,10 @@ async def check_allowlist(request: Request, ip: str):
         _logger.warning("cscli allowlists check failed: %s", result.stderr.decode(errors="replace")[:500])
         return operation_error(ALLOWLISTS_CHECK, code)
 
+    # `cscli allowlists check` exits 0 for both outcomes and prints the verdict
+    # as text: "… is allowlisted by item …" (matched) vs "… is not allowlisted"
+    # (not matched). The word "found" never appears, so match the "allowlisted"
+    # phrasing while excluding its negation (issue #1).
     text = result.stdout.decode(errors="replace").lower()
-    matched = "found" in text
+    matched = "allowlisted" in text and "not allowlisted" not in text
     return success(ALLOWLISTS_CHECK, {"matched": matched})

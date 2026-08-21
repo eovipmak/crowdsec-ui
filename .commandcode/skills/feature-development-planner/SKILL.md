@@ -37,7 +37,7 @@ Create an implementation-ready plan without changing source code. Supports two m
 - Prefer existing project patterns over new abstractions.
 - Keep scope lean and explicitly exclude unrelated infrastructure.
 - Explicitly exclude CI/CD, unit tests, testing infrastructure, and monitoring/observability (Grafana/Prometheus/logging platforms, alerting) unless the user explicitly requests them. Do not add pipeline files, test scaffolding, or dashboards to the plan.
-- Do not plan feature development for the following crowdsec (cscli) commands: appsec-rules, appsec-configs, config, setup, support, hubtest, completion, simulation.
+- Do not plan feature development for the following crowdsec (cscli) commands: appsec-rules, appsec-configs, config, setup, support, hubtest, completion, simulation, versions, explain.
 - **Default behavior:** When invoked without arguments, immediately research the repository and write the ranked proposal; do not pause for clarification or selection unless explicitly requested.
 - If requirements are materially ambiguous in explicit mode, ask focused questions; otherwise proceed with documented assumptions.
 - After writing, reread the plan and check that every requirement maps to a task and acceptance criterion.

@@ -211,8 +211,10 @@ Request-level error (HTTP 400 — invalid component or query):
   percent-encoding of a CIDR's `/` as `%2F` (e.g. `1.2.3.0/24` →
   `1.2.3.0%2F24`) so the path parameter resolves correctly.
 - **`allowlists.check`** returns `{"matched": bool}`. `cscli` is run
-  WITHOUT `-o json`; `matched` is `true` when the substring `"found"` appears
-  in the lowercased stdout.
+  WITHOUT `-o json`; `matched` is `true` when the lowercased stdout contains
+  the `"allowlisted"` phrasing but NOT `"not allowlisted"` (cscli prints
+  `"… is allowlisted by item …"` for a hit vs `"… is not allowlisted"` for a
+  miss; the literal `"found"` never appears).
 - **`status.lapi`** returns `{"healthy": bool}`. `cscli` is run WITHOUT
   `-o json`; `healthy` is `true` when the substring `"successfully interact"`
   appears in the lowercased stdout.

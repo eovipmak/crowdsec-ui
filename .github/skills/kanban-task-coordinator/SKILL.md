@@ -42,19 +42,19 @@ Persist completion in the kanban plan by adding this exact block to the task fil
 - Commit or artifact reference: <reference, or `working tree`>
 ```
 
-Treat `Status: completed` as authoritative only when the block is complete and the referenced artifacts still exist. Never mark a task completed merely from an agent’s claim. If later changes invalidate the evidence, remove or change the marker and re-open the task. Preserve all existing task content when updating the marker.
+Treat `Status: completed` as authoritative only when the block is complete and the referenced artifacts still exist. Never mark a task completed merely from an agent's claim. If later changes invalidate the evidence, remove or change the marker and re-open the task. Preserve all existing task content when updating the marker.
 
 ## Phase 1 — Inspect and validate
 
 1. Read `AGENTS.md` and the complete target directory.
 2. List all `task-*.md` files and sort by numeric task number.
-3. Read each task’s coordinator status block first. Exclude tasks marked `completed` with valid evidence from delegation, implementation review, and verification; include them in the dependency graph as satisfied prerequisites and report them as skipped/already completed.
+3. Read each task's coordinator status block first. Exclude tasks marked `completed` with valid evidence from delegation, implementation review, and verification; include them in the dependency graph as satisfied prerequisites and report them as skipped/already completed.
 4. Validate every task without a valid completion marker contains objective, prerequisites, owner, files/artifacts, implementation steps, contracts, acceptance criteria, verification, reviewer, and out-of-scope sections.
-5. Build a dependency graph from each task’s prerequisites. Treat missing, cyclic, or ambiguous dependencies as blockers and report them before delegation.
+5. Build a dependency graph from each task's prerequisites. Treat missing, cyclic, or ambiguous dependencies as blockers and report them before delegation.
 6. Inspect repository status and relevant files before assigning work. Preserve existing uncommitted changes.
 7. Group remaining tasks into dependency waves. Only tasks with completed prerequisites may be delegated.
 
-When a task passes review and verification, immediately append or update its completion marker before moving to the next task. On subsequent runs, recheck only the marker’s referenced artifacts and any tasks that depend on changed or invalidated work; do not repeat the full task review for valid completed markers.
+When a task passes review and verification, immediately append or update its completion marker before moving to the next task. On subsequent runs, recheck only the marker's referenced artifacts and any tasks that depend on changed or invalidated work; do not repeat the full task review for valid completed markers.
 
 ## Phase 2 — Assign work
 
@@ -82,7 +82,7 @@ Collect results from each parallel agent result as they return:
 2. Check acceptance criteria and scope boundaries from each task file.
 3. Run relevant formatter, lint, typecheck, build, or focused verification commands for each task. Do not invent commands when none exist; report that verification is unavailable.
 4. If incomplete or incorrect, delegate a focused follow-up to the same domain using `DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)`.
-5. Mark a task complete only after implementation and verification satisfy its acceptance criteria. Keep it blocked/in progress when evidence is incomplete.
+5. Mark a task complete only after implementation and verification satisfy its acceptance criteria. Keep it blocked in progress when evidence is incomplete.
 6. Continue through ready dependency waves until all executable tasks are complete or explicitly blocked, while never exceeding the concurrency limit.
 
 **Concurrency stop:** Never exceed 3 in-flight delegated tasks. After a result is reviewed, a new ready task may replace it in the same run when it is safe and context remains manageable. Stop only when no ready task remains or context would be exceeded; list any next ready task(s) for the next invocation.
@@ -94,8 +94,8 @@ Use a durable task ledger only when persistence, dependency edges, or ownership 
 - Never delegate with another model; the required execution model is always `DeepSeek-V4-Flash-0731 (Fast High-Output) (customendpoint)`.
 - Never create arbitrary shell execution, bypass authentication, weaken permissions, or ignore task acceptance criteria.
 - Never overwrite unfamiliar user changes, delete files, reset branches, commit, push, or alter shared infrastructure without explicit approval.
-- Preserve the original plan’s exclusions. If a missing requirement is discovered, stop the affected task and create a clearly reported follow-up instead of silently expanding scope.
-- Do not claim completion based solely on an agent’s message; inspect the repository and verify it.
+- Preserve the original plan's exclusions. If a missing requirement is discovered, stop the affected task and create a clearly reported follow-up instead of silently expanding scope.
+- Do not claim completion based solely on an agent's message; inspect the repository and verify it.
 
 ## Completion report
 
